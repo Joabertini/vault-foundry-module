@@ -1,0 +1,415 @@
+{{!-- Bertini's Vault — Character Creator Template --}}
+<div class="vault-app">
+
+  {{!-- Header --}}
+  <div class="vault-header">
+    <h2>VAULT</h2>
+    <div class="vault-subtitle">D&D 5e 2014 · Creador de Personaje</div>
+  </div>
+
+  {{!-- Progress --}}
+  <div class="vault-progress">
+    {{#times 9}}
+    <div class="vault-progress-dot" data-step="{{this}}"></div>
+    {{/times}}
+  </div>
+
+  {{!-- Scrollable body --}}
+  <div class="vault-body">
+
+    {{!-- ── PASO 1: DATOS BÁSICOS ── --}}
+    <div class="vault-step active" id="vault-step-1">
+      <div class="vault-step-header">
+        <div class="vault-step-num">PASO 01 / 09</div>
+        <div class="vault-step-title">Datos Básicos</div>
+        <div class="vault-step-desc">Identificá a tu aventurero.</div>
+      </div>
+      <div class="vault-field">
+        <label>Nombre del personaje <span class="req">*</span></label>
+        <input type="text" id="vault-char-name" placeholder="Ej: Donatello, Gritko, Seraphina…">
+      </div>
+      <div class="vault-field">
+        <label>Nombre del jugador <span class="req">*</span></label>
+        <input type="text" id="vault-player-name" placeholder="Tu nombre">
+      </div>
+      <div class="vault-field">
+        <label>Nivel inicial <span class="req">*</span></label>
+        <select id="vault-level">
+          <option value="">— elegí un nivel —</option>
+          {{#each (range 1 21)}}
+          <option value="{{this}}">Nivel {{this}}</option>
+          {{/each}}
+        </select>
+      </div>
+      <div class="vault-field">
+        <label>Alineamiento</label>
+        <select id="vault-alignment">
+          <option value="Sin definir">Sin definir</option>
+          <option value="Legal Bueno">Legal Bueno</option>
+          <option value="Neutral Bueno">Neutral Bueno</option>
+          <option value="Caótico Bueno">Caótico Bueno</option>
+          <option value="Legal Neutral">Legal Neutral</option>
+          <option value="Neutral Verdadero">Neutral Verdadero</option>
+          <option value="Caótico Neutral">Caótico Neutral</option>
+          <option value="Legal Malvado">Legal Malvado</option>
+          <option value="Neutral Malvado">Neutral Malvado</option>
+          <option value="Caótico Malvado">Caótico Malvado</option>
+        </select>
+      </div>
+    </div>
+
+    {{!-- ── PASO 2: CLASE ── --}}
+    <div class="vault-step" id="vault-step-2">
+      <div class="vault-step-header">
+        <div class="vault-step-num">PASO 02 / 09</div>
+        <div class="vault-step-title">Clase y Subclase</div>
+        <div class="vault-step-desc">Tu clase define la mayoría de tus capacidades.</div>
+      </div>
+      <div class="vault-field">
+        <label>Clase <span class="req">*</span></label>
+        <div class="vault-options-grid">
+          {{#each (array "Bárbaro" "Bardo" "Clérigo" "Druida" "Explorador" "Guerrero" "Hechicero" "Mago" "Monje" "Paladín" "Pícaro" "Brujo" "Artífice")}}
+          <label class="vault-opt"><input type="radio" name="cls" value="{{this}}"> {{this}}</label>
+          {{/each}}
+        </div>
+      </div>
+      <div id="vault-subclass-field" class="vault-field" style="display:none">
+        <label>Subclase</label>
+        <select id="vault-subclass"></select>
+        <div style="font-size:11px;color:#4a4a38;margin-top:5px">Si todavía no corresponde por nivel, elegí "Sin subclase aún".</div>
+      </div>
+    </div>
+
+    {{!-- ── PASO 3: RAZA ── --}}
+    <div class="vault-step" id="vault-step-3">
+      <div class="vault-step-header">
+        <div class="vault-step-num">PASO 03 / 09</div>
+        <div class="vault-step-title">Raza / Especie</div>
+        <div class="vault-step-desc">Tu raza otorga rasgos, velocidad e idiomas.</div>
+      </div>
+      <div class="vault-field">
+        <label>Raza <span class="req">*</span></label>
+        <div class="vault-options-grid">
+          {{#each (array "Humano" "Elfo" "Semi-elfo" "Enano" "Mediano" "Semiorco" "Gnomo" "Tiefling" "Dracónido" "Aasimar" "Tortle" "Firbolg" "Harengon" "Tabaxi" "Genasi" "Goliath" "Kenku" "Githyanki" "Githzerai" "Leonin" "Satyr" "Fairy" "Owlfolk" "Rabbitfolk")}}
+          <label class="vault-opt"><input type="radio" name="race" value="{{this}}"> {{this}}</label>
+          {{/each}}
+        </div>
+      </div>
+      <div id="vault-subrace-field" class="vault-field" style="display:none">
+        <label>Variante / Subraza</label>
+        <select id="vault-subrace"></select>
+      </div>
+    </div>
+
+    {{!-- ── PASO 4: TRASFONDO ── --}}
+    <div class="vault-step" id="vault-step-4">
+      <div class="vault-step-header">
+        <div class="vault-step-num">PASO 04 / 09</div>
+        <div class="vault-step-title">Trasfondo</div>
+        <div class="vault-step-desc">El trasfondo otorga proficiencias y en algunos casos una feat automática.</div>
+      </div>
+      <div class="vault-field">
+        <label>Trasfondo <span class="req">*</span></label>
+        <select id="vault-background">
+          <option value="">— elegí un trasfondo —</option>
+          <optgroup label="Player's Handbook">
+            <option value="Acólito">Acólito</option>
+            <option value="Charlatán">Charlatán</option>
+            <option value="Criminal">Criminal</option>
+            <option value="Entretenido">Entretenido</option>
+            <option value="Héroe del Pueblo">Héroe del Pueblo</option>
+            <option value="Artesano de Gremio">Artesano de Gremio</option>
+            <option value="Ermitaño">Ermitaño</option>
+            <option value="Noble">Noble</option>
+            <option value="Forastero">Forastero</option>
+            <option value="Erudito">Erudito</option>
+            <option value="Marinero">Marinero</option>
+            <option value="Soldado">Soldado</option>
+            <option value="Urchin">Urchin</option>
+          </optgroup>
+          <optgroup label="Sword Coast Adventurer's Guide">
+            <option value="City Watch">City Watch</option>
+            <option value="Clan Crafter">Clan Crafter</option>
+            <option value="Cloistered Scholar">Cloistered Scholar</option>
+            <option value="Courtier">Courtier</option>
+            <option value="Faction Agent">Faction Agent</option>
+            <option value="Far Traveler">Far Traveler</option>
+            <option value="Inheritor">Inheritor</option>
+            <option value="Mercenary Veteran">Mercenary Veteran</option>
+            <option value="Urban Bounty Hunter">Urban Bounty Hunter</option>
+          </optgroup>
+          <optgroup label="Strixhaven">
+            <option value="Lorehold Student" data-feat="Strixhaven Initiate (Lorehold)">Lorehold Student</option>
+            <option value="Prismari Student" data-feat="Strixhaven Initiate (Prismari)">Prismari Student</option>
+            <option value="Quandrix Student" data-feat="Strixhaven Initiate (Quandrix)">Quandrix Student</option>
+            <option value="Silverquill Student" data-feat="Strixhaven Initiate (Silverquill)">Silverquill Student</option>
+            <option value="Witherbloom Student" data-feat="Strixhaven Initiate (Witherbloom)">Witherbloom Student</option>
+          </optgroup>
+          <optgroup label="Dragonlance">
+            <option value="Knight of Solamnia" data-feat="Squire of Solamnia">Knight of Solamnia</option>
+            <option value="Mage of High Sorcery" data-feat="Initiate of High Sorcery">Mage of High Sorcery</option>
+          </optgroup>
+          <optgroup label="Otros suplementos">
+            <option value="Wildspacer" data-feat="Tough">Wildspacer</option>
+            <option value="Gate Crasher" data-feat="Tavern Brawler">Gate Crasher</option>
+            <option value="Giant Foundling" data-feat="Strike of the Giants">Giant Foundling</option>
+            <option value="Runecrafter" data-feat="Rune Shaper">Runecrafter</option>
+          </optgroup>
+          <optgroup label="Otro">
+            <option value="Otro (personalizado)">Otro — especificá abajo</option>
+          </optgroup>
+        </select>
+      </div>
+      <div id="vault-bg-feat-auto"></div>
+      <div id="vault-bg-feat-custom" class="vault-field" style="display:none">
+        <label>Feat del trasfondo personalizado</label>
+        <input type="text" id="vault-bg-feat-custom-input" placeholder="Nombre de la feat">
+      </div>
+    </div>
+
+    {{!-- ── PASO 5: ATRIBUTOS ── --}}
+    <div class="vault-step" id="vault-step-5">
+      <div class="vault-step-header">
+        <div class="vault-step-num">PASO 05 / 09</div>
+        <div class="vault-step-title">Atributos</div>
+        <div class="vault-step-desc">Elegí el método acordado con tu DM.</div>
+      </div>
+      <div class="vault-tabs">
+        <button class="vault-tab active" data-method="roll">🎲 Tiradas</button>
+        <button class="vault-tab" data-method="array">📋 Standard Array</button>
+        <button class="vault-tab" data-method="pb">⚖️ Point Buy</button>
+        <button class="vault-tab" data-method="manual">✏️ Manual</button>
+      </div>
+
+      {{!-- Tiradas: 3 sets --}}
+      <div class="vault-panel active" id="vault-panel-roll">
+        <p class="vault-assign-hint" style="margin-bottom:12px">Un solo click genera 3 sets. Elegís uno — los otros se deshabilitan. Sin más tiradas.</p>
+        <button id="vault-roll-btn" style="margin-bottom:14px;padding:8px 16px;background:rgba(90,58,138,.2);border:1px solid #5a3a8a;color:#c09af0;font-family:inherit;cursor:pointer;border-radius:6px;font-size:12px;letter-spacing:2px;">🎲 TIRAR LOS 3 SETS</button>
+
+        {{#each (array 0 1 2)}}
+        <div class="vault-roll-set" id="vault-roll-set-{{this}}">
+          <div class="vault-roll-set-header">
+            <span class="vault-set-label">SET {{lookup (array "A" "B" "C") @index}}</span>
+            <span class="vault-set-total" id="vault-set-sum-{{this}}"></span>
+            <button class="vault-btn-choose-set" id="vault-choose-set-{{this}}" data-set="{{this}}" style="display:none">ELEGIR</button>
+          </div>
+          <div class="vault-roll-dice-row" id="vault-set-dice-{{this}}"></div>
+        </div>
+        {{/each}}
+
+        <div id="vault-assign-section" style="display:none">
+          <p class="vault-assign-hint">Hacé clic en un dado del set elegido → luego en el stat:</p>
+          <div class="vault-stats-grid">
+            {{#each (array "str" "dex" "con" "int" "wis" "cha")}}
+            <div class="vault-stat-field">
+              <label>{{uppercase this}}</label>
+              <input type="number" class="vault-stat-input" data-stat="{{this}}" min="1" max="30" placeholder="—" readonly>
+              <div class="vault-stat-mod" data-stat="{{this}}"></div>
+            </div>
+            {{/each}}
+          </div>
+        </div>
+      </div>
+
+      {{!-- Standard Array --}}
+      <div class="vault-panel" id="vault-panel-array">
+        <p class="vault-assign-hint">15, 14, 13, 12, 10, 8 — hacé clic en un valor y luego en el stat.</p>
+        <div class="vault-array-row">
+          {{#each (array 15 14 13 12 10 8)}}
+          <div class="vault-array-chip" data-val="{{this}}">{{this}}</div>
+          {{/each}}
+        </div>
+        <div class="vault-stats-grid">
+          {{#each (array "str" "dex" "con" "int" "wis" "cha")}}
+          <div class="vault-stat-field">
+            <label>{{uppercase this}}</label>
+            <input type="number" class="vault-arr-stat-input" data-stat="{{this}}" min="1" max="30" placeholder="—" readonly>
+            <div class="vault-arr-stat-mod" data-stat="{{this}}"></div>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+
+      {{!-- Point Buy --}}
+      <div class="vault-panel" id="vault-panel-pb">
+        <div class="vault-pb-total" id="vault-pb-total">Puntos disponibles: <b>27</b> / 27</div>
+        <div class="vault-pb-grid">
+          {{#each (array "str" "dex" "con" "int" "wis" "cha")}}
+          <div class="vault-pb-field">
+            <label>{{uppercase this}}</label>
+            <div class="vault-pb-controls">
+              <button class="vault-pb-btn" data-stat="{{this}}" data-delta="-1">−</button>
+              <div class="vault-pb-val" id="vault-pb-val-{{this}}">8</div>
+              <button class="vault-pb-btn" data-stat="{{this}}" data-delta="1">+</button>
+            </div>
+            <div class="vault-pb-mod" id="vault-pb-mod-{{this}}">−1</div>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+
+      {{!-- Manual --}}
+      <div class="vault-panel" id="vault-panel-manual">
+        <p class="vault-assign-hint">Ingresá los valores FINALES (ya con bonos raciales aplicados).</p>
+        <div class="vault-stats-grid">
+          {{#each (array "str" "dex" "con" "int" "wis" "cha")}}
+          <div class="vault-stat-field">
+            <label>{{uppercase this}}</label>
+            <input type="number" class="vault-stat-manual" data-stat="{{this}}" min="1" max="30" placeholder="—">
+            <div class="vault-manual-mod" data-stat="{{this}}"></div>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+
+      {{!-- Hidden inputs to hold final stats --}}
+      {{#each (array "str" "dex" "con" "int" "wis" "cha")}}
+      <input type="hidden" class="vault-stat-input" data-stat="{{this}}" value="10">
+      {{/each}}
+    </div>
+
+    {{!-- ── PASO 6: FEATS ── --}}
+    <div class="vault-step" id="vault-step-6">
+      <div class="vault-step-header">
+        <div class="vault-step-num">PASO 06 / 09</div>
+        <div class="vault-step-title">Feats</div>
+        <div class="vault-step-desc">Las feats dependen del nivel y de las reglas acordadas con el DM.</div>
+      </div>
+      <div class="vault-info" id="vault-feat-info"></div>
+      <div class="vault-field">
+        <label>¿El DM te regala una feat sin prerequisitos?</label>
+        <div class="vault-options-grid" style="grid-template-columns:1fr 1fr">
+          <label class="vault-opt"><input type="radio" name="dmfeat" value="si"> Sí</label>
+          <label class="vault-opt selected"><input type="radio" name="dmfeat" value="no" checked> No</label>
+        </div>
+      </div>
+      <div id="vault-dmfeat-field" class="vault-field" style="display:none">
+        <label>Feat gratuita del DM (sin prerequisitos)</label>
+        <select id="vault-dmfeat-select">
+          <option value="">— elegí —</option>
+          {{!-- Populated from FEATS_NO_PREREQ in activateListeners --}}
+        </select>
+      </div>
+      <div id="vault-level-feats-section" style="display:none">
+        <div class="vault-field">
+          <label>Feats de nivel (ASI convertida en feat)</label>
+          <div id="vault-level-feat-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    {{!-- ── PASO 7: CONJUROS Y HABILIDADES ── --}}
+    <div class="vault-step" id="vault-step-7">
+      <div class="vault-step-header">
+        <div class="vault-step-num">PASO 07 / 09</div>
+        <div class="vault-step-title">Conjuros y Habilidades</div>
+        <div class="vault-step-desc">Listá los cantrips, conjuros preparados y habilidades especiales de clase.</div>
+      </div>
+      <div class="vault-field">
+        <label>Cantrips (uno por línea)</label>
+        <textarea id="vault-cantrips" placeholder="Shillelagh&#10;Toll the Dead&#10;Chill Touch"></textarea>
+      </div>
+      <div class="vault-field">
+        <label>Conjuros preparados / conocidos</label>
+        <textarea id="vault-spells" placeholder="Nv1: Hex&#10;Nv1: Entangle&#10;Nv2: Misty Step&#10;Nv2: Spike Growth"></textarea>
+      </div>
+      <div class="vault-field">
+        <label>Habilidades especiales de clase/subclase</label>
+        <textarea id="vault-features" placeholder="Entidad Simbiótica&#10;Halo de Esporas&#10;Action Surge&#10;Bardic Inspiration"></textarea>
+      </div>
+    </div>
+
+    {{!-- ── PASO 8: EQUIPO ── --}}
+    <div class="vault-step" id="vault-step-8">
+      <div class="vault-step-header">
+        <div class="vault-step-num">PASO 08 / 09</div>
+        <div class="vault-step-title">Equipo de Combate</div>
+        <div class="vault-step-desc">Solo se muestran opciones compatibles con las proficiencias de tu clase.</div>
+      </div>
+      <div class="vault-equip-group">
+        <div class="vault-equip-title">ARMADURA</div>
+        <div class="vault-options-grid" id="vault-armor-grid"></div>
+      </div>
+      <div class="vault-equip-group">
+        <div class="vault-equip-title">ESCUDO</div>
+        <div class="vault-options-grid" style="grid-template-columns:1fr 1fr">
+          <label class="vault-opt" id="vault-shield-yes"><input type="radio" name="shield" value="Sí (+2 CA)"> Sí (+2 CA)</label>
+          <label class="vault-opt selected"><input type="radio" name="shield" value="No" checked> No</label>
+        </div>
+      </div>
+      <div class="vault-equip-group">
+        <div class="vault-equip-title">ARMA PRINCIPAL</div>
+        <div class="vault-options-grid" id="vault-weapon-grid"></div>
+        <div class="vault-field" style="margin-top:8px">
+          <label>O especificá manualmente:</label>
+          <input type="text" id="vault-weapon-custom" placeholder="Ej: Quarterstaff con Shillelagh, Longsword +1…">
+        </div>
+      </div>
+      <div class="vault-field">
+        <label>Notas adicionales (items mágicos, equipo especial)</label>
+        <textarea id="vault-notes" placeholder="Ring of Protection +1&#10;Driftglobe&#10;Bag of Holding"></textarea>
+      </div>
+    </div>
+
+    {{!-- ── PASO 9: PERSONALIDAD + CREAR ── --}}
+    <div class="vault-step" id="vault-step-9">
+      <div class="vault-step-header">
+        <div class="vault-step-num">PASO 09 / 09</div>
+        <div class="vault-step-title">Personalidad</div>
+        <div class="vault-step-desc">Opcional — y luego creamos el personaje directamente en Foundry.</div>
+      </div>
+      <div class="vault-field">
+        <label>Rasgo de personalidad</label>
+        <textarea id="vault-trait" rows="2" placeholder="Ej: Me río en situaciones peligrosas cuando los demás se asustan."></textarea>
+      </div>
+      <div class="vault-field">
+        <label>Ideal</label>
+        <input type="text" id="vault-ideal" placeholder="Ej: La libertad. Las cadenas son para romperse.">
+      </div>
+      <div class="vault-field">
+        <label>Vínculo</label>
+        <input type="text" id="vault-bond" placeholder="Ej: Debo proteger mi aldea de los males del pasado.">
+      </div>
+      <div class="vault-field">
+        <label>Defecto</label>
+        <input type="text" id="vault-flaw" placeholder="Ej: Una vez comprometido, ignoro todo lo demás.">
+      </div>
+    </div>
+
+    {{!-- ── ESTADOS DE CREACIÓN ── --}}
+    <div id="vault-creating" style="display:none">
+      <div class="vault-spinner-wrap">
+        <div class="vault-spinner"></div>
+        <div class="vault-spinner-text">Creando personaje en Foundry…</div>
+      </div>
+    </div>
+
+    <div id="vault-success" style="display:none">
+      <div class="vault-result">
+        <div class="vault-result-icon">⚔</div>
+        <div class="vault-result-title">¡PERSONAJE CREADO!</div>
+        <div class="vault-result-sub">
+          <strong id="vault-created-name"></strong> fue agregado al directorio de actores.<br>
+          Podés abrir su hoja ahora o cerrar esta ventana.
+        </div>
+        <button class="vault-btn-open">Abrir Hoja de Personaje</button>
+      </div>
+    </div>
+
+    <div id="vault-error" style="display:none">
+      <div class="vault-error">
+        <strong>Error al crear el personaje:</strong><br>
+        <span id="vault-error-msg"></span>
+      </div>
+    </div>
+
+  </div>{{!-- /vault-body --}}
+
+  {{!-- Footer nav --}}
+  <div class="vault-footer">
+    <button class="vault-btn vault-btn-back">← ATRÁS</button>
+    <button class="vault-btn vault-btn-next">SIGUIENTE →</button>
+    <button class="vault-btn vault-btn-create" style="display:none">✦ CREAR EN FOUNDRY</button>
+  </div>
+
+</div>{{!-- /vault-app --}}

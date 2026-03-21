@@ -1,0 +1,38 @@
+{
+  "id": "bertinis-vault",
+  "title": "Bertini's Vault — Character Importer",
+  "description": "Character creation and import tool for D&D 5e 2014. Creates fully populated actors directly inside Foundry VTT from a step-by-step character builder, including class, subclass, race, stats, spells, equipment, and features. Compatible with dnd5e system 5.x.",
+  "version": "0.1.0",
+  "authors": [
+    {
+      "name": "Bertini's Vault",
+      "discord": "",
+      "url": ""
+    }
+  ],
+  "compatibility": {
+    "minimum": "12",
+    "verified": "13"
+  },
+  "system": ["dnd5e"],
+  "esmodules": ["scripts/vault.js"],
+  "styles": ["styles/vault.css"],
+  "languages": [
+    {
+      "lang": "es",
+      "name": "Español",
+      "path": "lang/es.json"
+    },
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "url": "https://github.com/Joabertini/vault-foundry-module",
+  "manifest": "https://raw.githubusercontent.com/Joabertini/vault-foundry-module/main/module.json",
+  "download": "https://github.com/Joabertini/vault-foundry-module/releases/latest/download/bertinis-vault.zip",
+  "bugs": "https://github.com/Joabertini/vault-foundry-module/issues",
+  "readme": "https://github.com/Joabertini/vault-foundry-module/blob/main/README.md",
+  "changelog": "https://github.com/Joabertini/vault-foundry-module/blob/main/CHANGELOG.md"
+}

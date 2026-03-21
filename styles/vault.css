@@ -1,0 +1,509 @@
+/* ============================================================
+   Bertini's Vault — Character Creator Module
+   Styles for the Application window inside Foundry VTT
+   ============================================================ */
+
+/* ── Window override ── */
+#vault-creator .window-content {
+  padding: 0;
+  overflow: hidden;
+  background: #0d0d0f;
+}
+
+/* ── Main container ── */
+.vault-app {
+  font-family: 'Georgia', serif;
+  background: #0d0d0f;
+  color: #e8e4d0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Header ── */
+.vault-header {
+  background: linear-gradient(180deg, #13131a 0%, #0d0d0f 100%);
+  border-bottom: 1px solid #3a3018;
+  padding: 14px 20px 12px;
+  flex-shrink: 0;
+}
+.vault-header h2 {
+  font-family: 'Cinzel Decorative', 'Palatino Linotype', serif;
+  font-size: 18px;
+  color: #c9a84c;
+  letter-spacing: 3px;
+  margin: 0 0 2px;
+  border: none;
+  text-shadow: 0 0 20px rgba(201,168,76,0.2);
+}
+.vault-header .vault-subtitle {
+  font-size: 11px;
+  color: #5a5a42;
+  letter-spacing: 2px;
+}
+
+/* ── Progress bar ── */
+.vault-progress {
+  display: flex;
+  gap: 4px;
+  padding: 10px 20px 0;
+  background: #0d0d0f;
+  flex-shrink: 0;
+}
+.vault-progress-dot {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: #2a2a3a;
+  transition: background 0.3s, transform 0.3s;
+}
+.vault-progress-dot.active {
+  background: #c9a84c;
+  transform: scaleY(1.6);
+}
+.vault-progress-dot.done {
+  background: #1a6655;
+}
+
+/* ── Scrollable body ── */
+.vault-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px;
+  scrollbar-width: thin;
+  scrollbar-color: #3a3018 transparent;
+}
+.vault-body::-webkit-scrollbar { width: 6px; }
+.vault-body::-webkit-scrollbar-track { background: transparent; }
+.vault-body::-webkit-scrollbar-thumb { background: #3a3018; border-radius: 3px; }
+
+/* ── Step sections ── */
+.vault-step { display: none; }
+.vault-step.active { display: block; animation: vaultFadeIn 0.2s ease; }
+@keyframes vaultFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.vault-step-header { margin-bottom: 18px; }
+.vault-step-num {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: #4a4a38;
+  margin-bottom: 3px;
+}
+.vault-step-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 16px;
+  color: #c9a84c;
+  font-weight: 600;
+}
+.vault-step-desc {
+  font-size: 12px;
+  color: #8a8470;
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+/* ── Form fields ── */
+.vault-field { margin-bottom: 16px; }
+.vault-field label {
+  display: block;
+  font-size: 12px;
+  color: #8a8470;
+  margin-bottom: 5px;
+  letter-spacing: 0.3px;
+}
+.vault-field label .req { color: #c9a84c; margin-left: 3px; }
+
+.vault-field input[type="text"],
+.vault-field input[type="number"],
+.vault-field textarea,
+.vault-field select {
+  width: 100%;
+  background: #181820;
+  border: 1px solid #2a2a3a;
+  color: #e8e4d0;
+  font-family: 'Georgia', serif;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.vault-field input:focus,
+.vault-field textarea:focus,
+.vault-field select:focus {
+  border-color: #5a3a8a;
+  box-shadow: 0 0 0 2px rgba(90,58,138,0.2);
+}
+.vault-field textarea {
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.5;
+}
+.vault-field select option { background: #181820; }
+
+/* ── Options grid (radio/checkbox) ── */
+.vault-options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 6px;
+}
+.vault-opt {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  background: #13131a;
+  border: 1px solid #2a2a3a;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: border-color 0.15s, background 0.15s;
+  user-select: none;
+}
+.vault-opt:hover { border-color: #7a5f28; background: rgba(201,168,76,0.04); }
+.vault-opt.selected { border-color: #7a5f28; background: rgba(201,168,76,0.06); }
+.vault-opt input {
+  width: 14px;
+  height: 14px;
+  accent-color: #c9a84c;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ── Stats grid ── */
+.vault-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.vault-stat-field { text-align: center; }
+.vault-stat-field label {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #8a8470;
+  display: block;
+  margin-bottom: 4px;
+}
+.vault-stat-field input {
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 8px 4px;
+}
+.vault-stat-mod {
+  font-size: 11px;
+  color: #7ecfb8;
+  text-align: center;
+  margin-top: 3px;
+  min-height: 14px;
+  font-family: 'Cinzel Decorative', serif;
+}
+
+/* ── 3 sets dice roller ── */
+.vault-roll-set {
+  margin-bottom: 14px;
+  border: 1px solid #2a2a3a;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+.vault-roll-set.chosen { border-color: #7a5f28; background: rgba(201,168,76,0.03); }
+.vault-roll-set.disabled { opacity: 0.3; pointer-events: none; }
+.vault-roll-set-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid #2a2a3a;
+}
+.vault-set-label {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: #7a5f28;
+}
+.vault-set-total { font-size: 12px; color: #8a8470; }
+.vault-set-sum { font-size: 12px; color: #c9a84c; font-weight: bold; margin-left: 4px; }
+.vault-roll-dice-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 5px;
+  padding: 8px;
+}
+.vault-die {
+  background: #13131a;
+  border: 1px solid #2a2a3a;
+  border-radius: 6px;
+  padding: 6px 4px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.vault-die:hover { border-color: #7a5f28; }
+.vault-die.used { border-color: #1a6655; background: rgba(26,102,85,0.15); }
+.vault-die.selected { outline: 2px solid #c9a84c; }
+.vault-die .die-val { font-size: 18px; font-weight: bold; color: #c9a84c; display: block; }
+.vault-die .die-sub { font-size: 9px; color: #4a4a38; display: block; margin-top: 1px; }
+.vault-die .die-stat { font-size: 9px; color: #7ecfb8; display: block; }
+.btn-choose-set {
+  margin-left: auto;
+  padding: 4px 10px;
+  background: rgba(201,168,76,0.1);
+  border: 1px solid #7a5f28;
+  color: #c9a84c;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 9px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: none;
+}
+.btn-choose-set:hover { background: rgba(201,168,76,0.2); }
+.btn-choose-set.chosen-mark { background: rgba(26,102,85,0.2); border-color: #1a6655; color: #7ecfb8; }
+
+/* ── Point buy ── */
+.vault-pb-total {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 13px;
+  color: #c9a84c;
+  text-align: center;
+  padding: 8px;
+  background: #13131a;
+  border: 1px solid #3a3018;
+  border-radius: 6px;
+  margin-bottom: 14px;
+}
+.vault-pb-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.vault-pb-field { text-align: center; }
+.vault-pb-field label {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #8a8470;
+  display: block;
+  margin-bottom: 5px;
+}
+.vault-pb-controls { display: flex; align-items: center; justify-content: center; gap: 6px; }
+.vault-pb-btn {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: #13131a;
+  border: 1px solid #2a2a3a;
+  color: #8a8470;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+}
+.vault-pb-btn:hover { border-color: #7a5f28; color: #c9a84c; }
+.vault-pb-val { font-size: 20px; font-weight: bold; color: #c9a84c; min-width: 36px; text-align: center; }
+.vault-pb-mod { font-size: 11px; color: #7ecfb8; text-align: center; margin-top: 2px; font-family: 'Cinzel Decorative', serif; }
+
+/* ── Array chips ── */
+.vault-array-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.vault-array-chip {
+  padding: 6px 12px;
+  background: #13131a;
+  border: 1px solid #2a2a3a;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: bold;
+  color: #c9a84c;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s;
+}
+.vault-array-chip:hover { border-color: #7a5f28; }
+.vault-array-chip.selected { outline: 2px solid #c9a84c; }
+.vault-array-chip.used { opacity: 0.35; cursor: default; }
+
+/* ── Info/hint boxes ── */
+.vault-info {
+  font-size: 12px;
+  color: #7ecfb8;
+  padding: 8px 12px;
+  background: rgba(26,102,85,0.15);
+  border: 1px solid #1a6655;
+  border-radius: 6px;
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+.vault-feat-auto {
+  padding: 8px 12px;
+  background: rgba(201,168,76,0.08);
+  border: 1px solid #3a3018;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #7a5f28;
+  margin-top: 10px;
+  display: none;
+}
+
+/* ── Method tabs ── */
+.vault-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.vault-tab {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  border: 1px solid #2a2a3a;
+  background: #13131a;
+  color: #8a8470;
+  transition: all 0.2s;
+}
+.vault-tab.active { background: rgba(201,168,76,0.15); border-color: #7a5f28; color: #c9a84c; }
+.vault-panel { display: none; }
+.vault-panel.active { display: block; }
+
+/* ── Equipment group ── */
+.vault-equip-group { margin-bottom: 16px; }
+.vault-equip-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #8a8470;
+  margin-bottom: 7px;
+}
+
+/* ── Footer nav ── */
+.vault-footer {
+  display: flex;
+  gap: 8px;
+  padding: 12px 20px;
+  border-top: 1px solid #2a2a3a;
+  background: #0d0d0f;
+  flex-shrink: 0;
+}
+.vault-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid;
+  text-align: center;
+}
+.vault-btn-back { background: transparent; border-color: #2a2a3a; color: #8a8470; }
+.vault-btn-back:hover { border-color: #7a5f28; color: #c9a84c; }
+.vault-btn-next { background: rgba(201,168,76,0.1); border-color: #7a5f28; color: #c9a84c; }
+.vault-btn-next:hover { background: rgba(201,168,76,0.18); border-color: #c9a84c; }
+.vault-btn-create { background: rgba(90,58,138,0.2); border-color: #5a3a8a; color: #c09af0; }
+.vault-btn-create:hover { background: rgba(90,58,138,0.35); }
+
+/* ── Creation result ── */
+.vault-result {
+  text-align: center;
+  padding: 24px 16px;
+}
+.vault-result-icon { font-size: 40px; margin-bottom: 12px; }
+.vault-result-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 16px;
+  color: #c9a84c;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.vault-result-sub { font-size: 13px; color: #8a8470; margin-bottom: 20px; line-height: 1.6; }
+.vault-btn-open {
+  display: inline-block;
+  padding: 10px 24px;
+  background: rgba(26,102,85,0.2);
+  border: 1px solid #1a6655;
+  color: #7ecfb8;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+.vault-btn-open:hover { background: rgba(26,102,85,0.35); }
+
+.vault-error {
+  padding: 14px;
+  background: rgba(192,57,43,0.1);
+  border: 1px solid #922b21;
+  border-radius: 6px;
+  color: #e08080;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* ── Spinner ── */
+.vault-spinner-wrap { text-align: center; padding: 40px 20px; }
+.vault-spinner {
+  width: 40px; height: 40px;
+  border: 2px solid #2a2a3a;
+  border-top-color: #c9a84c;
+  border-radius: 50%;
+  animation: vaultSpin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+@keyframes vaultSpin { to { transform: rotate(360deg); } }
+.vault-spinner-text { font-size: 13px; color: #8a8470; font-style: italic; }
+
+/* ── Dice animation ── */
+@keyframes vaultDiceRoll {
+  0%   { transform: rotate(0deg) scale(1); }
+  25%  { transform: rotate(-12deg) scale(1.15); }
+  50%  { transform: rotate(8deg) scale(0.92); }
+  75%  { transform: rotate(-4deg) scale(1.08); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+.vault-die.rolling { animation: vaultDiceRoll 0.35s ease; }
+
+/* ── Subclass / subrace dropdowns ── */
+#vault-subclass-field,
+#vault-subrace-field { display: none; margin-top: 12px; }
+
+/* ── Background feat highlight ── */
+#vault-bg-feat-auto {
+  display: none;
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: rgba(201,168,76,0.08);
+  border: 1px solid #3a3018;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #c9a84c;
+}
+
+/* ── Roll assign section ── */
+#vault-assign-section { display: none; margin-top: 14px; }
+.vault-assign-hint {
+  font-size: 12px;
+  color: #8a8470;
+  font-style: italic;
+  margin-bottom: 10px;
+}
+
+/* ── Scrollbar for Foundry app ── */
+.vault-app * {
+  scrollbar-width: thin;
+  scrollbar-color: #3a3018 transparent;
+}
