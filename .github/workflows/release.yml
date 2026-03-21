@@ -25,11 +25,10 @@ jobs:
 
       - name: Create release ZIP
         run: |
-          cd ..
-          zip -r bertinis-vault.zip bertinis-vault/ \
-            --exclude "*.git*" \
-            --exclude "*/.github/*" \
-            --exclude "*/node_modules/*"
+          zip -r bertinis-vault.zip . \
+          --exclude "*.git*" \
+          --exclude "*/.github/*" \
+          --exclude "*/node_modules/*"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
