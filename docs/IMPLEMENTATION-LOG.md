@@ -416,3 +416,20 @@ Impacto:
 - empezamos a usar el BFF como fuente de datos real del builder;
 - la integracion con tu stack de Render/5etools ya tiene una ruta concreta;
 - mantenemos estabilidad local aunque la API todavia no este arriba.
+
+### Proxy selectivo hacia 5etools
+
+Se agrego la primera ruta de upstream controlado dentro de `apps/api`.
+
+Ahora incluye:
+
+- `GET /upstream/json?path=...`;
+- validacion de prefijos permitidos;
+- cache en memoria para respuestas del upstream;
+- estado enriquecido en `/upstream/status`.
+
+Impacto:
+
+- el BFF ya puede consultar tu API de Render sin exponer directamente toda la UI al upstream;
+- empezamos a tener una base real para sincronizaciones o lecturas selectivas de 5etools;
+- mantenemos una integracion controlada en vez de llamadas crudas desde frontend.

@@ -1,9 +1,16 @@
 import { createServer } from "node:http";
 import { buildBuilderOptionsPayload } from "./builder-options.js";
 import { createFiveToolsClient } from "./five-tools-client.js";
+import { createUpstreamCache } from "./upstream-cache.js";
 
 const port = Number.parseInt(process.env.PORT ?? "3001", 10);
 const fiveToolsClient = createFiveToolsClient();
+const upstreamCache = createUpstreamCache();
+const allowedUpstreamPrefixes = ["/data/", "/api/"];
+
+function isAllowedUpstreamPath(path: string) {
+  return allowedUpstreamPrefixes.some((prefix) => path.startsWith(prefix));
+}
 
 function sendJson(response: import("node:http").ServerResponse, statusCode: number, payload: unknown) {
   response.writeHead(statusCode, {
@@ -51,8 +58,62 @@ const server = createServer(async (request, response) => {
     sendJson(response, 200, {
       upstream: fiveToolsClient.baseUrl,
       mode: "configured-client",
-      note: "Client scaffold ready; selective proxy routes come next.",
+      note: "Selective upstream proxy enabled via /upstream/json?path=...",
+      allowedPrefixes: allowedUpstreamPrefixes,
+      cache: upstreamCache.stats(),
     });
+    return;
+  }
+
+  if (request.method === "GET" && url.pathname === "/upstream/json") {
+    const upstreamPath = url.searchParams.get("path");
+
+    if (!upstreamPath) {
+      sendJson(response, 400, {
+        error: "Missing required query param: path",
+      });
+      return;
+    }
+
+    if (!isAllowedUpstreamPath(upstreamPath)) {
+      sendJson(response, 400, {
+        error: "Upstream path not allowed",
+        path: upstreamPath,
+        allowedPrefixes: allowedUpstreamPrefixes,
+      });
+      return;
+    }
+
+    const cachedPayload = upstreamCache.get(upstreamPath);
+
+    if (cachedPayload !== undefined) {
+      sendJson(response, 200, {
+        source: "cache",
+        path: upstreamPath,
+        upstream: fiveToolsClient.baseUrl,
+        payload: cachedPayload,
+      });
+      return;
+    }
+
+    try {
+      const payload = await fiveToolsClient.get(upstreamPath);
+      upstreamCache.set(upstreamPath, payload);
+
+      sendJson(response, 200, {
+        source: "upstream",
+        path: upstreamPath,
+        upstream: fiveToolsClient.baseUrl,
+        payload,
+      });
+    } catch (error) {
+      sendJson(response, 502, {
+        error: "Upstream request failed",
+        path: upstreamPath,
+        detail: error instanceof Error ? error.message : "Unknown upstream error",
+      });
+    }
+
     return;
   }
 
