@@ -195,3 +195,18 @@ Impacto:
 - la web ya no solo edita campos visuales;
 - ahora tambien muestra una representacion estructurada del personaje;
 - eso acerca la UI web al `CharacterBuild` que ya usa la arquitectura nueva.
+
+### Ampliacion del builder web
+
+Se agregaron decisiones nuevas al flujo web:
+
+- background;
+- feat destacada;
+- arma principal;
+- proteccion/armor.
+
+Impacto:
+
+- el builder ya se parece mas a un creador real de personaje;
+- el snapshot canonico web ahora incluye mas decisiones relevantes;
+- la siguiente capa natural sera spells, features y una sheet visual mas completa.

@@ -36,10 +36,44 @@ const raceOptions = [
   { value: "aasimar", label: "Aasimar" },
 ];
 
+const backgroundOptions = [
+  { value: "acolyte", label: "Acolyte" },
+  { value: "criminal", label: "Criminal" },
+  { value: "folk-hero", label: "Folk Hero" },
+  { value: "sage", label: "Sage" },
+  { value: "soldier", label: "Soldier" },
+  { value: "wildspacer", label: "Wildspacer" },
+];
+
+const featOptions = [
+  { value: "alert", label: "Alert" },
+  { value: "magic-initiate", label: "Magic Initiate" },
+  { value: "resilient", label: "Resilient" },
+  { value: "telekinetic", label: "Telekinetic" },
+  { value: "war-caster", label: "War Caster" },
+];
+
+const weaponOptions = [
+  { value: "quarterstaff", label: "Quarterstaff" },
+  { value: "dagger", label: "Dagger" },
+  { value: "longsword", label: "Longsword" },
+  { value: "shortbow", label: "Shortbow" },
+  { value: "mace", label: "Mace" },
+];
+
+const armorOptions = [
+  { value: "unarmored", label: "Unarmored" },
+  { value: "mage-armor", label: "Mage Armor" },
+  { value: "leather", label: "Leather Armor" },
+  { value: "chain-mail", label: "Chain Mail" },
+  { value: "shield", label: "Shield" },
+];
+
 const steps = [
   { id: "identity", label: "Identidad" },
   { id: "build", label: "Base" },
   { id: "abilities", label: "Atributos" },
+  { id: "choices", label: "Elecciones" },
   { id: "persona", label: "Persona" },
 ];
 
@@ -200,6 +234,63 @@ export function App() {
 
           {stepIndex === 3 ? (
             <div className="form-grid">
+              <label className="field">
+                <span>Background</span>
+                <select
+                  value={state.backgroundId}
+                  onChange={(event) => updateField("backgroundId", event.target.value)}
+                >
+                  {backgroundOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="field">
+                <span>Feat destacada</span>
+                <select
+                  value={state.featId}
+                  onChange={(event) => updateField("featId", event.target.value)}
+                >
+                  {featOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="field">
+                <span>Arma principal</span>
+                <select
+                  value={state.weaponId}
+                  onChange={(event) => updateField("weaponId", event.target.value)}
+                >
+                  {weaponOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="field">
+                <span>Protección</span>
+                <select
+                  value={state.armorId}
+                  onChange={(event) => updateField("armorId", event.target.value)}
+                >
+                  {armorOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          ) : null}
+
+          {stepIndex === 4 ? (
+            <div className="form-grid">
               <label className="field field-full">
                 <span>Trait</span>
                 <textarea
@@ -268,6 +359,18 @@ export function App() {
 
             <div className="persona-card">
               <p>
+                <strong>Background:</strong> {state.backgroundId}
+              </p>
+              <p>
+                <strong>Feat:</strong> {state.featId}
+              </p>
+              <p>
+                <strong>Weapon:</strong> {state.weaponId}
+              </p>
+              <p>
+                <strong>Armor:</strong> {state.armorId}
+              </p>
+              <p>
                 <strong>Trait:</strong> {state.trait}
               </p>
               <p>
@@ -296,17 +399,17 @@ export function App() {
             {
               title: "Estado Local",
               status: "Ready",
-              text: "La app ya tiene estado vivo para identidad, build base, atributos y personalidad.",
+              text: "La app ya tiene estado vivo para identidad, build base, atributos, equipo y personalidad.",
             },
             {
               title: "Preview Visual",
               status: "Live",
-              text: "Cada cambio actualiza una vista de hoja resumida, acercándonos a la future character sheet.",
+              text: "Cada cambio actualiza una vista de hoja resumida y un snapshot canónico del personaje.",
             },
             {
               title: "Siguiente Capa",
               status: "Next",
-              text: "El siguiente paso es conectar esta UI al modelo canónico y al export real.",
+              text: "El siguiente paso es profundizar la sheet final y conectarla con export real.",
             },
           ].map((milestone) => (
             <article className="milestone-card" key={milestone.title}>
@@ -326,7 +429,7 @@ export function App() {
         <div className="roadmap-panel">
           {[
             "Conectar esta UI al CharacterBuild real del workspace compartido.",
-            "Agregar selección de background, feats y equipamiento.",
+            "Expandir decisiones del personaje con spells y features de clase.",
             "Llevar esta preview hacia una character sheet visual exportable.",
           ].map((item) => (
             <div className="roadmap-item" key={item}>

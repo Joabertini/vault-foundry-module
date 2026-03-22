@@ -4,6 +4,10 @@ export type BuilderState = {
   alignment: string;
   raceId: string;
   classId: string;
+  backgroundId: string;
+  featId: string;
+  weaponId: string;
+  armorId: string;
   level: number;
   str: number;
   dex: number;
@@ -21,6 +25,10 @@ export const initialState: BuilderState = {
   alignment: "Neutral Bueno",
   raceId: "human",
   classId: "wizard",
+  backgroundId: "sage",
+  featId: "magic-initiate",
+  weaponId: "quarterstaff",
+  armorId: "mage-armor",
   level: 3,
   str: 8,
   dex: 14,
@@ -75,6 +83,10 @@ export function buildCanonicalSnapshot(state: BuilderState) {
         },
       ],
     },
+    background: {
+      backgroundId: state.backgroundId,
+      grantedFeatIds: [state.featId],
+    },
     abilities: {
       generationMethod: "manual",
       base: {
@@ -103,6 +115,13 @@ export function buildCanonicalSnapshot(state: BuilderState) {
         attackBonus: pb + intMod,
         saveDC: 8 + pb + intMod,
       },
+    },
+    choices: {
+      feats: [state.featId],
+      proficiencies: [],
+      spells: ["Nv0: Mage Hand", "Nv1: Shield"],
+      equipment: [state.weaponId, state.armorId],
+      features: [],
     },
   };
 }
