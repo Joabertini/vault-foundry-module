@@ -11,8 +11,12 @@ import {
 } from "@bertinis-vault/data-engine";
 import {
   abilityModifierMap,
+  getEquipmentEntries,
+  getFeatureEntries,
   getHitDieForClass,
+  getProficiencyLabels,
   getSpellAbilityForClass,
+  getSpellEntries,
   getSpellProgressionForClass,
   normalizeClassId,
 } from "@bertinis-vault/domain";
@@ -317,88 +321,6 @@ function parseToolEntry(value: string) {
   return TOOL_ALIAS_TO_ID[normalized];
 }
 
-function getNormalizedProficiencyLabels(
-  character: CharacterBuild,
-  kind: "skill" | "language" | "tool",
-) {
-  const entries = character.choices.normalized?.proficiencies ?? [];
-  return entries
-    .filter((entry) => entry.kind === kind)
-    .map((entry) => entry.label);
-}
-
-function getProficiencyLabels(
-  character: CharacterBuild,
-  kind: "skill" | "language" | "tool",
-) {
-  const normalizedLabels = getNormalizedProficiencyLabels(character, kind);
-  if (normalizedLabels.length) {
-    return normalizedLabels;
-  }
-
-  if (kind === "language") {
-    return character.choices.proficiencies
-      .filter((entry) => /^language:/i.test(entry))
-      .map((entry) => entry.replace(/^language:\s*/i, "").trim());
-  }
-
-  if (kind === "tool") {
-    return character.choices.proficiencies
-      .filter((entry) => /^tool:/i.test(entry))
-      .map((entry) => entry.replace(/^tool:\s*/i, "").trim());
-  }
-
-  return character.choices.proficiencies.filter(
-    (entry) => !/^language:/i.test(entry) && !/^tool:/i.test(entry),
-  );
-}
-
-function getSpellEntries(character: CharacterBuild) {
-  const normalizedSpells = character.choices.normalized?.spells ?? [];
-  if (normalizedSpells.length) {
-    return normalizedSpells.map((entry) => ({
-      name: entry.label,
-      level: entry.level,
-    }));
-  }
-
-  return character.choices.spells.map((rawSpell) => parseSpellEntry(rawSpell));
-}
-
-function getFeatureEntries(character: CharacterBuild) {
-  const normalizedFeatures = character.choices.normalized?.features ?? [];
-  if (normalizedFeatures.length) {
-    return normalizedFeatures.map((entry) => ({
-      name: entry.label,
-      source: entry.source,
-    }));
-  }
-
-  return character.choices.features.map((feature) => ({
-    name: feature,
-    source: "class" as const,
-  }));
-}
-
-function getEquipmentEntries(character: CharacterBuild) {
-  const normalizedEquipment = character.choices.normalized?.equipment ?? [];
-  if (normalizedEquipment.length) {
-    return normalizedEquipment.map((entry) => ({
-      lookupName: entry.itemId ?? entry.label,
-      label: entry.label,
-      category: entry.category,
-      quantity: entry.quantity,
-    }));
-  }
-
-  return character.choices.equipment.map((entry) => ({
-    lookupName: entry,
-    label: entry,
-    category: "other" as const,
-    quantity: 1,
-  }));
-}
-
 function buildSkills(character: CharacterBuild) {
   const skills = makeSkills();
   const backgroundSkillIds = BACKGROUND_SKILL_PROFS_BY_ID[character.background.backgroundId] ?? [];
@@ -590,19 +512,6 @@ function buildFeatItem(name: string, featType: string): FoundryItem {
     folder: null,
     sort: 0,
     ownership: { default: 0 },
-  };
-}
-
-function parseSpellEntry(raw: string): { name: string; level: number } {
-  const match = raw.match(/^(?:nv\s*(\d+)\s*:\s*)?(.+)$/i);
-  if (!match) {
-    return { name: raw.trim(), level: 1 };
-  }
-  const [, parsedLevel, parsedName] = match;
-
-  return {
-    level: parsedLevel ? Number.parseInt(parsedLevel, 10) : 1,
-    name: (parsedName ?? raw).trim(),
   };
 }
 

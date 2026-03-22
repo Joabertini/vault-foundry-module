@@ -1006,3 +1006,24 @@ Impacto:
 - la arquitectura ya no solo acepta el contrato enriquecido: tambien lo consume de verdad;
 - mejora mantenimiento y escalabilidad porque el exporter deja de depender primero de labels sueltos;
 - el siguiente tramo de migracion puede reducir strings legacy sin bloquear el runtime actual.
+
+### Dominio como dueño de la normalizacion derivada
+
+La siguiente consolidacion se hizo en `packages/domain`: la logica compartida para resolver elecciones canonicamente dejo de vivir duplicada dentro del exporter.
+
+Ahora incluye:
+
+- nuevo `packages/domain/src/choices.ts` con helpers compartidos para:
+  - proficiencies por tipo (`skill`, `language`, `tool`)
+  - spells normalizados o legacy
+  - features normalizados o legacy
+  - equipment normalizado o legacy
+- exportacion de esa capa desde `packages/domain/src/index.ts`;
+- tests nuevos en `packages/domain/test/choices.test.mjs` para cubrir prioridad de `choices.normalized` y fallback legacy;
+- `packages/foundry-exporter/src/index.ts` simplificado para consumir esas derivaciones desde `@bertinis-vault/domain`.
+
+Impacto:
+
+- `packages/domain` pasa a ser realmente la capa de reglas y seleccion compartida, en vez de delegar esa responsabilidad al exporter;
+- se reduce duplicacion entre capas y baja el riesgo de divergencia entre web, exporter y futuros procesos de import/sync;
+- la siguiente etapa puede enfocarse en ids canonicos y reglas de progresion sin arrastrar parsing repetido en consumidores.
