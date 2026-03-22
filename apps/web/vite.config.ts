@@ -1,8 +1,22 @@
-import { defineConfig } from "vite";
+import { fileURLToPath, URL } from "node:url";
 import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      "@bertinis-vault/contracts": fileURLToPath(
+        new URL("../../packages/contracts/src/index.ts", import.meta.url),
+      ),
+      "@bertinis-vault/domain": fileURLToPath(
+        new URL("../../packages/domain/src/index.ts", import.meta.url),
+      ),
+      "@bertinis-vault/foundry-exporter": fileURLToPath(
+        new URL("../../packages/foundry-exporter/src/index.ts", import.meta.url),
+      ),
+    },
+  },
   server: {
     host: "127.0.0.1",
     port: 4173,

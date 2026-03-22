@@ -334,3 +334,19 @@ Impacto:
 - ya no dependemos de imaginar la UI solo leyendo codigo;
 - el equipo puede abrir la web localmente mucho mas rapido;
 - acelera validacion visual y futuras iteraciones de diseño.
+
+### Aliases de workspace para preview web
+
+Se ajusto Vite para resolver los paquetes internos del monorepo directo desde `src` en desarrollo.
+
+Ahora incluye:
+
+- alias para `@bertinis-vault/contracts`;
+- alias para `@bertinis-vault/domain`;
+- alias para `@bertinis-vault/foundry-exporter`.
+
+Impacto:
+
+- la web puede levantar en modo dev sin exigir builds previos de cada paquete;
+- reduce friccion para revisar la UI localmente;
+- mejora el flujo diario de trabajo del proyecto.
