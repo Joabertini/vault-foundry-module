@@ -10,6 +10,7 @@ This repository now also contains the first shared foundation for the broader Be
 - [docs/IMPLEMENTATION-LOG.md](C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/docs/IMPLEMENTATION-LOG.md)
 - [docs/MIGRATION-MATRIX.md](C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/docs/MIGRATION-MATRIX.md)
 - [docs/AI-HANDOFF.md](C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/docs/AI-HANDOFF.md)
+- [docs/THREE-STAGE-ROADMAP.md](D:/Users/Martin/Desktop/RESPALDO/D&D 5e/Documents/web builder/bertinis-vault-github-ready/bertinis-vault/docs/THREE-STAGE-ROADMAP.md)
 - `apps/` for future product surfaces
 - `packages/contracts` for shared schemas
 - `packages/domain` for reusable rules and derivations

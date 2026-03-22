@@ -17,11 +17,13 @@ This document is the fast-start guide for the next AI working on the repo.
 1. [`ARCHITECTURE-PLAN.md`](/C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/ARCHITECTURE-PLAN.md)
 2. [`docs/IMPLEMENTATION-LOG.md`](/C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/docs/IMPLEMENTATION-LOG.md)
 3. [`docs/MIGRATION-MATRIX.md`](/C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/docs/MIGRATION-MATRIX.md)
-4. `docs/FRONTEND-INTEGRATION.md` if visual/frontend work is being split across agents
-5. [`docs/DDIMPORT-COMPARISON.md`](/D:/Users/Martin/Desktop/RESPALDO/D&D%205e/Documents/web%20builder/bertinis-vault-github-ready/bertinis-vault/docs/DDIMPORT-COMPARISON.md) for import/export workflow benchmarking
+4. [`docs/THREE-STAGE-ROADMAP.md`](/D:/Users/Martin/Desktop/RESPALDO/D&D%205e/Documents/web%20builder/bertinis-vault-github-ready/bertinis-vault/docs/THREE-STAGE-ROADMAP.md)
+5. `docs/FRONTEND-INTEGRATION.md` if visual/frontend work is being split across agents
+6. [`docs/DDIMPORT-COMPARISON.md`](/D:/Users/Martin/Desktop/RESPALDO/D&D%205e/Documents/web%20builder/bertinis-vault-github-ready/bertinis-vault/docs/DDIMPORT-COMPARISON.md) for import/export workflow benchmarking
 
 ## Current Technical Priorities
 
+- Stage A from `docs/THREE-STAGE-ROADMAP.md`: stabilize preflight, import/export workflow, and exporter convergence before wider product polish;
 - keep `apps/web` dual-purpose: financier-facing demo first, builder internals second;
 - keep extracting logic out of legacy Foundry JS and into shared packages;
 - tighten the contract between `CharacterBuild` and `FoundryActorPayload`;

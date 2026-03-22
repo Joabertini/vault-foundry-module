@@ -2,6 +2,25 @@
 
 ## 2026-03-22
 
+### Roadmap de tres etapas para salida a beta
+
+Se formalizo un roadmap nuevo para ordenar el siguiente tramo del proyecto alrededor de tres etapas:
+
+- Stage A: estabilizar preflight, import/export y convergencia del exporter;
+- Stage B: completar la migracion canonica y reducir dependencia del runtime legacy;
+- Stage C: preparar una beta defendible con demo, persistencia y disciplina de release.
+
+Cambios principales:
+
+- nuevo documento `docs/THREE-STAGE-ROADMAP.md`;
+- enlace desde `docs/AI-HANDOFF.md` para que futuras iteraciones arranquen desde ese orden de prioridades;
+- referencia desde `README.md` para que la direccion del repo no quede solo implícita en docs internas.
+
+Decision importante:
+
+- la prioridad inmediata pasa a ser Stage A;
+- no conviene abrir trabajo amplio de polish o beta antes de fortalecer el pipeline operativo Foundry-side.
+
 ### Base architecture bootstrap
 
 Se agrego la base inicial del monorepo sin romper el prototipo actual de Foundry.
