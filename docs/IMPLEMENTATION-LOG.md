@@ -210,3 +210,17 @@ Impacto:
 - el builder ya se parece mas a un creador real de personaje;
 - el snapshot canonico web ahora incluye mas decisiones relevantes;
 - la siguiente capa natural sera spells, features y una sheet visual mas completa.
+
+### Magia y features en web
+
+Se agregaron al builder web:
+
+- cantrips;
+- spells por linea;
+- features por linea.
+
+Impacto:
+
+- el flujo web ya cubre una porcion mucho mas realista del personaje;
+- el snapshot canonico ahora incluye magia y rasgos editables;
+- el siguiente paso natural es convertir la preview en una sheet visual mas parecida al producto final.

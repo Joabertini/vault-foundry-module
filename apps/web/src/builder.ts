@@ -8,6 +8,9 @@ export type BuilderState = {
   featId: string;
   weaponId: string;
   armorId: string;
+  cantripsText: string;
+  spellsText: string;
+  featuresText: string;
   level: number;
   str: number;
   dex: number;
@@ -29,6 +32,9 @@ export const initialState: BuilderState = {
   featId: "magic-initiate",
   weaponId: "quarterstaff",
   armorId: "mage-armor",
+  cantripsText: "Mage Hand\nPrestidigitation",
+  spellsText: "Nv1: Shield\nNv1: Magic Missile\nNv2: Misty Step",
+  featuresText: "Arcane Recovery\nSculpt Spells",
   level: 3,
   str: 8,
   dex: 14,
@@ -57,6 +63,20 @@ export function buildCanonicalSnapshot(state: BuilderState) {
   const dexMod = abilityModifier(state.dex);
   const conMod = abilityModifier(state.con);
   const intMod = abilityModifier(state.int);
+
+  const cantrips = state.cantripsText
+    .split("\n")
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .map((entry) => `Nv0: ${entry}`);
+  const leveledSpells = state.spellsText
+    .split("\n")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+  const features = state.featuresText
+    .split("\n")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
 
   return {
     meta: {
@@ -119,9 +139,9 @@ export function buildCanonicalSnapshot(state: BuilderState) {
     choices: {
       feats: [state.featId],
       proficiencies: [],
-      spells: ["Nv0: Mage Hand", "Nv1: Shield"],
+      spells: [...cantrips, ...leveledSpells],
       equipment: [state.weaponId, state.armorId],
-      features: [],
+      features,
     },
   };
 }

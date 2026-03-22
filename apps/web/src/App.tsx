@@ -74,6 +74,7 @@ const steps = [
   { id: "build", label: "Base" },
   { id: "abilities", label: "Atributos" },
   { id: "choices", label: "Elecciones" },
+  { id: "magic", label: "Magia" },
   { id: "persona", label: "Persona" },
 ];
 
@@ -292,6 +293,35 @@ export function App() {
           {stepIndex === 4 ? (
             <div className="form-grid">
               <label className="field field-full">
+                <span>Cantrips</span>
+                <textarea
+                  rows={3}
+                  value={state.cantripsText}
+                  onChange={(event) => updateField("cantripsText", event.target.value)}
+                />
+              </label>
+              <label className="field field-full">
+                <span>Spells</span>
+                <textarea
+                  rows={4}
+                  value={state.spellsText}
+                  onChange={(event) => updateField("spellsText", event.target.value)}
+                />
+              </label>
+              <label className="field field-full">
+                <span>Features</span>
+                <textarea
+                  rows={3}
+                  value={state.featuresText}
+                  onChange={(event) => updateField("featuresText", event.target.value)}
+                />
+              </label>
+            </div>
+          ) : null}
+
+          {stepIndex === 5 ? (
+            <div className="form-grid">
+              <label className="field field-full">
                 <span>Trait</span>
                 <textarea
                   rows={3}
@@ -371,6 +401,15 @@ export function App() {
                 <strong>Armor:</strong> {state.armorId}
               </p>
               <p>
+                <strong>Cantrips:</strong> {state.cantripsText.replace(/\n/g, ", ")}
+              </p>
+              <p>
+                <strong>Spells:</strong> {state.spellsText.replace(/\n/g, ", ")}
+              </p>
+              <p>
+                <strong>Features:</strong> {state.featuresText.replace(/\n/g, ", ")}
+              </p>
+              <p>
                 <strong>Trait:</strong> {state.trait}
               </p>
               <p>
@@ -399,7 +438,7 @@ export function App() {
             {
               title: "Estado Local",
               status: "Ready",
-              text: "La app ya tiene estado vivo para identidad, build base, atributos, equipo y personalidad.",
+              text: "La app ya tiene estado vivo para identidad, build base, atributos, equipo, magia y personalidad.",
             },
             {
               title: "Preview Visual",
