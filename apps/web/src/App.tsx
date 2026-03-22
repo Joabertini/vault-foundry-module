@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   type BuilderState,
   abilityModifier,
+  builderDraftStorageKey,
   buildCanonicalSnapshot,
+  coerceBuilderState,
   initialState,
   proficiencyBonus,
 } from "./builder";
@@ -80,7 +82,24 @@ const steps = [
 
 export function App() {
   const [stepIndex, setStepIndex] = useState(0);
-  const [state, setState] = useState<BuilderState>(initialState);
+  const [state, setState] = useState<BuilderState>(() => {
+    if (typeof window === "undefined") {
+      return initialState;
+    }
+
+    const storedDraft = window.localStorage.getItem(builderDraftStorageKey);
+
+    if (!storedDraft) {
+      return initialState;
+    }
+
+    try {
+      return coerceBuilderState(JSON.parse(storedDraft));
+    } catch {
+      return initialState;
+    }
+  });
+  const [saveState, setSaveState] = useState("Borrador local activo");
 
   const pb = proficiencyBonus(state.level);
   const intMod = abilityModifier(state.int);
@@ -96,6 +115,25 @@ export function App() {
   function updateField<K extends keyof BuilderState>(key: K, value: BuilderState[K]) {
     setState((current) => ({ ...current, [key]: value }));
   }
+
+  function resetDraft() {
+    setState(initialState);
+    setStepIndex(0);
+    setSaveState("Borrador reiniciado");
+
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem(builderDraftStorageKey);
+    }
+  }
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    window.localStorage.setItem(builderDraftStorageKey, JSON.stringify(state));
+    setSaveState("Guardado local automatico");
+  }, [state]);
 
   return (
     <main className="app-shell">
@@ -143,6 +181,13 @@ export function App() {
                 {step.label}
               </button>
             ))}
+          </div>
+
+          <div className="builder-toolbar">
+            <span className="save-pill">{saveState}</span>
+            <button className="secondary-button" onClick={resetDraft} type="button">
+              Reiniciar demo
+            </button>
           </div>
 
           {stepIndex === 0 ? (

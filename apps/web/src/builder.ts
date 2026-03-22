@@ -22,6 +22,8 @@ export type BuilderState = {
   ideal: string;
 };
 
+export const builderDraftStorageKey = "bertinis-vault:web-builder:draft";
+
 export const initialState: BuilderState = {
   characterName: "Seraphina Vale",
   playerName: "Martin",
@@ -45,6 +47,41 @@ export const initialState: BuilderState = {
   trait: "Siempre toma notas, incluso en medio del peligro.",
   ideal: "El conocimiento es la mejor defensa contra el caos.",
 };
+
+export function coerceBuilderState(value: unknown): BuilderState {
+  if (!value || typeof value !== "object") {
+    return initialState;
+  }
+
+  const candidate = value as Partial<BuilderState>;
+
+  return {
+    characterName: typeof candidate.characterName === "string" ? candidate.characterName : initialState.characterName,
+    playerName: typeof candidate.playerName === "string" ? candidate.playerName : initialState.playerName,
+    alignment: typeof candidate.alignment === "string" ? candidate.alignment : initialState.alignment,
+    raceId: typeof candidate.raceId === "string" ? candidate.raceId : initialState.raceId,
+    classId: typeof candidate.classId === "string" ? candidate.classId : initialState.classId,
+    backgroundId:
+      typeof candidate.backgroundId === "string" ? candidate.backgroundId : initialState.backgroundId,
+    featId: typeof candidate.featId === "string" ? candidate.featId : initialState.featId,
+    weaponId: typeof candidate.weaponId === "string" ? candidate.weaponId : initialState.weaponId,
+    armorId: typeof candidate.armorId === "string" ? candidate.armorId : initialState.armorId,
+    cantripsText:
+      typeof candidate.cantripsText === "string" ? candidate.cantripsText : initialState.cantripsText,
+    spellsText: typeof candidate.spellsText === "string" ? candidate.spellsText : initialState.spellsText,
+    featuresText:
+      typeof candidate.featuresText === "string" ? candidate.featuresText : initialState.featuresText,
+    level: typeof candidate.level === "number" ? candidate.level : initialState.level,
+    str: typeof candidate.str === "number" ? candidate.str : initialState.str,
+    dex: typeof candidate.dex === "number" ? candidate.dex : initialState.dex,
+    con: typeof candidate.con === "number" ? candidate.con : initialState.con,
+    int: typeof candidate.int === "number" ? candidate.int : initialState.int,
+    wis: typeof candidate.wis === "number" ? candidate.wis : initialState.wis,
+    cha: typeof candidate.cha === "number" ? candidate.cha : initialState.cha,
+    trait: typeof candidate.trait === "string" ? candidate.trait : initialState.trait,
+    ideal: typeof candidate.ideal === "string" ? candidate.ideal : initialState.ideal,
+  };
+}
 
 export function abilityModifier(score: number) {
   return Math.floor((score - 10) / 2);

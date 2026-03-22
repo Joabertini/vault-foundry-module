@@ -236,3 +236,19 @@ Ahora incluye:
 - bloques de magia;
 - bloques de features;
 - distribucion mas cercana a una hoja visual de personaje.
+
+### Persistencia local del builder web
+
+Se agrego guardado automatico del borrador del builder web en el navegador.
+
+Ahora incluye:
+
+- restauracion del personaje al recargar la pagina;
+- guardado local automatico al cambiar campos;
+- reinicio rapido del borrador desde la interfaz.
+
+Impacto:
+
+- la web ya no se siente como una demo descartable;
+- permite iterar un personaje sin perder progreso al refrescar;
+- deja lista una base simple para futuras capas de autosave real o cuentas de usuario.
