@@ -21,7 +21,9 @@ Estado actual:
 Notas de integración:
 
 - `GET /datasets/backgrounds?source=local|upstream|hybrid`
-- `upstreamPath` es configurable por query string o por `BERTINIS_5E_UPSTREAM_BACKGROUNDS_PATH`
+- `GET /datasets/feats?source=local|upstream|hybrid`
+- `upstreamPath` es configurable por query string
+- variables soportadas: `BERTINIS_5E_UPSTREAM_BACKGROUNDS_PATH` y `BERTINIS_5E_UPSTREAM_FEATS_PATH`
 
 Comandos útiles:
 

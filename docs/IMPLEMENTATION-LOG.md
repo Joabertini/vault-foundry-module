@@ -501,3 +501,20 @@ Impacto:
 - el BFF ya tiene una primera ruta de integracion real, no solo teórica, con 5etools;
 - valida el enfoque de mezclar estabilidad local con datos externos;
 - abre el camino para repetir el mismo patron en clases, feats, spells y equipo.
+
+### Feats con modo local/upstream/hibrido
+
+Se repitio el mismo patron de integracion semantica para feats.
+
+Ahora incluye:
+
+- `source=local|upstream|hybrid` en `GET /datasets/feats`;
+- normalizacion flexible del payload externo;
+- merge local/upstream para modo hibrido;
+- fallback limpio a local si el upstream falla.
+
+Impacto:
+
+- confirmamos que el patron del BFF no depende de una sola categoria;
+- el builder gana otra categoria lista para enriquecerse desde 5etools;
+- seguimos convirtiendo el backend en una capa de producto real.

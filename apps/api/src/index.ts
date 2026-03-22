@@ -15,6 +15,11 @@ import {
   defaultUpstreamBackgroundsPath,
   normalizeUpstreamBackgroundsPayload,
 } from "./upstream-backgrounds.js";
+import {
+  buildHybridFeatsDataset,
+  defaultUpstreamFeatsPath,
+  normalizeUpstreamFeatsPayload,
+} from "./upstream-feats.js";
 
 const port = Number.parseInt(process.env.PORT ?? "3001", 10);
 const fiveToolsClient = createFiveToolsClient();
@@ -141,7 +146,60 @@ const server = createServer(async (request, response) => {
   }
 
   if (request.method === "GET" && url.pathname === "/datasets/feats") {
-    sendJson(response, 200, buildFeatsDataset());
+    const sourceMode = url.searchParams.get("source") ?? "local";
+
+    if (sourceMode === "local") {
+      sendJson(response, 200, buildFeatsDataset());
+      return;
+    }
+
+    const upstreamPath =
+      url.searchParams.get("upstreamPath") ?? defaultUpstreamFeatsPath;
+
+    if (!isAllowedUpstreamPath(upstreamPath)) {
+      sendJson(response, 400, {
+        error: "Upstream path not allowed for feats dataset",
+        path: upstreamPath,
+        allowedPrefixes: allowedUpstreamPrefixes,
+      });
+      return;
+    }
+
+    try {
+      const cacheKey = `feats:${upstreamPath}`;
+      const cachedPayload = upstreamCache.get(cacheKey);
+      const upstreamPayload =
+        cachedPayload ?? (await fiveToolsClient.get(upstreamPath));
+
+      if (cachedPayload === undefined) {
+        upstreamCache.set(cacheKey, upstreamPayload);
+      }
+
+      const normalized = normalizeUpstreamFeatsPayload(upstreamPayload);
+
+      if (sourceMode === "upstream") {
+        sendJson(response, 200, normalized);
+        return;
+      }
+
+      sendJson(response, 200, buildHybridFeatsDataset(normalized.items));
+    } catch (error) {
+      if (sourceMode === "upstream") {
+        sendJson(response, 502, {
+          error: "Upstream feats request failed",
+          path: upstreamPath,
+          detail: error instanceof Error ? error.message : "Unknown upstream error",
+        });
+        return;
+      }
+
+      sendJson(response, 200, {
+        ...buildFeatsDataset(),
+        warning: "Hybrid upstream unavailable, local dataset returned",
+        attemptedUpstreamPath: upstreamPath,
+      });
+    }
+
     return;
   }
 
