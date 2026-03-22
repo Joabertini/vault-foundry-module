@@ -917,3 +917,21 @@ Impacto:
 - la visual del builder ahora responde de verdad a la direccion de UI definida para la demo;
 - desaparece la sensacion de que la ficha nueva estaba "montada arriba" de la preview anterior;
 - futuras iteraciones visuales pueden trabajar sobre una sola hoja principal en vez de dos previews mezcladas.
+
+### Simplificacion de la ruta principal del builder
+
+Se removio la landing editorial intermedia que seguia viviendo dentro de la misma pantalla del builder.
+
+Ahora la ruta principal queda mucho mas cerca del esquema trabajado para frontend:
+
+- hero;
+- presets;
+- resumen de preset activo;
+- story block;
+- `builder + character sheet` como superficie principal.
+
+Impacto:
+
+- baja la friccion visual entre demo comercial y builder real;
+- la pagina ya no compite con una segunda landing dentro de la misma ruta;
+- la ficha y el builder quedan como protagonistas reales de la experiencia.
