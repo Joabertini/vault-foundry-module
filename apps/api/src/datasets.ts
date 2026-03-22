@@ -4,6 +4,7 @@ import {
   classCatalog,
   featCatalog,
   raceCatalog,
+  spellCatalog,
   weaponCatalog,
 } from "@bertinis-vault/data-engine";
 
@@ -74,5 +75,19 @@ export function buildEquipmentDataset() {
       damageType: entry.damageType,
       attackType: entry.attackType,
     })),
+  };
+}
+
+export function buildSpellsDataset() {
+  const items = spellCatalog.map((entry) => ({
+    id: entry.id,
+    label: entry.label,
+    level: entry.level,
+  }));
+
+  return {
+    ...buildDatasetMeta(),
+    cantrips: items.filter((entry) => entry.level === 0),
+    spells: items.filter((entry) => entry.level > 0),
   };
 }

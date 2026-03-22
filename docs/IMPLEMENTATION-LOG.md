@@ -586,3 +586,20 @@ Impacto:
 - el builder queda mejor alineado con AC, armas y exportacion Foundry;
 - reducimos mas la dependencia de catalogos puramente embebidos;
 - preparamos mejor el terreno para una hoja visual y una exportacion mas fieles.
+
+### Spells con modo local/upstream/hibrido
+
+Se sumo una primera capa semantica para magia dentro del BFF y el builder web.
+
+Ahora incluye:
+
+- `GET /datasets/spells?source=local|upstream|hybrid`;
+- catalogo compartido inicial de cantrips y spells;
+- normalizacion flexible del payload externo;
+- sugerencias rapidas de magia en la UI web.
+
+Impacto:
+
+- el builder gana una base mas real para la parte magica del personaje;
+- acercamos la hoja y la exportacion a Foundry a un flujo mas creible;
+- dejamos listo el terreno para pasar luego de texto libre a seleccion mas estructurada.

@@ -9,6 +9,7 @@ import {
   buildEquipmentDataset,
   buildFeatsDataset,
   buildRacesDataset,
+  buildSpellsDataset,
 } from "./datasets.js";
 import {
   buildHybridBackgroundsDataset,
@@ -35,6 +36,11 @@ import {
   defaultUpstreamRacesPath,
   normalizeUpstreamRacesPayload,
 } from "./upstream-races.js";
+import {
+  buildHybridSpellsDataset,
+  defaultUpstreamSpellsPath,
+  normalizeUpstreamSpellsPayload,
+} from "./upstream-spells.js";
 
 const port = Number.parseInt(process.env.PORT ?? "3001", 10);
 const fiveToolsClient = createFiveToolsClient();
@@ -372,6 +378,64 @@ const server = createServer(async (request, response) => {
 
       sendJson(response, 200, {
         ...buildEquipmentDataset(),
+        warning: "Hybrid upstream unavailable, local dataset returned",
+        attemptedUpstreamPath: upstreamPath,
+      });
+    }
+
+    return;
+  }
+
+  if (request.method === "GET" && url.pathname === "/datasets/spells") {
+    const sourceMode = url.searchParams.get("source") ?? "local";
+
+    if (sourceMode === "local") {
+      sendJson(response, 200, buildSpellsDataset());
+      return;
+    }
+
+    const upstreamPath =
+      url.searchParams.get("upstreamPath") ?? defaultUpstreamSpellsPath;
+
+    if (!isAllowedUpstreamPath(upstreamPath)) {
+      sendJson(response, 400, {
+        error: "Upstream path not allowed for spells dataset",
+        path: upstreamPath,
+        allowedPrefixes: allowedUpstreamPrefixes,
+      });
+      return;
+    }
+
+    try {
+      const cacheKey = `spells:${upstreamPath}`;
+      const cachedPayload = upstreamCache.get(cacheKey);
+      const upstreamPayload =
+        cachedPayload ?? (await fiveToolsClient.get(upstreamPath));
+
+      if (cachedPayload === undefined) {
+        upstreamCache.set(cacheKey, upstreamPayload);
+      }
+
+      const normalized = normalizeUpstreamSpellsPayload(upstreamPayload);
+
+      if (sourceMode === "upstream") {
+        sendJson(response, 200, normalized);
+        return;
+      }
+
+      sendJson(response, 200, buildHybridSpellsDataset(normalized));
+    } catch (error) {
+      if (sourceMode === "upstream") {
+        sendJson(response, 502, {
+          error: "Upstream spells request failed",
+          path: upstreamPath,
+          detail: error instanceof Error ? error.message : "Unknown upstream error",
+        });
+        return;
+      }
+
+      sendJson(response, 200, {
+        ...buildSpellsDataset(),
         warning: "Hybrid upstream unavailable, local dataset returned",
         attemptedUpstreamPath: upstreamPath,
       });

@@ -4,6 +4,7 @@ import {
   classCatalog,
   featCatalog,
   raceCatalog,
+  spellCatalog,
   weaponCatalog,
 } from "@bertinis-vault/data-engine";
 
@@ -21,6 +22,10 @@ export type BuilderOptionsPayload = {
   races: SelectOption[];
   backgrounds: Array<SelectOption & { source?: string; grantedFeatIds?: string[] }>;
   feats: SelectOption[];
+  spells: {
+    cantrips: Array<SelectOption & { level: number }>;
+    spells: Array<SelectOption & { level: number }>;
+  };
   equipment: {
     armor: Array<SelectOption & { armorFormula?: string; grantsShieldBonus?: boolean }>;
     weapons: Array<SelectOption & { damage?: string; damageType?: string; attackType?: string }>;
@@ -33,6 +38,8 @@ type DatasetEnvelope<T> = {
     upstream: string;
   };
   items?: T[];
+  cantrips?: Array<SelectOption & { level: number }>;
+  spells?: Array<SelectOption & { level: number }>;
   armor?: Array<SelectOption & { armorFormula?: string; grantsShieldBonus?: boolean }>;
   weapons?: Array<SelectOption & { damage?: string; damageType?: string; attackType?: string }>;
 };
@@ -60,6 +67,14 @@ export const fallbackBuilderOptions: BuilderOptionsPayload = {
     id: entry.id,
     label: entry.label,
   })),
+  spells: {
+    cantrips: spellCatalog
+      .filter((entry) => entry.level === 0)
+      .map((entry) => ({ id: entry.id, label: entry.label, level: entry.level })),
+    spells: spellCatalog
+      .filter((entry) => entry.level > 0)
+      .map((entry) => ({ id: entry.id, label: entry.label, level: entry.level })),
+  },
   equipment: {
     armor: armorCatalog.map((entry) => ({
       id: entry.id,
@@ -83,8 +98,9 @@ export async function loadBuilderOptions(): Promise<BuilderOptionsPayload> {
   const racesUrl = `${baseUrl}/datasets/races?source=hybrid`;
   const backgroundsUrl = `${baseUrl}/datasets/backgrounds?source=hybrid`;
   const featsUrl = `${baseUrl}/datasets/feats?source=hybrid`;
+  const spellsUrl = `${baseUrl}/datasets/spells?source=hybrid`;
   const equipmentUrl = `${baseUrl}/datasets/equipment?source=hybrid`;
-  const [meta, classes, races, backgrounds, feats, equipment] = await Promise.all([
+  const [meta, classes, races, backgrounds, feats, spells, equipment] = await Promise.all([
     fetchJson<DatasetEnvelope<SelectOption>>(`${baseUrl}/datasets/meta`),
     fetchJson<DatasetEnvelope<SelectOption>>(classesUrl),
     fetchJson<DatasetEnvelope<SelectOption>>(racesUrl),
@@ -92,6 +108,12 @@ export async function loadBuilderOptions(): Promise<BuilderOptionsPayload> {
       backgroundsUrl,
     ),
     fetchJson<DatasetEnvelope<SelectOption>>(featsUrl),
+    fetchJson<
+      DatasetEnvelope<SelectOption> & {
+        cantrips: Array<SelectOption & { level: number }>;
+        spells: Array<SelectOption & { level: number }>;
+      }
+    >(spellsUrl),
     fetchJson<
       DatasetEnvelope<SelectOption> & {
         armor: Array<SelectOption & { armorFormula?: string; grantsShieldBonus?: boolean }>;
@@ -106,6 +128,10 @@ export async function loadBuilderOptions(): Promise<BuilderOptionsPayload> {
     races: races.items ?? [],
     backgrounds: backgrounds.items ?? [],
     feats: feats.items ?? [],
+    spells: {
+      cantrips: spells.cantrips ?? [],
+      spells: spells.spells ?? [],
+    },
     equipment: {
       armor: equipment.armor ?? [],
       weapons: equipment.weapons ?? [],

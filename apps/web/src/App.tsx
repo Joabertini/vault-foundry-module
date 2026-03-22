@@ -83,6 +83,12 @@ export function App() {
     value: entry.id,
     label: entry.label,
   }));
+  const spellSuggestions = builderOptions.spells.spells
+    .slice(0, 10)
+    .map((entry) => `Nv${entry.level}: ${entry.label}`);
+  const cantripSuggestions = builderOptions.spells.cantrips
+    .slice(0, 10)
+    .map((entry) => entry.label);
 
   function updateField<K extends keyof BuilderState>(key: K, value: BuilderState[K]) {
     setState((current) => ({ ...current, [key]: value }));
@@ -407,6 +413,45 @@ export function App() {
                   onChange={(event) => updateField("spellsText", event.target.value)}
                 />
               </label>
+              <div className="field field-full">
+                <span>Sugerencias rápidas</span>
+                <div className="tag-list">
+                  {cantripSuggestions.slice(0, 4).map((entry) => (
+                    <button
+                      className="sheet-tag"
+                      key={entry}
+                      onClick={() =>
+                        updateField(
+                          "cantripsText",
+                          state.cantripsText.includes(entry)
+                            ? state.cantripsText
+                            : `${state.cantripsText}${state.cantripsText.trim() ? "\n" : ""}${entry}`,
+                        )
+                      }
+                      type="button"
+                    >
+                      {entry}
+                    </button>
+                  ))}
+                  {spellSuggestions.slice(0, 4).map((entry) => (
+                    <button
+                      className="sheet-tag"
+                      key={entry}
+                      onClick={() =>
+                        updateField(
+                          "spellsText",
+                          state.spellsText.includes(entry)
+                            ? state.spellsText
+                            : `${state.spellsText}${state.spellsText.trim() ? "\n" : ""}${entry}`,
+                        )
+                      }
+                      type="button"
+                    >
+                      {entry}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <label className="field field-full">
                 <span>Features</span>
                 <textarea
@@ -654,6 +699,11 @@ export function App() {
               title: "Salida Portable",
               status: "Ready",
               text: "La web ya produce JSON canonico y una preview inicial de actor para Foundry.",
+            },
+            {
+              title: "Datasets Hibridos",
+              status: "Live",
+              text: "Clases, razas, backgrounds, feats, equipo y magia ya pueden venir del BFF con mezcla local/upstream.",
             },
           ].map((milestone) => (
             <article className="milestone-card" key={milestone.title}>
