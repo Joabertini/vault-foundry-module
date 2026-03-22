@@ -42,6 +42,37 @@ Impacto:
 - las siguientes capas de Stage A pueden construir checks reales sin inventar contratos nuevos;
 - Foundry, exporter y validacion compartida ya tienen un punto comun para converger.
 
+### Primer builder real de preflight en domain
+
+Se agrego la primera implementacion operativa de preflight en `packages/domain`.
+
+Ahora incluye:
+
+- nuevo `packages/domain/src/preflight.ts`;
+- `buildPreflightResult(...)` como punto compartido para validar builds antes del export/import;
+- bloqueo temprano para fallas estructurales del contrato canonico usando `characterBuildInputSchema.safeParse(...)`;
+- checks semanticos iniciales contra `packages/data-engine` para:
+  - clases;
+  - raza;
+  - background;
+  - feats;
+  - spells normalizados;
+  - equipment normalizado;
+- `summary` agregado con conteo de `blockers`, `warnings`, `info` y `total`;
+- export desde `packages/domain/src/index.ts`;
+- tests nuevos en `packages/domain/test/preflight.test.mjs`.
+
+Validacion ejecutada:
+
+- build de `packages/domain` correcto;
+- `node --test packages/domain/test/*.test.mjs` pasando.
+
+Impacto:
+
+- Stage A ya no depende solo de un schema vacio de preflight;
+- existe una capa compartida que puede ser consumida por exporter, web y Foundry runtime;
+- el siguiente paso natural es cablear este resultado a la experiencia de export/import y ampliar la matriz de checks.
+
 ### Base architecture bootstrap
 
 Se agrego la base inicial del monorepo sin romper el prototipo actual de Foundry.

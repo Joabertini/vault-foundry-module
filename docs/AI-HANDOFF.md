@@ -24,6 +24,7 @@ This document is the fast-start guide for the next AI working on the repo.
 ## Current Technical Priorities
 
 - Stage A from `docs/THREE-STAGE-ROADMAP.md`: stabilize preflight, import/export workflow, and exporter convergence before wider product polish;
+- shared preflight now exists in `packages/contracts` + `packages/domain`; next work should wire it into exporter and Foundry-side workflow rather than creating parallel validation paths;
 - keep `apps/web` dual-purpose: financier-facing demo first, builder internals second;
 - keep extracting logic out of legacy Foundry JS and into shared packages;
 - tighten the contract between `CharacterBuild` and `FoundryActorPayload`;
