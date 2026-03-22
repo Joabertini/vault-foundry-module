@@ -1,50 +1,22 @@
 import {
-  armorCatalog,
-  backgroundCatalog,
-  classCatalog,
-  featCatalog,
-  raceCatalog,
-  weaponCatalog,
-} from "@bertinis-vault/data-engine";
+  buildBackgroundsDataset,
+  buildClassesDataset,
+  buildEquipmentDataset,
+  buildFeatsDataset,
+  buildRacesDataset,
+  buildDatasetMeta,
+} from "./datasets.js";
 
 export function buildBuilderOptionsPayload() {
   return {
-    source: {
-      mode: "curated-local",
-      upstream: "5etools-planned-via-bff",
-    },
-    classes: classCatalog.map((entry) => ({
-      id: entry.id,
-      label: entry.label,
-    })),
-    races: raceCatalog.map((entry) => ({
-      id: entry.id,
-      label: entry.label,
-    })),
-    backgrounds: backgroundCatalog.map((entry) => ({
-      id: entry.id,
-      label: entry.label,
-      source: entry.source,
-      grantedFeatIds: entry.grantedFeatIds,
-    })),
-    feats: featCatalog.map((entry) => ({
-      id: entry.id,
-      label: entry.label,
-    })),
+    ...buildDatasetMeta(),
+    classes: buildClassesDataset().items,
+    races: buildRacesDataset().items,
+    backgrounds: buildBackgroundsDataset().items,
+    feats: buildFeatsDataset().items,
     equipment: {
-      armor: armorCatalog.map((entry) => ({
-        id: entry.id,
-        label: entry.label,
-        armorFormula: entry.armorFormula,
-        grantsShieldBonus: Boolean(entry.grantsShieldBonus),
-      })),
-      weapons: weaponCatalog.map((entry) => ({
-        id: entry.id,
-        label: entry.label,
-        damage: entry.damage,
-        damageType: entry.damageType,
-        attackType: entry.attackType,
-      })),
+      armor: buildEquipmentDataset().armor,
+      weapons: buildEquipmentDataset().weapons,
     },
   };
 }

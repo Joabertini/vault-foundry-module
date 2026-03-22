@@ -449,3 +449,22 @@ Impacto:
 - el builder web depende menos de listas embebidas en componentes;
 - la arquitectura de datos del builder queda mas consistente;
 - deja mejor preparado el terreno para enriquecer feats desde upstream o datasets versionados.
+
+### Endpoints semanticos para datasets del BFF
+
+Se dio un paso mas en `apps/api` para pasar de rutas generales a rutas de producto mas claras.
+
+Ahora incluye:
+
+- `GET /datasets/meta`;
+- `GET /datasets/classes`;
+- `GET /datasets/races`;
+- `GET /datasets/backgrounds`;
+- `GET /datasets/feats`;
+- `GET /datasets/equipment`.
+
+Impacto:
+
+- el BFF ya empieza a parecer una API del producto y no solo un proxy o agregador ad hoc;
+- deja la web mejor preparada para consumir datasets de forma mas granular;
+- ordena el backend para futuras mezclas entre curado local y upstream de 5etools.

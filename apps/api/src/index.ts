@@ -2,6 +2,14 @@ import { createServer } from "node:http";
 import { buildBuilderOptionsPayload } from "./builder-options.js";
 import { createFiveToolsClient } from "./five-tools-client.js";
 import { createUpstreamCache } from "./upstream-cache.js";
+import {
+  buildBackgroundsDataset,
+  buildClassesDataset,
+  buildDatasetMeta,
+  buildEquipmentDataset,
+  buildFeatsDataset,
+  buildRacesDataset,
+} from "./datasets.js";
 
 const port = Number.parseInt(process.env.PORT ?? "3001", 10);
 const fiveToolsClient = createFiveToolsClient();
@@ -51,6 +59,36 @@ const server = createServer(async (request, response) => {
 
   if (request.method === "GET" && url.pathname === "/datasets/builder-options") {
     sendJson(response, 200, buildBuilderOptionsPayload());
+    return;
+  }
+
+  if (request.method === "GET" && url.pathname === "/datasets/meta") {
+    sendJson(response, 200, buildDatasetMeta());
+    return;
+  }
+
+  if (request.method === "GET" && url.pathname === "/datasets/classes") {
+    sendJson(response, 200, buildClassesDataset());
+    return;
+  }
+
+  if (request.method === "GET" && url.pathname === "/datasets/races") {
+    sendJson(response, 200, buildRacesDataset());
+    return;
+  }
+
+  if (request.method === "GET" && url.pathname === "/datasets/backgrounds") {
+    sendJson(response, 200, buildBackgroundsDataset());
+    return;
+  }
+
+  if (request.method === "GET" && url.pathname === "/datasets/feats") {
+    sendJson(response, 200, buildFeatsDataset());
+    return;
+  }
+
+  if (request.method === "GET" && url.pathname === "/datasets/equipment") {
+    sendJson(response, 200, buildEquipmentDataset());
     return;
   }
 

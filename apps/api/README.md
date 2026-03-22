@@ -13,6 +13,7 @@ Estado actual:
 
 - scaffold inicial del servicio listo;
 - endpoint `GET /health`;
+- endpoints semánticos de datasets (`/datasets/classes`, `/datasets/races`, `/datasets/backgrounds`, `/datasets/feats`, `/datasets/equipment`);
 - endpoint `GET /datasets/builder-options` usando catálogos compartidos del workspace;
 - cliente base preparado para la API externa de 5etools en Render;
 - proxy selectivo `GET /upstream/json?path=...` con caché en memoria.
