@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { buildFoundryActorPayload } from "../dist/index.js";
+import { buildFoundryActorPayload, buildFoundryExportResult } from "../dist/index.js";
 
 function makeCharacterBuild() {
   return {
@@ -115,4 +115,23 @@ test("buildFoundryActorPayload prefers normalized choices when present", () => {
   assert.equal(payload.items.some((item) => item.name === "Wrong Spell"), false);
   assert.equal(payload.items.some((item) => item.name === "Arcane Recovery" && item.type === "feat"), true);
   assert.equal(payload.items.some((item) => item.name === "wrong-item"), false);
+});
+
+test("buildFoundryExportResult returns preflight summary alongside payload", () => {
+  const result = buildFoundryExportResult(makeCharacterBuild());
+
+  assert.equal(result.preflight.ok, true);
+  assert.equal(result.preflight.summary.blockers, 0);
+  assert.equal(result.payload?.flags["bertinis-vault"].preflight.warnings, 0);
+});
+
+test("buildFoundryExportResult omits payload when preflight has blockers", () => {
+  const build = makeCharacterBuild();
+  build.classing.classes[0].classId = "unknown-class";
+
+  const result = buildFoundryExportResult(build);
+
+  assert.equal(result.preflight.ok, false);
+  assert.equal(result.preflight.summary.blockers, 1);
+  assert.equal(result.payload, undefined);
 });

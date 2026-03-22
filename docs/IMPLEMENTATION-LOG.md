@@ -89,6 +89,33 @@ Impacto:
 - los links quedan portables para cualquier clon del repo;
 - los commits futuros ya no deberian arrastrar este problema salvo que se vuelva a introducir manualmente.
 
+### Preflight integrado al foundry-exporter
+
+Se conecto el preflight compartido al flujo de exportacion a Foundry.
+
+Ahora incluye:
+
+- nuevo `buildFoundryExportResult(...)` en `packages/foundry-exporter/src/index.ts`;
+- ejecucion de `buildPreflightResult(...)` antes de producir payload;
+- retorno conjunto de:
+  - `preflight`
+  - `payload` opcional;
+- bloqueo de export cuando existen blockers reales de preflight;
+- `buildFoundryActorPayload(...)` ahora pasa por el mismo carril y falla solo si el preflight bloquea;
+- resumen de preflight agregado dentro de `flags.bertinis-vault.preflight` cuando el export es valido;
+- tests ampliados en `packages/foundry-exporter/test/index.test.mjs`.
+
+Validacion ejecutada:
+
+- build de `packages/foundry-exporter` correcto;
+- `node --test packages/foundry-exporter/test/*.test.mjs` pasando.
+
+Impacto:
+
+- exporter y preflight ya no viven en carriles separados;
+- cualquier superficie que quiera exportar puede inspeccionar blockers y warnings antes de tocar Foundry;
+- el siguiente paso natural es mostrar este resultado en web o en el runtime Foundry como feedback de operador.
+
 ### Base architecture bootstrap
 
 Se agrego la base inicial del monorepo sin romper el prototipo actual de Foundry.

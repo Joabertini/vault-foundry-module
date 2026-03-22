@@ -2,6 +2,7 @@ import {
   type AbilityId,
   type CharacterBuild,
   type FoundryActorPayload,
+  type PreflightResult,
   foundryActorPayloadSchema,
 } from "@bertinis-vault/contracts";
 import { findWeaponCatalogEntry } from "@bertinis-vault/data-engine";
@@ -11,6 +12,7 @@ import {
 } from "@bertinis-vault/data-engine";
 import {
   abilityModifierMap,
+  buildPreflightResult,
   getEquipmentEntries,
   getFeatureEntries,
   getHitDieForClass,
@@ -32,6 +34,10 @@ type FoundryAbilityData = {
   };
 };
 type FoundryAbilities = Record<AbilityId, FoundryAbilityData>;
+export type FoundryExportResult = {
+  preflight: PreflightResult;
+  payload?: FoundryActorPayload;
+};
 
 const CLASS_PROFS_BY_ID: Record<string, { armor: string[]; weapons: string[] }> = {
   barbarian: { armor: ["light", "medium", "shields"], weapons: ["simple", "martial"] },
@@ -819,7 +825,7 @@ function buildItems(character: CharacterBuild): FoundryItem[] {
   ];
 }
 
-export function buildFoundryActorPayload(character: CharacterBuild): FoundryActorPayload {
+function buildFoundryActorPayloadUnchecked(character: CharacterBuild): FoundryActorPayload {
   const payload: FoundryActorPayload = {
     name: character.identity.characterName,
     type: "character",
@@ -901,6 +907,12 @@ export function buildFoundryActorPayload(character: CharacterBuild): FoundryActo
       "bertinis-vault": {
         sourceProfile: character.meta.sourceProfile,
         rulesVersion: character.meta.rulesVersion,
+        preflight: {
+          blockers: 0,
+          warnings: 0,
+          info: 0,
+          total: 0,
+        },
       },
     },
     prototypeToken: makeToken(character.identity.characterName),
@@ -910,4 +922,54 @@ export function buildFoundryActorPayload(character: CharacterBuild): FoundryActo
   };
 
   return foundryActorPayloadSchema.parse(payload);
+}
+
+export function buildFoundryExportResult(character: CharacterBuild): FoundryExportResult {
+  const preflight = buildPreflightResult(character, {
+    target: {
+      rulesVersion: character.meta.rulesVersion,
+      sourceProfile: character.meta.sourceProfile,
+      foundryVersion: "13.351",
+      systemId: "dnd5e",
+      systemVersion: "5.2.5",
+    },
+  });
+
+  if (!preflight.ok) {
+    return { preflight };
+  }
+
+  const payload = buildFoundryActorPayloadUnchecked(character);
+  const flaggedPayload: FoundryActorPayload = foundryActorPayloadSchema.parse({
+    ...payload,
+    flags: {
+      ...payload.flags,
+      "bertinis-vault": {
+        ...((payload.flags?.["bertinis-vault"] as Record<string, unknown> | undefined) ?? {}),
+        preflight: preflight.summary,
+      },
+    },
+  });
+
+  return {
+    preflight,
+    payload: flaggedPayload,
+  };
+}
+
+export function buildFoundryActorPayload(character: CharacterBuild): FoundryActorPayload {
+  const result = buildFoundryExportResult(character);
+
+  if (!result.payload) {
+    const blockerSummary = result.preflight.issues
+      .filter((issue) => issue.severity === "blocker")
+      .map((issue) => issue.message)
+      .join(" ");
+
+    throw new Error(
+      blockerSummary || "Foundry export blocked by preflight validation.",
+    );
+  }
+
+  return result.payload;
 }
