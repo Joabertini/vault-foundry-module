@@ -4,6 +4,8 @@
   "private": true,
   "packageManager": "pnpm@10.6.2",
   "scripts": {
+    "web:dev": "pnpm --filter @bertinis-vault/web dev",
+    "web:preview": "pnpm --filter @bertinis-vault/web preview",
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test"

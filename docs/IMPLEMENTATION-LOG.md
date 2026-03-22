@@ -317,3 +317,20 @@ Impacto:
 - el `CharacterBuild` web alimenta mejor la biografia canonica;
 - la salida hacia Foundry ya puede aprovechar mas campos narrativos;
 - la sheet web empieza a sentirse mas cercana a una character sheet real.
+
+### Preview local lista para web
+
+Se preparo `apps/web` para levantarse con un preview local real usando Vite.
+
+Ahora incluye:
+
+- script `dev` para desarrollo local;
+- script `preview` para revisar el build;
+- configuracion `vite.config.ts`;
+- comandos documentados en el README del frontend.
+
+Impacto:
+
+- ya no dependemos de imaginar la UI solo leyendo codigo;
+- el equipo puede abrir la web localmente mucho mas rapido;
+- acelera validacion visual y futuras iteraciones de diseño.
