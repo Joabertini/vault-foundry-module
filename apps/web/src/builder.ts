@@ -24,6 +24,9 @@ export type BuilderState = {
   cha: number;
   trait: string;
   ideal: string;
+  bond: string;
+  flaw: string;
+  notes: string;
 };
 
 export const builderDraftStorageKey = "bertinis-vault:web-builder:draft";
@@ -51,6 +54,9 @@ export const initialState: BuilderState = {
   cha: 10,
   trait: "Siempre toma notas, incluso en medio del peligro.",
   ideal: "El conocimiento es la mejor defensa contra el caos.",
+  bond: "Su mentor desaparecido dejo pistas sobre una biblioteca sellada.",
+  flaw: "Le cuesta abandonar una pista, incluso cuando pone al grupo en riesgo.",
+  notes: "Lleva un grimorio con observaciones sobre portales, constelaciones y runas rotas.",
 };
 
 export function coerceBuilderState(value: unknown): BuilderState {
@@ -86,6 +92,9 @@ export function coerceBuilderState(value: unknown): BuilderState {
     cha: typeof candidate.cha === "number" ? candidate.cha : initialState.cha,
     trait: typeof candidate.trait === "string" ? candidate.trait : initialState.trait,
     ideal: typeof candidate.ideal === "string" ? candidate.ideal : initialState.ideal,
+    bond: typeof candidate.bond === "string" ? candidate.bond : initialState.bond,
+    flaw: typeof candidate.flaw === "string" ? candidate.flaw : initialState.flaw,
+    notes: typeof candidate.notes === "string" ? candidate.notes : initialState.notes,
   };
 }
 
@@ -130,6 +139,9 @@ export function buildCanonicalSnapshot(state: BuilderState): CharacterBuild {
       biography: {
         trait: state.trait,
         ideal: state.ideal,
+        bond: state.bond,
+        flaw: state.flaw,
+        notes: state.notes,
       },
     },
     ancestry: {

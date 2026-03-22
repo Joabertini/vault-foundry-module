@@ -300,3 +300,20 @@ Impacto:
 - la preview Foundry web se parece mas al actor real esperado;
 - el exportador compartido absorbe logica que antes vivia solo en el puente legacy;
 - prepara mejor el terreno para reemplazar piezas del modulo actual con la capa nueva.
+
+### Biografia completa en el builder web
+
+Se completo la captura de personalidad y notas dentro del builder web.
+
+Ahora incluye:
+
+- bond;
+- flaw;
+- notes;
+- y reflejo de esos campos en la preview de personaje.
+
+Impacto:
+
+- el `CharacterBuild` web alimenta mejor la biografia canonica;
+- la salida hacia Foundry ya puede aprovechar mas campos narrativos;
+- la sheet web empieza a sentirse mas cercana a una character sheet real.

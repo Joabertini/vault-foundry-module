@@ -441,6 +441,30 @@ export function App() {
                   onChange={(event) => updateField("ideal", event.target.value)}
                 />
               </label>
+              <label className="field field-full">
+                <span>Bond</span>
+                <textarea
+                  rows={3}
+                  value={state.bond}
+                  onChange={(event) => updateField("bond", event.target.value)}
+                />
+              </label>
+              <label className="field field-full">
+                <span>Flaw</span>
+                <textarea
+                  rows={3}
+                  value={state.flaw}
+                  onChange={(event) => updateField("flaw", event.target.value)}
+                />
+              </label>
+              <label className="field field-full">
+                <span>Notas</span>
+                <textarea
+                  rows={4}
+                  value={state.notes}
+                  onChange={(event) => updateField("notes", event.target.value)}
+                />
+              </label>
             </div>
           ) : null}
         </section>
@@ -497,6 +521,15 @@ export function App() {
               </p>
               <p>
                 <strong>Ideal:</strong> {state.ideal}
+              </p>
+              <p>
+                <strong>Bond:</strong> {state.bond}
+              </p>
+              <p>
+                <strong>Flaw:</strong> {state.flaw}
+              </p>
+              <p>
+                <strong>Notas:</strong> {state.notes}
               </p>
             </div>
 
