@@ -21,6 +21,27 @@ Decision importante:
 - la prioridad inmediata pasa a ser Stage A;
 - no conviene abrir trabajo amplio de polish o beta antes de fortalecer el pipeline operativo Foundry-side.
 
+### Contrato inicial de preflight compartido
+
+Se abrio el primer slice tecnico de Stage A con una base tipada para preflight dentro de `packages/contracts`.
+
+Ahora incluye:
+
+- nuevo archivo `packages/contracts/src/preflight.ts`;
+- severidades compartidas: `blocker`, `warning`, `info`;
+- scopes iniciales para build canonico, export, import, compatibilidad y datasets;
+- `preflightIssueSchema` para findings estructurados;
+- `preflightTargetSchema` para capturar el target Foundry/sistema/modulo;
+- `preflightResultSchema` con `issues` y `summary`;
+- export desde `packages/contracts/src/index.ts`;
+- tests nuevos en `packages/contracts/test/preflight.test.mjs`.
+
+Impacto:
+
+- el proyecto ya tiene un shape unico para reportar blockers y warnings;
+- las siguientes capas de Stage A pueden construir checks reales sin inventar contratos nuevos;
+- Foundry, exporter y validacion compartida ya tienen un punto comun para converger.
+
 ### Base architecture bootstrap
 
 Se agrego la base inicial del monorepo sin romper el prototipo actual de Foundry.
