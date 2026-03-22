@@ -89,6 +89,9 @@ export function App() {
   const ac = 10 + dexMod;
   const hp = 6 + conMod + Math.max(state.level - 1, 0) * (4 + conMod);
   const canonicalSnapshot = buildCanonicalSnapshot(state);
+  const listedSpells = canonicalSnapshot.choices.spells;
+  const listedFeatures = canonicalSnapshot.choices.features;
+  const listedEquipment = canonicalSnapshot.choices.equipment;
 
   function updateField<K extends keyof BuilderState>(key: K, value: BuilderState[K]) {
     setState((current) => ({ ...current, [key]: value }));
@@ -389,32 +392,59 @@ export function App() {
 
             <div className="persona-card">
               <p>
-                <strong>Background:</strong> {state.backgroundId}
-              </p>
-              <p>
-                <strong>Feat:</strong> {state.featId}
-              </p>
-              <p>
-                <strong>Weapon:</strong> {state.weaponId}
-              </p>
-              <p>
-                <strong>Armor:</strong> {state.armorId}
-              </p>
-              <p>
-                <strong>Cantrips:</strong> {state.cantripsText.replace(/\n/g, ", ")}
-              </p>
-              <p>
-                <strong>Spells:</strong> {state.spellsText.replace(/\n/g, ", ")}
-              </p>
-              <p>
-                <strong>Features:</strong> {state.featuresText.replace(/\n/g, ", ")}
-              </p>
-              <p>
                 <strong>Trait:</strong> {state.trait}
               </p>
               <p>
                 <strong>Ideal:</strong> {state.ideal}
               </p>
+            </div>
+
+            <div className="sheet-section">
+              <div className="sheet-section-head">
+                <span className="eyebrow">Build</span>
+                <strong>Origen y equipo</strong>
+              </div>
+              <div className="tag-list">
+                <span className="sheet-tag">{state.backgroundId}</span>
+                <span className="sheet-tag">{state.featId}</span>
+                {listedEquipment.map((item) => (
+                  <span className="sheet-tag" key={item}>
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="sheet-columns">
+              <div className="sheet-section">
+                <div className="sheet-section-head">
+                  <span className="eyebrow">Spellbook</span>
+                  <strong>Magia</strong>
+                </div>
+                <div className="list-stack">
+                  {listedSpells.map((spell) => (
+                    <div className="list-row" key={spell}>
+                      <span className="list-bullet">*</span>
+                      <span>{spell}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="sheet-section">
+                <div className="sheet-section-head">
+                  <span className="eyebrow">Core Traits</span>
+                  <strong>Features</strong>
+                </div>
+                <div className="list-stack">
+                  {listedFeatures.map((feature) => (
+                    <div className="list-row" key={feature}>
+                      <span className="list-bullet">*</span>
+                      <span>{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <div className="canonical-card">

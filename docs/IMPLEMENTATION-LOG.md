@@ -224,3 +224,15 @@ Impacto:
 - el flujo web ya cubre una porcion mucho mas realista del personaje;
 - el snapshot canonico ahora incluye magia y rasgos editables;
 - el siguiente paso natural es convertir la preview en una sheet visual mas parecida al producto final.
+
+### Preview elevada a character sheet
+
+Se mejoro la preview lateral del builder web para que se parezca mas a una sheet final.
+
+Ahora incluye:
+
+- seccion de build;
+- tags de background, feat y equipo;
+- bloques de magia;
+- bloques de features;
+- distribucion mas cercana a una hoja visual de personaje.
