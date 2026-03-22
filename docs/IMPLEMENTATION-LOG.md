@@ -116,6 +116,33 @@ Impacto:
 - cualquier superficie que quiera exportar puede inspeccionar blockers y warnings antes de tocar Foundry;
 - el siguiente paso natural es mostrar este resultado en web o en el runtime Foundry como feedback de operador.
 
+### Preflight visible en apps/web
+
+Se llevo el resultado del preflight integrado a la superficie web de demo.
+
+Ahora incluye:
+
+- `apps/web/src/App.tsx` usando `buildFoundryExportResult(...)` en lugar de exportar Foundry a ciegas;
+- nueva tarjeta visual de preflight con:
+  - blockers;
+  - warnings;
+  - info;
+  - lista resumida de hallazgos;
+- bloqueo elegante de copia/descarga Foundry cuando el preflight no permite exportar;
+- fallback de la vista tecnica para mostrar `preflight` cuando no existe payload Foundry;
+- estilos nuevos en `apps/web/src/styles.css` para integrar el chequeo al lenguaje visual actual.
+
+Validacion ejecutada:
+
+- `corepack pnpm web:typecheck`;
+- `corepack pnpm web:build`.
+
+Impacto:
+
+- la demo ya comunica claramente si la build esta lista para Foundry;
+- el export deja de ser una accion ciega desde la UI;
+- el siguiente paso natural es exponer el mismo preflight en el runtime legacy de Foundry.
+
 ### Base architecture bootstrap
 
 Se agrego la base inicial del monorepo sin romper el prototipo actual de Foundry.

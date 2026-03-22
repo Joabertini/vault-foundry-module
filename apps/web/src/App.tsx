@@ -1,4 +1,4 @@
-import { buildFoundryActorPayload } from "@bertinis-vault/foundry-exporter";
+import { buildFoundryExportResult } from "@bertinis-vault/foundry-exporter";
 import { useEffect, useState } from "react";
 import {
   type BuilderState,
@@ -152,6 +152,69 @@ function StoryBlock() {
   );
 }
 
+function PreflightCard({
+  blockers,
+  warnings,
+  info,
+  issues,
+}: {
+  blockers: number;
+  warnings: number;
+  info: number;
+  issues: Array<{ code: string; message: string; severity: string; path: string | undefined }>;
+}) {
+  const headline =
+    blockers > 0
+      ? "Export bloqueado hasta corregir hallazgos clave."
+      : warnings > 0
+        ? "Export disponible con advertencias visibles."
+        : "Export limpio para demo y descarga.";
+
+  return (
+    <div className={`preflight-card${blockers > 0 ? " is-blocked" : warnings > 0 ? " is-warning" : " is-clean"}`}>
+      <div className="sheet-section-head">
+        <div>
+          <span className="eyebrow">Preflight</span>
+          <strong>Chequeo previo a Foundry</strong>
+        </div>
+        <span className="preflight-headline">{headline}</span>
+      </div>
+
+      <div className="preflight-summary">
+        <article>
+          <span>Blockers</span>
+          <strong>{blockers}</strong>
+        </article>
+        <article>
+          <span>Warnings</span>
+          <strong>{warnings}</strong>
+        </article>
+        <article>
+          <span>Info</span>
+          <strong>{info}</strong>
+        </article>
+      </div>
+
+      <div className="preflight-list">
+        {issues.length ? (
+          issues.slice(0, 4).map((issue) => (
+            <div className="preflight-issue" key={`${issue.code}-${issue.path ?? issue.message}`}>
+              <span className={`preflight-severity severity-${issue.severity}`}>{issue.severity}</span>
+              <div>
+                <strong>{issue.code}</strong>
+                <p>{issue.message}</p>
+                {issue.path ? <code>{issue.path}</code> : null}
+              </div>
+            </div>
+          ))
+        ) : (
+          <span className="empty-note">No se detectaron blockers ni warnings en esta build.</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function App() {
   const [stepIndex, setStepIndex] = useState(0);
   const [showTechnicalView, setShowTechnicalView] = useState(false);
@@ -182,8 +245,10 @@ export function App() {
   const [foundryExportState, setFoundryExportState] = useState("Preview Foundry lista");
 
   const canonicalSnapshot = buildCanonicalSnapshot(state);
-  const foundryPreview = buildFoundryActorPayload(canonicalSnapshot);
-  const foundryItemCount = foundryPreview.items.length;
+  const foundryExport = buildFoundryExportResult(canonicalSnapshot);
+  const foundryPreview = foundryExport.payload;
+  const foundryPreflight = foundryExport.preflight;
+  const foundryItemCount = foundryPreview?.items.length ?? 0;
   const pb = canonicalSnapshot.derived.proficiencyBonus;
   const ac = canonicalSnapshot.derived.ac;
   const hp = canonicalSnapshot.derived.hp;
@@ -404,10 +469,20 @@ export function App() {
   }
 
   async function copyFoundryPreview() {
+    if (!foundryPreview) {
+      setFoundryExportState("Export bloqueado por preflight");
+      return;
+    }
+
     await copyJson(JSON.stringify(foundryPreview, null, 2), setFoundryExportState);
   }
 
   function downloadFoundryPreview() {
+    if (!foundryPreview) {
+      setFoundryExportState("Export bloqueado por preflight");
+      return;
+    }
+
     const fileNameBase = state.characterName.trim() || "bertinis-vault-character";
     const fileName = `${fileNameBase.toLowerCase().replace(/\s+/g, "-")}.foundry-actor.json`;
     downloadJson(JSON.stringify(foundryPreview, null, 2), fileName, setFoundryExportState);
@@ -1102,6 +1177,20 @@ export function App() {
             </div>
 
             <div className="preview-support-card preview-support-card-wide">
+              <PreflightCard
+                blockers={foundryPreflight.summary.blockers}
+                warnings={foundryPreflight.summary.warnings}
+                info={foundryPreflight.summary.info}
+                issues={foundryPreflight.issues.map((issue) => ({
+                  code: issue.code,
+                  message: issue.message,
+                  severity: issue.severity,
+                  path: issue.path,
+                }))}
+              />
+            </div>
+
+            <div className="preview-support-card preview-support-card-wide">
               <div className="canonical-head">
                 <span className="eyebrow">Deliverables</span>
                 <strong>Salida lista para demo</strong>
@@ -1115,7 +1204,11 @@ export function App() {
                 <article>
                   <span>Foundry actor</span>
                   <strong>{foundryExportState}</strong>
-                  <p>El export comparte la misma base y ya produce un actor con {foundryItemCount} items.</p>
+                  <p>
+                    {foundryPreview
+                      ? `El export comparte la misma base y ya produce un actor con ${foundryItemCount} items.`
+                      : "El export Foundry esta pausado hasta resolver los blockers de preflight."}
+                  </p>
                 </article>
               </div>
               <div className="button-row">
@@ -1164,7 +1257,11 @@ export function App() {
                 <div className="canonical-card foundry-card">
                   <div className="canonical-head">
                     <span className="eyebrow">Foundry Preview</span>
-                    <strong>Actor listo ({foundryItemCount} items)</strong>
+                    <strong>
+                      {foundryPreview
+                        ? `Actor listo (${foundryItemCount} items)`
+                        : "Preview bloqueada por preflight"}
+                    </strong>
                   </div>
                   <div className="export-toolbar">
                     <span className="save-pill">{foundryExportState}</span>
@@ -1185,7 +1282,7 @@ export function App() {
                       </button>
                     </div>
                   </div>
-                  <pre>{JSON.stringify(foundryPreview, null, 2)}</pre>
+                  <pre>{JSON.stringify(foundryPreview ?? foundryPreflight, null, 2)}</pre>
                 </div>
               </>
             ) : null}
