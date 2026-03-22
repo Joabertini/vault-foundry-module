@@ -1,4 +1,4 @@
-import { normalizeLabel } from "./normalize";
+import { normalizeLabel } from "./normalize.js";
 
 export type ClassCatalogEntry = {
   id: string;

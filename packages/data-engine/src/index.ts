@@ -1,8 +1,8 @@
-export * from "./backgrounds";
-export * from "./classes";
-export * from "./equipment";
-export { gearCatalog } from "./equipment";
-export * from "./feats";
-export * from "./normalize";
-export * from "./races";
-export * from "./spells";
+export * from "./backgrounds.js";
+export * from "./classes.js";
+export * from "./equipment.js";
+export { gearCatalog } from "./equipment.js";
+export * from "./feats.js";
+export * from "./normalize.js";
+export * from "./races.js";
+export * from "./spells.js";

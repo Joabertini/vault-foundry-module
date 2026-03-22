@@ -4,9 +4,9 @@ Este directorio representa el destino del modulo de Foundry dentro de la arquite
 
 Por ahora, el prototipo funcional sigue viviendo en la raiz del repo:
 
-- [module.json](C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/cf72cb7dc21aaf7e/module.json)
-- [scripts/vault-app.js](C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/cf72cb7dc21aaf7e/scripts/vault-app.js)
-- [scripts/character-builder.js](C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/cf72cb7dc21aaf7e/scripts/character-builder.js)
+- [module.json](C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/module.json)
+- [scripts/vault-app.js](C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/scripts/vault-app.js)
+- [scripts/character-builder.js](C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/scripts/character-builder.js)
 
 La migracion correcta sera:
 

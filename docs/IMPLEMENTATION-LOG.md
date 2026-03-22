@@ -737,3 +737,39 @@ Impacto:
 - el personaje exportado se parece mas a un actor jugable y menos a un esqueleto;
 - cerramos mejor el bloque de "tools y demas" que faltaba en la ficha;
 - dejamos lista la base para futuras validaciones mas estrictas de background, clase y elecciones de proficiencia.
+
+### Baseline de tests compartidos y docs de continuidad
+
+Se reforzo la continuabilidad del repo para futuras iteraciones humanas o de IA.
+
+Ahora incluye:
+
+- tests reales en `packages/contracts`, `packages/data-engine`, `packages/domain` y `packages/foundry-exporter`;
+- limpieza de imports cruzados que apuntaban directo a `src/` de otros paquetes;
+- nueva matriz de migracion en `docs/MIGRATION-MATRIX.md`;
+- nueva guia operativa para continuidad en `docs/AI-HANDOFF.md`;
+- referencias desde el `README.md` a la documentacion clave de arquitectura, migracion y handoff.
+
+Impacto:
+
+- el repo deja de depender tanto de memoria tacita o relectura manual para retomar trabajo;
+- la siguiente IA puede ubicar mas rapido el limite entre legado, transicion y capa compartida;
+- mejora la base para seguir reemplazando el modulo legacy con el core compartido sin perder trazabilidad.
+
+### Ajustes de build del workspace y compatibilidad ESM
+
+Se corrigieron varios puntos que estaban frenando validaciones reales sobre los paquetes compartidos.
+
+Ahora incluye:
+
+- `tsconfig` de `packages/domain` y `packages/foundry-exporter` ajustados para consumir declaraciones compiladas de dependencias del workspace en lugar de resolver directo a `src`;
+- `apps/web/tsconfig.json` alineado para typecheck contra declaraciones compiladas y tipos de Vite;
+- imports relativos de los paquetes compartidos actualizados a sufijos `.js` para compatibilidad real con Node ESM al ejecutar `dist`;
+- correcciones menores de strictness en dominio y exportador;
+- limpieza e ignorado de artefactos generados accidentalmente dentro de `src/`.
+
+Impacto:
+
+- los paquetes compartidos ya compilan de forma mas predecible en el repo real;
+- los tests de `contracts`, `data-engine`, `domain` y `foundry-exporter` pueden ejecutarse contra `dist` sin romper por resolucion ESM;
+- baja bastante la friccion para que la siguiente IA valide cambios sin reencontrarse con el mismo set de problemas de tooling.

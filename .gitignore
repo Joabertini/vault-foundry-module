@@ -14,6 +14,14 @@ packages/data-engine/src/*.js
 packages/data-engine/src/*.js.map
 packages/data-engine/src/*.d.ts
 packages/data-engine/src/*.d.ts.map
+packages/contracts/src/*.js
+packages/contracts/src/*.js.map
+packages/contracts/src/*.d.ts
+packages/contracts/src/*.d.ts.map
+packages/domain/src/*.js
+packages/domain/src/*.js.map
+packages/domain/src/*.d.ts
+packages/domain/src/*.d.ts.map
 
 # Foundry local
 *.db

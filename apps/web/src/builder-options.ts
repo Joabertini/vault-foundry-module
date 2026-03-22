@@ -3,11 +3,11 @@ import {
   backgroundCatalog,
   classCatalog,
   featCatalog,
+  gearCatalog,
   raceCatalog,
   spellCatalog,
   weaponCatalog,
 } from "@bertinis-vault/data-engine";
-import { gearCatalog } from "../../../packages/data-engine/src/equipment.ts";
 
 export type SelectOption = {
   id: string;

@@ -22,9 +22,10 @@ export function calculateArmorClass(input: {
 
   let base = 10 + dexContribution;
   const formula = input.armorFormula;
+  const formulaBase = formula ? armorFormulaBase[formula] : undefined;
 
-  if (formula && formula in armorFormulaBase) {
-    base = armorFormulaBase[formula] + (formula.endsWith("+DEX") ? dexContribution : 0);
+  if (formulaBase !== undefined && formula) {
+    base = formulaBase + (formula.endsWith("+DEX") ? dexContribution : 0);
   } else if (formula === "13+DEX2") {
     base = 13 + Math.min(input.dexModifier, 2);
   } else if (formula === "14+DEX2") {

@@ -1,4 +1,4 @@
-import { normalizeLabel, slugifyId } from "./normalize";
+import { normalizeLabel, slugifyId } from "./normalize.js";
 
 export type BackgroundCatalogEntry = {
   id: string;

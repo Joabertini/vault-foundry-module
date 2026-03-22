@@ -106,7 +106,7 @@ export function getSpellSlotsForClassLevel(classId: string, level: number): Reco
   }
 
   const effectiveLevel = progression === "half" ? Math.floor(level / 2) : level;
-  const table = spellSlotsFullCasterTable[Math.max(effectiveLevel, 1)] ?? spellSlotsFullCasterTable[1];
+  const table = spellSlotsFullCasterTable[Math.max(effectiveLevel, 1)] ?? spellSlotsFullCasterTable[1] ?? [];
 
   table.forEach((count, index) => {
     slots[`spell${index + 1}`] = count;

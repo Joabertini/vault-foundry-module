@@ -1,14 +1,14 @@
 import { type CharacterBuild, characterBuildSchema } from "@bertinis-vault/contracts";
 import { getArmorCatalogEntry } from "@bertinis-vault/data-engine";
-import { abilityModifierMap } from "./abilities";
-import { calculateArmorClass, calculateEstimatedHitPoints } from "./combat";
+import { abilityModifierMap } from "./abilities.js";
+import { calculateArmorClass, calculateEstimatedHitPoints } from "./combat.js";
 import {
   getHitDieForClass,
   getSpellAbilityForClass,
   getSpellSlotsForClassLevel,
   normalizeClassId,
-} from "./dnd5e-2014";
-import { getCharacterLevel, getProficiencyBonus } from "./progression";
+} from "./dnd5e-2014.js";
+import { getCharacterLevel, getProficiencyBonus } from "./progression.js";
 
 export function deriveCharacterBuild(
   input: Omit<CharacterBuild, "derived">,

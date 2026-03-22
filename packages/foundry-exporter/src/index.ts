@@ -1,4 +1,5 @@
 import {
+  type AbilityId,
   type CharacterBuild,
   type FoundryActorPayload,
   foundryActorPayloadSchema,
@@ -7,7 +8,7 @@ import { findWeaponCatalogEntry } from "@bertinis-vault/data-engine";
 import {
   getArmorCatalogEntry,
   getGearCatalogEntry,
-} from "../../data-engine/src/equipment.ts";
+} from "@bertinis-vault/data-engine";
 import {
   abilityModifierMap,
   getHitDieForClass,
@@ -17,6 +18,16 @@ import {
 } from "@bertinis-vault/domain";
 
 type FoundryItem = Record<string, unknown>;
+type FoundryAbilityData = {
+  value: number;
+  mod: number;
+  proficient: 0 | 1;
+  bonuses: {
+    check: string;
+    save: string;
+  };
+};
+type FoundryAbilities = Record<AbilityId, FoundryAbilityData>;
 
 const CLASS_PROFS_BY_ID: Record<string, { armor: string[]; weapons: string[] }> = {
   barbarian: { armor: ["light", "medium", "shields"], weapons: ["simple", "martial"] },
@@ -37,7 +48,7 @@ const CLASS_PROFS_BY_ID: Record<string, { armor: string[]; weapons: string[] }> 
   artificer: { armor: ["light", "medium", "shields"], weapons: ["simple"] },
 };
 
-const CLASS_SAVE_PROFS_BY_ID: Record<string, Array<keyof ReturnType<typeof buildFoundryAbilities>>> = {
+const CLASS_SAVE_PROFS_BY_ID: Record<string, AbilityId[]> = {
   barbarian: ["str", "con"],
   bard: ["dex", "cha"],
   cleric: ["wis", "cha"],
@@ -216,7 +227,7 @@ function makeStats() {
   };
 }
 
-function buildFoundryAbilities(character: CharacterBuild) {
+function buildFoundryAbilities(character: CharacterBuild): FoundryAbilities {
   const modifiers = abilityModifierMap(character.abilities.final);
   const primaryClassId = normalizeClassId(character.classing.classes[0]?.classId ?? "");
   const saveProficiencies = new Set(CLASS_SAVE_PROFS_BY_ID[primaryClassId] ?? []);
@@ -235,7 +246,7 @@ function makeAbility(value: number, modifier: number, saveProficient: boolean) {
   return {
     value,
     mod: modifier,
-    proficient: saveProficient ? 1 : 0,
+    proficient: (saveProficient ? 1 : 0) as 0 | 1,
     bonuses: { check: "", save: "" },
   };
 }
@@ -291,7 +302,7 @@ function normalizeProficiencyLabel(value: string) {
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z\s':-]/g, " ")
+    .replace(/[^a-z\s:-]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -505,10 +516,11 @@ function parseSpellEntry(raw: string): { name: string; level: number } {
   if (!match) {
     return { name: raw.trim(), level: 1 };
   }
+  const [, parsedLevel, parsedName] = match;
 
   return {
-    level: match[1] ? Number.parseInt(match[1], 10) : 1,
-    name: match[2].trim(),
+    level: parsedLevel ? Number.parseInt(parsedLevel, 10) : 1,
+    name: (parsedName ?? raw).trim(),
   };
 }
 
@@ -585,10 +597,11 @@ function buildFeatItems(character: CharacterBuild): FoundryItem[] {
 
 function parseDamageFormula(formula: string) {
   const match = formula.match(/(\d+)d(\d+)/i);
+  const [, numberPart, denominationPart] = match ?? [];
 
   return {
-    number: match ? Number.parseInt(match[1], 10) : 1,
-    denomination: match ? Number.parseInt(match[2], 10) : 6,
+    number: numberPart ? Number.parseInt(numberPart, 10) : 1,
+    denomination: denominationPart ? Number.parseInt(denominationPart, 10) : 6,
   };
 }
 

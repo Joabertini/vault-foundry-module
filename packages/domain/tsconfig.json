@@ -2,7 +2,11 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "dist"
+    "outDir": "dist",
+    "paths": {
+      "@bertinis-vault/contracts": ["../contracts/dist/index.d.ts"],
+      "@bertinis-vault/data-engine": ["../data-engine/dist/index.d.ts"]
+    }
   },
   "include": ["src/**/*.ts"]
 }
