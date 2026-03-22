@@ -27,6 +27,16 @@ export type BuilderOptionsPayload = {
   };
 };
 
+type DatasetEnvelope<T> = {
+  source: {
+    mode: string;
+    upstream: string;
+  };
+  items?: T[];
+  armor?: Array<SelectOption & { armorFormula?: string; grantsShieldBonus?: boolean }>;
+  weapons?: Array<SelectOption & { damage?: string; damageType?: string; attackType?: string }>;
+};
+
 export const fallbackBuilderOptions: BuilderOptionsPayload = {
   source: {
     mode: "curated-local",
@@ -68,13 +78,42 @@ export const fallbackBuilderOptions: BuilderOptionsPayload = {
 };
 
 export async function loadBuilderOptions(): Promise<BuilderOptionsPayload> {
-  const baseUrl =
-    import.meta.env.VITE_BERTINIS_API_URL?.trim() || "http://127.0.0.1:3001";
-  const response = await fetch(`${baseUrl}/datasets/builder-options`);
+  const baseUrl = import.meta.env.VITE_BERTINIS_API_URL?.trim() || "http://127.0.0.1:3001";
+  const [meta, classes, races, backgrounds, feats, equipment] = await Promise.all([
+    fetchJson<DatasetEnvelope<SelectOption>>(`${baseUrl}/datasets/meta`),
+    fetchJson<DatasetEnvelope<SelectOption>>(`${baseUrl}/datasets/classes`),
+    fetchJson<DatasetEnvelope<SelectOption>>(`${baseUrl}/datasets/races`),
+    fetchJson<DatasetEnvelope<SelectOption & { source?: string; grantedFeatIds?: string[] }>>(
+      `${baseUrl}/datasets/backgrounds`,
+    ),
+    fetchJson<DatasetEnvelope<SelectOption>>(`${baseUrl}/datasets/feats`),
+    fetchJson<
+      DatasetEnvelope<SelectOption> & {
+        armor: Array<SelectOption & { armorFormula?: string; grantsShieldBonus?: boolean }>;
+        weapons: Array<SelectOption & { damage?: string; damageType?: string; attackType?: string }>;
+      }
+    >(`${baseUrl}/datasets/equipment`),
+  ]);
+
+  return {
+    source: meta.source,
+    classes: classes.items ?? [],
+    races: races.items ?? [],
+    backgrounds: backgrounds.items ?? [],
+    feats: feats.items ?? [],
+    equipment: {
+      armor: equipment.armor ?? [],
+      weapons: equipment.weapons ?? [],
+    },
+  };
+}
+
+async function fetchJson<T>(url: string): Promise<T> {
+  const response = await fetch(url);
 
   if (!response.ok) {
-    throw new Error(`Builder options request failed: ${response.status}`);
+    throw new Error(`Dataset request failed: ${response.status} for ${url}`);
   }
 
-  return response.json() as Promise<BuilderOptionsPayload>;
+  return response.json() as Promise<T>;
 }

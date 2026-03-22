@@ -468,3 +468,19 @@ Impacto:
 - el BFF ya empieza a parecer una API del producto y no solo un proxy o agregador ad hoc;
 - deja la web mejor preparada para consumir datasets de forma mas granular;
 - ordena el backend para futuras mezclas entre curado local y upstream de 5etools.
+
+### Web consumiendo datasets granulares
+
+La carga de opciones del builder web ya no depende de un solo endpoint agregado.
+
+Ahora incluye:
+
+- carga separada de `meta`, `classes`, `races`, `backgrounds`, `feats` y `equipment`;
+- recomposicion local del payload de opciones;
+- misma politica de fallback local si la API no responde.
+
+Impacto:
+
+- la web queda lista para evolucionar datasets por categoria;
+- el frontend empieza a parecerse mas al flujo real de producto;
+- prepara mejor la integracion futura con upstream semantico desde 5etools.
