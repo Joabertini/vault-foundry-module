@@ -17,10 +17,13 @@ import {
   getFeatureEntries,
   getHitDieForClass,
   getProficiencyLabels,
+  resolveLanguageId as resolveLanguageIdShared,
+  resolveSkillId as resolveSkillIdShared,
   getSpellAbilityForClass,
   getSpellEntries,
   getSpellProgressionForClass,
   normalizeClassId,
+  resolveToolEntry as resolveToolEntryShared,
 } from "@bertinis-vault/domain";
 
 type FoundryItem = Record<string, unknown>;
@@ -304,7 +307,7 @@ function normalizeSkillLabel(value: string) {
 }
 
 function resolveSkillId(value: string) {
-  return SKILL_ALIAS_TO_ID[normalizeSkillLabel(value)];
+  return resolveSkillIdShared(value);
 }
 
 function normalizeProficiencyLabel(value: string) {
@@ -318,13 +321,11 @@ function normalizeProficiencyLabel(value: string) {
 }
 
 function parseLanguageEntry(value: string) {
-  const normalized = normalizeProficiencyLabel(value).replace(/^language:\s*/, "");
-  return LANGUAGE_ALIAS_TO_ID[normalized];
+  return resolveLanguageIdShared(value);
 }
 
 function parseToolEntry(value: string) {
-  const normalized = normalizeProficiencyLabel(value).replace(/^tool:\s*/, "");
-  return TOOL_ALIAS_TO_ID[normalized];
+  return resolveToolEntryShared(value);
 }
 
 function buildSkills(character: CharacterBuild) {

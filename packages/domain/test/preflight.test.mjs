@@ -234,3 +234,62 @@ test("buildPreflightResult warns when non-caster builds carry derived spellcasti
   assert.equal(result.summary.warnings, 1);
   assert.equal(result.issues[0].code, "UNEXPECTED_DERIVED_SPELLCASTING");
 });
+
+test("buildPreflightResult warns on unresolved, duplicate, and mismatched proficiencies", () => {
+  const result = buildPreflightResult(makeInput({
+    choices: {
+      feats: [],
+      proficiencies: [],
+      spells: [],
+      equipment: [],
+      features: [],
+      normalized: {
+        feats: [],
+        proficiencies: [
+          { kind: "skill", label: "Arcana" },
+          { kind: "skill", label: "Arcana" },
+          { kind: "skill", label: "Language: Elvish" },
+          { kind: "tool", label: "Unknown Kit" },
+        ],
+        spells: [],
+        equipment: [],
+        features: [],
+      },
+    },
+  }), {
+    generatedAt: "2026-03-22T00:00:00.000Z",
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.summary.warnings, 4);
+  assert.deepEqual(
+    result.issues.map((issue) => issue.code),
+    [
+      "DUPLICATE_PROFICIENCY_ENTRY",
+      "PROFICIENCY_KIND_LABEL_MISMATCH",
+      "UNRESOLVED_PROFICIENCY",
+      "UNRESOLVED_PROFICIENCY",
+    ],
+  );
+});
+
+test("buildPreflightResult warns on unresolved and duplicate legacy proficiencies", () => {
+  const result = buildPreflightResult(makeInput({
+    choices: {
+      feats: [],
+      proficiencies: ["Arcana", "Arcana", "Language: ???"],
+      spells: [],
+      equipment: [],
+      features: [],
+    },
+  }), {
+    generatedAt: "2026-03-22T00:00:00.000Z",
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.summary.warnings, 2);
+  assert.deepEqual(
+    result.issues.map((issue) => issue.code),
+    ["DUPLICATE_PROFICIENCY_ENTRY", "UNRESOLVED_PROFICIENCY"],
+  );
+});

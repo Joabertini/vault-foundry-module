@@ -227,6 +227,37 @@ Impacto:
 - esto ayuda a identificar exportaciones potencialmente "correctas de schema pero stale de calculo";
 - el siguiente paso natural es ampliar la matriz a proficiencies y fixtures mas realistas de caster/non-caster antes de reducir mas duplicacion legacy.
 
+### Proficiencies compartidas y preflight mas estricto
+
+Se avanzo sobre `proficiencies` con una mejora que no solo agrega warnings: tambien reduce duplicacion entre dominio y exporter.
+
+Ahora incluye:
+
+- nuevo modulo compartido `packages/domain/src/proficiencies.ts` para resolver:
+  - skills
+  - languages
+  - tools
+- `packages/foundry-exporter/src/index.ts` reutilizando esa capa compartida en lugar de depender solo de mapas locales;
+- warnings nuevos en preflight para proficiencies:
+  - `UNRESOLVED_PROFICIENCY`
+  - `DUPLICATE_PROFICIENCY_ENTRY`
+  - `PROFICIENCY_KIND_LABEL_MISMATCH`
+- cobertura tanto para `choices.normalized.proficiencies` como para el array legacy `choices.proficiencies`;
+- tests ampliados en `packages/domain/test/preflight.test.mjs` y `packages/foundry-exporter/test/index.test.mjs`.
+
+Validacion ejecutada:
+
+- build de `packages/domain` correcto;
+- build de `packages/foundry-exporter` correcto;
+- `node --test packages/domain/test/preflight.test.mjs` pasando;
+- `node --test packages/foundry-exporter/test/index.test.mjs` pasando.
+
+Impacto:
+
+- preflight ahora detecta mejor picks de skill/language/tool que hoy se perderian silenciosamente al exportar;
+- exporter y preflight comparten una misma logica de resolucion, lo que baja riesgo de divergencia;
+- el siguiente paso natural es ampliar fixtures mixtos de equipment y continuar la convergencia del runtime Foundry con esta capa compartida.
+
 ### Base architecture bootstrap
 
 Se agrego la base inicial del monorepo sin romper el prototipo actual de Foundry.

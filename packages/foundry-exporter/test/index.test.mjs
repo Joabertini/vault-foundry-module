@@ -191,3 +191,26 @@ test("buildFoundryExportResult propagates derived consistency warnings", () => {
     ],
   );
 });
+
+test("buildFoundryExportResult propagates proficiency warnings from preflight", () => {
+  const build = makeCharacterBuild();
+  build.choices.normalized.proficiencies = [
+    { kind: "skill", label: "Arcana" },
+    { kind: "skill", label: "Arcana" },
+    { kind: "skill", label: "Language: Elvish" },
+    { kind: "tool", label: "Unknown Kit" },
+  ];
+
+  const result = buildFoundryExportResult(build);
+
+  assert.equal(result.preflight.ok, true);
+  assert.deepEqual(
+    result.preflight.issues.map((issue) => issue.code),
+    [
+      "DUPLICATE_PROFICIENCY_ENTRY",
+      "PROFICIENCY_KIND_LABEL_MISMATCH",
+      "UNRESOLVED_PROFICIENCY",
+      "UNRESOLVED_PROFICIENCY",
+    ],
+  );
+});

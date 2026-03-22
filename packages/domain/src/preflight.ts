@@ -19,6 +19,12 @@ import {
 } from "@bertinis-vault/data-engine";
 import { abilityModifierMap } from "./abilities.js";
 import { getSpellAbilityForClass, getSpellSlotsForClassLevel } from "./dnd5e-2014.js";
+import {
+  normalizeProficiencyLabel,
+  resolveLanguageId,
+  resolveSkillId,
+  resolveToolEntry,
+} from "./proficiencies.js";
 import { getCharacterLevel, getProficiencyBonus } from "./progression.js";
 
 type PreflightOptions = {
@@ -266,6 +272,121 @@ function validateNormalizedChoices(character: CharacterBuild) {
   return issues;
 }
 
+function validateProficiencies(character: CharacterBuild) {
+  const issues: PreflightIssue[] = [];
+  const seenEntries = new Set<string>();
+  const normalizedChoices = character.choices.normalized;
+
+  if (normalizedChoices) {
+    for (const [index, entry] of normalizedChoices.proficiencies.entries()) {
+      let resolvedId: string | undefined;
+      const explicitKind = /^language:\s*/i.test(entry.label)
+        ? "language"
+        : /^tool:\s*/i.test(entry.label)
+          ? "tool"
+          : undefined;
+      const normalizedLabel = normalizeProficiencyLabel(entry.label);
+
+      if (explicitKind && explicitKind !== entry.kind) {
+        issues.push(makeIssue({
+          code: "PROFICIENCY_KIND_LABEL_MISMATCH",
+          message: `Proficiency "${entry.label}" is tagged as "${entry.kind}" but looks like "${explicitKind}".`,
+          severity: "warning",
+          scope: "canonical-build",
+          path: `choices.normalized.proficiencies[${index}]`,
+          source: "domain",
+          canonicalId: entry.id,
+          details: {
+            expectedKind: explicitKind,
+            providedKind: entry.kind,
+          },
+        }));
+      }
+
+      if (entry.kind === "skill") {
+        resolvedId = resolveSkillId(entry.label);
+      } else if (entry.kind === "language") {
+        resolvedId = resolveLanguageId(entry.label);
+      } else if (entry.kind === "tool") {
+        const resolvedTool = resolveToolEntry(entry.label);
+        resolvedId = resolvedTool?.id;
+      } else if (explicitKind === "language") {
+        resolvedId = resolveLanguageId(entry.label);
+      } else if (explicitKind === "tool") {
+        resolvedId = resolveToolEntry(entry.label)?.id;
+      }
+
+      if ((entry.kind === "skill" || entry.kind === "language" || entry.kind === "tool") && !resolvedId) {
+        issues.push(makeIssue({
+          code: "UNRESOLVED_PROFICIENCY",
+          message: `Proficiency "${entry.label}" could not be resolved for kind "${entry.kind}".`,
+          severity: "warning",
+          scope: "canonical-build",
+          path: `choices.normalized.proficiencies[${index}]`,
+          source: "domain",
+          canonicalId: entry.id,
+        }));
+        continue;
+      }
+
+      const duplicateKey = `${entry.kind}:${entry.id ?? resolvedId ?? normalizedLabel}`;
+      if (seenEntries.has(duplicateKey)) {
+        issues.push(makeIssue({
+          code: "DUPLICATE_PROFICIENCY_ENTRY",
+          message: `Proficiency "${entry.label}" appears more than once for kind "${entry.kind}".`,
+          severity: "warning",
+          scope: "canonical-build",
+          path: `choices.normalized.proficiencies[${index}]`,
+          source: "domain",
+          canonicalId: entry.id ?? resolvedId,
+        }));
+      } else {
+        seenEntries.add(duplicateKey);
+      }
+    }
+
+    return issues;
+  }
+
+  for (const [index, entry] of character.choices.proficiencies.entries()) {
+    const looksLikeLanguage = /^language:\s*/i.test(entry);
+    const looksLikeTool = /^tool:\s*/i.test(entry);
+    const resolvedId = looksLikeLanguage
+      ? resolveLanguageId(entry)
+      : looksLikeTool
+        ? resolveToolEntry(entry)?.id
+        : resolveSkillId(entry);
+
+    if (!resolvedId) {
+      issues.push(makeIssue({
+        code: "UNRESOLVED_PROFICIENCY",
+        message: `Legacy proficiency "${entry}" could not be resolved.`,
+        severity: "warning",
+        scope: "canonical-build",
+        path: `choices.proficiencies[${index}]`,
+        source: "domain",
+      }));
+      continue;
+    }
+
+    const duplicateKey = `${looksLikeLanguage ? "language" : looksLikeTool ? "tool" : "skill"}:${resolvedId}`;
+    if (seenEntries.has(duplicateKey)) {
+      issues.push(makeIssue({
+        code: "DUPLICATE_PROFICIENCY_ENTRY",
+        message: `Legacy proficiency "${entry}" appears more than once.`,
+        severity: "warning",
+        scope: "canonical-build",
+        path: `choices.proficiencies[${index}]`,
+        source: "domain",
+      }));
+    } else {
+      seenEntries.add(duplicateKey);
+    }
+  }
+
+  return issues;
+}
+
 function validateDerivedState(character: CharacterBuild) {
   const issues: PreflightIssue[] = [];
   const totalLevels = getCharacterLevel(character.classing.classes.map((entry) => entry.level));
@@ -410,6 +531,7 @@ export function buildPreflightResult(
   const issues = [
     ...validateCanonicalCatalogs(character as CharacterBuild),
     ...validateNormalizedChoices(character as CharacterBuild),
+    ...validateProficiencies(character as CharacterBuild),
     ...(parsedWithDerived.success ? validateDerivedState(parsedWithDerived.data) : []),
   ];
   const summary = summarizeIssues(issues);
