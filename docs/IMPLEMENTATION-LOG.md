@@ -268,3 +268,19 @@ Impacto:
 - el builder web ya produce una salida portable;
 - acerca la web al flujo real de exportacion futura hacia Foundry;
 - deja una base simple para agregar exportadores mas adelante sin rehacer la UI.
+
+### Preview Foundry desde la web
+
+Se conecto el builder web con el exportador Foundry compartido del workspace.
+
+Ahora incluye:
+
+- snapshot web mas alineado al contrato canonico del proyecto;
+- generacion de preview de actor Foundry desde la misma UI;
+- copia y descarga del payload inicial de actor.
+
+Impacto:
+
+- la web ya no exporta solo el formato interno;
+- acerca mucho mas el builder al flujo final de Foundry;
+- reduce la distancia entre la experiencia web y el modulo actual.

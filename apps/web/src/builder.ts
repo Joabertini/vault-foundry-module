@@ -1,4 +1,8 @@
+import type { CharacterBuild } from "@bertinis-vault/contracts";
+import { deriveCharacterBuild } from "@bertinis-vault/domain";
+
 export type BuilderState = {
+  createdAt: string;
   characterName: string;
   playerName: string;
   alignment: string;
@@ -25,6 +29,7 @@ export type BuilderState = {
 export const builderDraftStorageKey = "bertinis-vault:web-builder:draft";
 
 export const initialState: BuilderState = {
+  createdAt: new Date().toISOString(),
   characterName: "Seraphina Vale",
   playerName: "Martin",
   alignment: "Neutral Bueno",
@@ -56,6 +61,7 @@ export function coerceBuilderState(value: unknown): BuilderState {
   const candidate = value as Partial<BuilderState>;
 
   return {
+    createdAt: typeof candidate.createdAt === "string" ? candidate.createdAt : initialState.createdAt,
     characterName: typeof candidate.characterName === "string" ? candidate.characterName : initialState.characterName,
     playerName: typeof candidate.playerName === "string" ? candidate.playerName : initialState.playerName,
     alignment: typeof candidate.alignment === "string" ? candidate.alignment : initialState.alignment,
@@ -95,12 +101,7 @@ export function proficiencyBonus(level: number) {
   return 2;
 }
 
-export function buildCanonicalSnapshot(state: BuilderState) {
-  const pb = proficiencyBonus(state.level);
-  const dexMod = abilityModifier(state.dex);
-  const conMod = abilityModifier(state.con);
-  const intMod = abilityModifier(state.int);
-
+export function buildCanonicalSnapshot(state: BuilderState): CharacterBuild {
   const cantrips = state.cantripsText
     .split("\n")
     .map((entry) => entry.trim())
@@ -115,10 +116,12 @@ export function buildCanonicalSnapshot(state: BuilderState) {
     .map((entry) => entry.trim())
     .filter(Boolean);
 
-  return {
+  const buildInput: Omit<CharacterBuild, "derived"> = {
     meta: {
       rulesVersion: "5e-2014",
       sourceProfile: "vault-v1",
+      createdAt: state.createdAt,
+      updatedAt: new Date().toISOString(),
     },
     identity: {
       characterName: state.characterName,
@@ -163,16 +166,6 @@ export function buildCanonicalSnapshot(state: BuilderState) {
         cha: state.cha,
       },
     },
-    derived: {
-      proficiencyBonus: pb,
-      ac: 10 + dexMod,
-      hp: 6 + conMod + Math.max(state.level - 1, 0) * (4 + conMod),
-      spellcasting: {
-        ability: "int",
-        attackBonus: pb + intMod,
-        saveDC: 8 + pb + intMod,
-      },
-    },
     choices: {
       feats: [state.featId],
       proficiencies: [],
@@ -181,4 +174,6 @@ export function buildCanonicalSnapshot(state: BuilderState) {
       features,
     },
   };
+
+  return deriveCharacterBuild(buildInput);
 }

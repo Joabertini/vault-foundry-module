@@ -1,3 +1,4 @@
+import { buildFoundryActorPayload } from "@bertinis-vault/foundry-exporter";
 import { useEffect, useState } from "react";
 import {
   type BuilderState,
@@ -101,6 +102,7 @@ export function App() {
   });
   const [saveState, setSaveState] = useState("Borrador local activo");
   const [exportState, setExportState] = useState("Listo para exportar");
+  const [foundryExportState, setFoundryExportState] = useState("Preview Foundry lista");
 
   const pb = proficiencyBonus(state.level);
   const intMod = abilityModifier(state.int);
@@ -109,6 +111,7 @@ export function App() {
   const ac = 10 + dexMod;
   const hp = 6 + conMod + Math.max(state.level - 1, 0) * (4 + conMod);
   const canonicalSnapshot = buildCanonicalSnapshot(state);
+  const foundryPreview = buildFoundryActorPayload(canonicalSnapshot);
   const listedSpells = canonicalSnapshot.choices.spells;
   const listedFeatures = canonicalSnapshot.choices.features;
   const listedEquipment = canonicalSnapshot.choices.equipment;
@@ -127,31 +130,26 @@ export function App() {
     }
   }
 
-  async function copyCanonicalSnapshot() {
-    const payload = JSON.stringify(canonicalSnapshot, null, 2);
-
+  async function copyJson(payload: string, onResult: (value: string) => void) {
     if (typeof window === "undefined" || !window.navigator?.clipboard) {
-      setExportState("Clipboard no disponible");
+      onResult("Clipboard no disponible");
       return;
     }
 
     try {
       await window.navigator.clipboard.writeText(payload);
-      setExportState("JSON copiado al portapapeles");
+      onResult("JSON copiado al portapapeles");
     } catch {
-      setExportState("No se pudo copiar el JSON");
+      onResult("No se pudo copiar el JSON");
     }
   }
 
-  function downloadCanonicalSnapshot() {
+  function downloadJson(payload: string, fileName: string, onResult: (value: string) => void) {
     if (typeof window === "undefined" || typeof document === "undefined") {
-      setExportState("Descarga no disponible");
+      onResult("Descarga no disponible");
       return;
     }
 
-    const payload = JSON.stringify(canonicalSnapshot, null, 2);
-    const fileNameBase = state.characterName.trim() || "bertinis-vault-character";
-    const fileName = `${fileNameBase.toLowerCase().replace(/\s+/g, "-")}.canonical.json`;
     const blob = new Blob([payload], { type: "application/json" });
     const url = window.URL.createObjectURL(blob);
     const anchor = document.createElement("a");
@@ -161,7 +159,27 @@ export function App() {
     anchor.click();
 
     window.URL.revokeObjectURL(url);
-    setExportState("JSON descargado");
+    onResult("JSON descargado");
+  }
+
+  async function copyCanonicalSnapshot() {
+    await copyJson(JSON.stringify(canonicalSnapshot, null, 2), setExportState);
+  }
+
+  function downloadCanonicalSnapshot() {
+    const fileNameBase = state.characterName.trim() || "bertinis-vault-character";
+    const fileName = `${fileNameBase.toLowerCase().replace(/\s+/g, "-")}.canonical.json`;
+    downloadJson(JSON.stringify(canonicalSnapshot, null, 2), fileName, setExportState);
+  }
+
+  async function copyFoundryPreview() {
+    await copyJson(JSON.stringify(foundryPreview, null, 2), setFoundryExportState);
+  }
+
+  function downloadFoundryPreview() {
+    const fileNameBase = state.characterName.trim() || "bertinis-vault-character";
+    const fileName = `${fileNameBase.toLowerCase().replace(/\s+/g, "-")}.foundry-actor.json`;
+    downloadJson(JSON.stringify(foundryPreview, null, 2), fileName, setFoundryExportState);
   }
 
   useEffect(() => {
@@ -556,6 +574,33 @@ export function App() {
               </div>
               <pre>{JSON.stringify(canonicalSnapshot, null, 2)}</pre>
             </div>
+
+            <div className="canonical-card foundry-card">
+              <div className="canonical-head">
+                <span className="eyebrow">Foundry Preview</span>
+                <strong>Actor Payload</strong>
+              </div>
+              <div className="export-toolbar">
+                <span className="save-pill">{foundryExportState}</span>
+                <div className="button-row">
+                  <button
+                    className="secondary-button"
+                    onClick={copyFoundryPreview}
+                    type="button"
+                  >
+                    Copiar actor
+                  </button>
+                  <button
+                    className="secondary-button secondary-button-accent"
+                    onClick={downloadFoundryPreview}
+                    type="button"
+                  >
+                    Descargar actor
+                  </button>
+                </div>
+              </div>
+              <pre>{JSON.stringify(foundryPreview, null, 2)}</pre>
+            </div>
           </div>
         </aside>
       </section>
@@ -578,9 +623,9 @@ export function App() {
               text: "Cada cambio actualiza una vista de hoja resumida y un snapshot canónico del personaje.",
             },
             {
-              title: "Siguiente Capa",
-              status: "Next",
-              text: "El siguiente paso es profundizar la sheet final y conectarla con export real.",
+              title: "Salida Portable",
+              status: "Ready",
+              text: "La web ya produce JSON canonico y una preview inicial de actor para Foundry.",
             },
           ].map((milestone) => (
             <article className="milestone-card" key={milestone.title}>
@@ -599,9 +644,9 @@ export function App() {
         </div>
         <div className="roadmap-panel">
           {[
-            "Conectar esta UI al CharacterBuild real del workspace compartido.",
-            "Expandir decisiones del personaje con spells y features de clase.",
-            "Llevar esta preview hacia una character sheet visual exportable.",
+            "Usar el exportador Foundry compartido como puente real entre builder web y modulo.",
+            "Expandir decisiones del personaje con opciones y validaciones mas cercanas a 5e real.",
+            "Llevar esta preview hacia una character sheet visual exportable y mas pulida.",
           ].map((item) => (
             <div className="roadmap-item" key={item}>
               <span className="roadmap-index">+</span>
