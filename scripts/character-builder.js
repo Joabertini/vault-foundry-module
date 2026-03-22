@@ -7,6 +7,8 @@ import {
   SPELL_ABILITY, SPELL_PROGRESSION, SPELL_SLOTS_FULL,
   HIT_DICE, PB_BY_LEVEL, ARMOR_OPTIONS, WEAPON_OPTIONS
 } from './data.js';
+import { createCanonicalCharacterBuild } from './model-bridge.js';
+import { buildFoundryActorPreview } from './foundry-export-bridge.js';
 
 /**
  * Calculates ability modifier
@@ -116,6 +118,10 @@ function makeSkill(ability, profValue = 0) {
   };
 }
 
+function previewItemsByType(preview, type) {
+  return (preview?.items || []).filter(item => item?.type === type);
+}
+
 /**
  * Generates a random 16-char Foundry-style ID
  */
@@ -200,44 +206,48 @@ export function buildActor(formData) {
 
   // ── Spell slots ──
   const spellSlots = getSpellSlots(cls, lvl);
+  const canonicalBuild = createCanonicalCharacterBuild(formData, {
+    pb,
+    hpMax,
+    ac,
+    spellStat,
+    spellDC,
+    spellAtk,
+    spellSlots: Object.fromEntries(
+      Object.entries(spellSlots).map(([slotKey, slotValue]) => [slotKey, slotValue.value])
+    ),
+  });
+  const canonicalFoundryPreview = buildFoundryActorPreview(canonicalBuild);
+  const previewSystem = canonicalFoundryPreview?.system || {};
+  const previewAttributes = previewSystem.attributes || {};
+  const previewDetails = previewSystem.details || {};
+  const previewTraits = previewSystem.traits || {};
 
   // ── Items ──
   const items = [];
 
   // Class item
-  items.push(buildClassItem(cls, subclass, lvl, hd, spellStat, pb));
+  items.push(...previewItemsByType(canonicalFoundryPreview, 'class'));
 
   // Weapons
-  const weaponName = weaponCustom || weapon;
-  if (weaponName) {
-    items.push(buildWeaponItem(weaponName, cls, mods, pb, spellStat));
+  const previewWeaponItems = previewItemsByType(canonicalFoundryPreview, 'weapon');
+  if (previewWeaponItems.length) {
+    items.push(...previewWeaponItems);
+  } else {
+    const weaponName = weaponCustom || weapon;
+    if (weaponName) {
+      items.push(buildWeaponItem(weaponName, cls, mods, pb, spellStat));
+    }
   }
 
   // Features from class/subclass text
-  if (features) {
-    features.split('\n').filter(Boolean).forEach(f => {
-      items.push(buildFeatItem(f.trim(), 'class'));
-    });
-  }
-
-  // Feats
-  if (bgFeat) items.push(buildFeatItem(bgFeat, 'background'));
-  if (dmFeat && dmFeat !== 'Ninguna') items.push(buildFeatItem(dmFeat, 'feat'));
-  if (levelFeats) {
-    levelFeats.split(',').filter(Boolean).forEach(f => {
-      const name = f.replace(/Nivel \d+:\s*/,'').trim();
-      if (name && !name.includes('ASI')) items.push(buildFeatItem(name, 'feat'));
-    });
-  }
-
-  // Spells
-  const spellItems = parseAndBuildSpells(cantrips, spells, cls);
-  items.push(...spellItems);
+  items.push(...previewItemsByType(canonicalFoundryPreview, 'feat'));
+  items.push(...previewItemsByType(canonicalFoundryPreview, 'spell'));
 
   // ── System data ──
   const system = {
     currency: { pp: 0, gp: 0, ep: 0, sp: 0, cp: 0 },
-    abilities,
+    abilities: canonicalFoundryPreview?.system?.abilities || abilities,
     bonuses: {
       mwak: { attack: '', damage: '' }, rwak: { attack: '', damage: '' },
       msak: { attack: '', damage: '' }, rsak: { attack: '', damage: '' },
@@ -246,44 +256,58 @@ export function buildActor(formData) {
     },
     skills,
     tools: {},
-    spells: spellSlots,
+    spells: canonicalFoundryPreview?.system?.spells || spellSlots,
     attributes: {
-      ac: { calc: 'flat', flat: ac },
+      ac: {
+        calc: 'flat',
+        flat: previewAttributes?.ac?.flat ?? ac,
+      },
       init: { ability: '', roll: { min: null, max: null, mode: 0 }, bonus: '' },
       movement: { units: null, hover: false, ignoredDifficultTerrain: [] },
       attunement: { max: 3 },
       senses: { darkvision: null, blindsight: null, tremorsense: null, truesight: null, units: null, special: '' },
-      spellcasting: spellStat || '',
+      spellcasting: previewAttributes?.spellcasting ?? spellStat ?? '',
       exhaustion: 0,
       concentration: {
         ability: '', roll: { min: null, max: null, mode: 0 },
         bonuses: { save: '' }, limit: 1,
       },
       loyalty: {},
-      hp: { max: null, temp: null, tempmax: 0, value: hpMax, bonuses: {} },
+      hp: {
+        max: previewAttributes?.hp?.max ?? null,
+        temp: null,
+        tempmax: 0,
+        value: previewAttributes?.hp?.value ?? hpMax,
+        bonuses: {},
+      },
       death: { roll: { min: null, max: null, mode: 0 }, success: 0, failure: 0, bonuses: { save: '' } },
       inspiration: false,
     },
     bastion: { name: '', description: '' },
     details: {
-      biography: { value: buildBiography(formData, { pb, ac, hpMax, spellDC, spellAtk }), public: '' },
-      alignment: alignment || '',
-      ideal: ideal || '', bond: bond || '', flaw: flaw || '',
-      race: null, background: null, originalClass: '',
+      biography: previewDetails?.biography || { value: buildBiography(formData, { pb, ac, hpMax, spellDC, spellAtk }), public: '' },
+      alignment: previewDetails?.alignment ?? alignment || '',
+      trait: previewDetails?.trait ?? trait || '',
+      ideal: previewDetails?.ideal ?? ideal || '',
+      bond: previewDetails?.bond ?? bond || '',
+      flaw: previewDetails?.flaw ?? flaw || '',
+      race: previewDetails?.race ?? null,
+      background: previewDetails?.background ?? null,
+      originalClass: previewDetails?.originalClass ?? '',
       xp: { value: 0 },
-      appearance: '', trait: trait || '',
+      appearance: previewDetails?.appearance ?? '',
       eyes: '', height: '', faith: '', hair: '', weight: '', gender: '', skin: '', age: '',
     },
     traits: {
-      size: 'med',
-      di: { value: [], custom: '', bypasses: [] },
-      dr: { value: [], custom: '', bypasses: [] },
-      dv: { value: [], custom: '', bypasses: [] },
-      dm: { amount: {}, bypasses: [] },
-      ci: { value: [], custom: '' },
-      languages: { value: [], custom: '', communication: {} },
-      weaponProf: { value: [], custom: '', mastery: { value: [], bonus: [] } },
-      armorProf:  { value: [], custom: '' },
+      size: previewTraits?.size ?? 'med',
+      di: previewTraits?.di ?? { value: [], custom: '', bypasses: [] },
+      dr: previewTraits?.dr ?? { value: [], custom: '', bypasses: [] },
+      dv: previewTraits?.dv ?? { value: [], custom: '', bypasses: [] },
+      dm: previewTraits?.dm ?? { amount: {}, bypasses: [] },
+      ci: previewTraits?.ci ?? { value: [], custom: '' },
+      languages: previewTraits?.languages ?? { value: [], custom: '', communication: {} },
+      weaponProf: previewTraits?.weaponProf ?? { value: [], custom: '', mastery: { value: [], bonus: [] } },
+      armorProf:  previewTraits?.armorProf ?? { value: [], custom: '' },
     },
     resources: {
       primary:   { value: 0, max: 0, sr: false, lr: false, label: '' },
@@ -302,7 +326,14 @@ export function buildActor(formData) {
     items,
     effects: [],
     folder: null,
-    flags: { 'bertinis-vault': { createdBy: playerName, version: '0.1.0' } },
+    flags: {
+      'bertinis-vault': {
+        createdBy: playerName,
+        version: '0.1.0',
+        canonicalBuild,
+        canonicalFoundryPreview,
+      },
+    },
     _stats: makeStats(),
     ownership: { default: 0 },
   };

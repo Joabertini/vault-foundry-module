@@ -1,0 +1,197 @@
+:root {
+  color-scheme: light;
+  --bg: #f5efe2;
+  --bg-strong: #eadfc8;
+  --panel: rgba(255, 250, 241, 0.88);
+  --ink: #22170f;
+  --muted: #6f5b46;
+  --accent: #9b4d28;
+  --accent-deep: #67321a;
+  --line: rgba(58, 35, 19, 0.14);
+  --shadow: 0 18px 45px rgba(75, 40, 15, 0.12);
+  font-family: "Georgia", "Times New Roman", serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+  background:
+    radial-gradient(circle at top left, rgba(155, 77, 40, 0.16), transparent 30%),
+    linear-gradient(180deg, #f8f2e7 0%, var(--bg) 100%);
+  color: var(--ink);
+}
+
+body {
+  min-height: 100vh;
+}
+
+.app-shell {
+  width: min(1120px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 48px 0 72px;
+}
+
+.hero {
+  padding: 28px;
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(135deg, rgba(255, 250, 241, 0.95), rgba(234, 223, 200, 0.9)),
+    var(--panel);
+  box-shadow: var(--shadow);
+  border-radius: 28px;
+}
+
+.eyebrow {
+  display: inline-block;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.74rem;
+  color: var(--accent-deep);
+}
+
+.hero h1,
+.section-head h2 {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.05;
+}
+
+.hero h1 {
+  font-size: clamp(2.3rem, 5vw, 4.8rem);
+  max-width: 10ch;
+}
+
+.hero-copy {
+  max-width: 64ch;
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  margin: 18px 0 0;
+}
+
+.hero-panels,
+.milestone-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 26px;
+}
+
+.panel,
+.milestone-card,
+.roadmap-panel {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+}
+
+.panel {
+  padding: 20px;
+}
+
+.panel-highlight {
+  background:
+    linear-gradient(160deg, rgba(155, 77, 40, 0.14), rgba(255, 250, 241, 0.9)),
+    var(--panel);
+}
+
+.panel h2,
+.milestone-card h3 {
+  margin: 0 0 10px;
+  font-size: 1.15rem;
+}
+
+.panel p,
+.milestone-card p,
+.roadmap-item p {
+  margin: 0;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.grid-section {
+  margin-top: 26px;
+}
+
+.section-head {
+  padding: 4px 4px 18px;
+}
+
+.section-head h2 {
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+}
+
+.milestone-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.milestone-card {
+  padding: 20px;
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(155, 77, 40, 0.12);
+  color: var(--accent-deep);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.roadmap-panel {
+  padding: 18px;
+}
+
+.roadmap-item {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 12px 4px;
+}
+
+.roadmap-item + .roadmap-item {
+  border-top: 1px solid var(--line);
+}
+
+.roadmap-index {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(103, 50, 26, 0.11);
+  color: var(--accent-deep);
+  font-weight: 700;
+}
+
+@media (max-width: 860px) {
+  .hero-panels,
+  .milestone-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .app-shell {
+    width: min(100vw - 20px, 1120px);
+    padding-top: 20px;
+  }
+
+  .hero {
+    padding: 20px;
+    border-radius: 22px;
+  }
+}

@@ -2,6 +2,17 @@
 
 A D&D 5e 2014 character creation module that builds fully populated actors directly inside Foundry VTT.
 
+## Current Direction
+
+This repository now also contains the first shared foundation for the broader Bertini's Vault product:
+
+- [ARCHITECTURE-PLAN.md](C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/cf72cb7dc21aaf7e/ARCHITECTURE-PLAN.md)
+- `apps/` for future product surfaces
+- `packages/contracts` for shared schemas
+- `packages/domain` for reusable rules and derivations
+
+The Foundry module at the repository root remains the active prototype while the shared product architecture is built around it.
+
 ## Features
 
 - Step-by-step character creation wizard (9 steps)
