@@ -7,6 +7,7 @@ Estado actual:
 - builder web funcional por pasos;
 - preview local disponible con Vite;
 - demo visual orientada a financiadores en la pantalla principal;
+- presets de demo para cargar personajes presentables en un click;
 - exportacion de snapshot canonico y actor Foundry desde la misma UI;
 - vista tecnica opcional para exponer JSON y diagnostico sin contaminar la demo principal.
 

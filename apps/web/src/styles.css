@@ -37,6 +37,13 @@ body {
   padding: 48px 0 72px;
 }
 
+.hero-product,
+.presets,
+.story {
+  max-width: 1100px;
+  margin: 0 auto 24px;
+}
+
 .hero {
   padding: 28px;
   border: 1px solid var(--line);
@@ -74,6 +81,23 @@ body {
   font-size: 1.05rem;
   line-height: 1.7;
   margin: 18px 0 0;
+}
+
+.hero-product {
+  padding: 80px 40px 40px;
+  border-radius: 28px;
+}
+
+.hero-product h1 {
+  font-size: clamp(2.7rem, 5vw, 4.4rem);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  max-width: 11ch;
+}
+
+.hero-product .hero-copy {
+  font-size: 1.12rem;
+  max-width: 600px;
 }
 
 .hero-showcase {
@@ -230,6 +254,97 @@ body {
   background:
     linear-gradient(145deg, rgba(155, 77, 40, 0.14), rgba(255, 250, 241, 0.94)),
     var(--panel);
+}
+
+.hero-badges {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.hero-badges span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(103, 50, 26, 0.08);
+  color: var(--accent-deep);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.presets {
+  padding: 30px 40px;
+}
+
+.preset-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.preset-card {
+  min-width: 190px;
+  border: 1px solid var(--line);
+  padding: 16px;
+  cursor: pointer;
+  background: rgba(255, 250, 241, 0.92);
+  border-radius: 16px;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+  box-shadow: var(--shadow);
+  text-align: left;
+  font: inherit;
+  color: var(--ink);
+}
+
+.preset-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(155, 77, 40, 0.35);
+}
+
+.preset-title {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.preset-sub {
+  margin-top: 6px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.story {
+  padding: 50px 40px;
+  border-radius: 24px;
+  background: rgba(255, 251, 245, 0.76);
+  border: 1px solid var(--line);
+}
+
+.story-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.story-grid h3 {
+  margin: 0 0 10px;
+  font-size: 1.1rem;
+}
+
+.story-grid p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.section-head-compact {
+  padding: 0 0 18px;
 }
 
 .hero-panels,
@@ -730,6 +845,7 @@ body {
   .pitch-grid,
   .hero-preview-stats,
   .delivery-grid,
+  .story-grid,
   .sheet-columns {
     grid-template-columns: 1fr;
   }
@@ -742,6 +858,13 @@ body {
   .hero {
     padding: 20px;
     border-radius: 22px;
+  }
+
+  .hero-product,
+  .presets,
+  .story {
+    padding-left: 20px;
+    padding-right: 20px;
   }
 
   .builder-toolbar {

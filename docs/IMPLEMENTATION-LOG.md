@@ -809,3 +809,21 @@ Impacto:
 - la integracion de cambios visuales ya no depende de memoria o comandos sueltos;
 - se reduce friccion al recibir trabajo de otra IA enfocada solo en frontend;
 - el repo queda mejor preparado para iteraciones rapidas sobre la demo sin perder disciplina de validacion.
+
+### Presets de demo y narrativa inicial reforzada
+
+Se integraron aportes orientados a mejorar la primera impresion de la web para demos y reuniones.
+
+Ahora incluye:
+
+- `apps/web/src/demo-presets.ts` con presets `wizard`, `rogue` y `cleric`;
+- hero inicial separado como componente local con CTA hacia builder y preview;
+- barra de presets visible arriba del flujo principal;
+- story block corto para explicar modelo, integracion y compartibilidad;
+- captura `docs/web-demo-financiers.png` regenerada despues del cambio.
+
+Impacto:
+
+- la demo se puede mostrar con personajes mas intencionales y menos dependientes del estado que haya quedado guardado;
+- mejora la narrativa de producto sin tocar la logica central del builder;
+- queda una base mucho mejor para una futura segunda pasada puramente visual.

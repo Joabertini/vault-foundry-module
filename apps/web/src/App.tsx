@@ -20,6 +20,7 @@ import {
   loadBuilderOptions,
   type BuilderOptionsPayload,
 } from "./builder-options";
+import { DEMO_PRESETS } from "./demo-presets";
 import { getFeatureSuggestions } from "./feature-suggestions";
 
 const steps = [
@@ -30,6 +31,93 @@ const steps = [
   { id: "magic", label: "Magia" },
   { id: "persona", label: "Persona" },
 ];
+
+function HeroSection({
+  datasetState,
+  onExplore,
+  onFocusSheet,
+}: {
+  datasetState: string;
+  onExplore: () => void;
+  onFocusSheet: () => void;
+}) {
+  return (
+    <section className="hero hero-product">
+      <div className="hero-content">
+        <div className="eyebrow">Bertini&apos;s Vault</div>
+        <h1>Builder de personajes D&amp;D 5e listo para mesa</h1>
+        <p className="hero-copy">
+          Modelo canónico propio, exportación directa a Foundry y fichas pensadas para
+          compartir sin fricción.
+        </p>
+
+        <div className="hero-actions">
+          <button className="primary-button" onClick={onExplore} type="button">
+            Probar demo
+          </button>
+          <button className="secondary-button" onClick={onFocusSheet} type="button">
+            Ver ficha
+          </button>
+          <span className="inline-status">{datasetState}</span>
+        </div>
+
+        <div className="hero-badges">
+          <span>Modelo canónico</span>
+          <span>Export a Foundry</span>
+          <span>Snapshots claros</span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PresetsBar({ onLoadPreset }: { onLoadPreset: (presetId: string) => void }) {
+  return (
+    <section className="presets">
+      <div className="section-head section-head-compact">
+        <span className="eyebrow">Ejemplos listos</span>
+        <h2>Presets para demo</h2>
+      </div>
+
+      <div className="preset-list">
+        {DEMO_PRESETS.map((preset) => (
+          <button
+            key={preset.id}
+            className="preset-card"
+            onClick={() => onLoadPreset(preset.id)}
+            type="button"
+          >
+            <div className="preset-title">{preset.name}</div>
+            <div className="preset-sub">{preset.subtitle}</div>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function StoryBlock() {
+  return (
+    <section className="story">
+      <div className="story-grid">
+        <div>
+          <h3>Modelo consistente</h3>
+          <p>Toda la información del personaje sigue una estructura canónica única.</p>
+        </div>
+
+        <div>
+          <h3>Integración real</h3>
+          <p>Exportación directa a Foundry lista para usar, sin pasos intermedios.</p>
+        </div>
+
+        <div>
+          <h3>Listo para compartir</h3>
+          <p>Fichas claras, legibles y preparadas para snapshots o mesa.</p>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export function App() {
   const [stepIndex, setStepIndex] = useState(0);
@@ -198,6 +286,24 @@ export function App() {
     }
   }
 
+  function loadPreset(presetId: string) {
+    const preset = DEMO_PRESETS.find((entry) => entry.id === presetId);
+
+    if (!preset) {
+      return;
+    }
+
+    setState((current) => ({
+      ...current,
+      ...preset.data,
+      createdAt: new Date().toISOString(),
+    }));
+    setStepIndex(0);
+    setSaveState(`Preset cargado: ${preset.name}`);
+    setExportState("Listo para exportar");
+    setFoundryExportState("Preview Foundry lista");
+  }
+
   async function copyJson(payload: string, onResult: (value: string) => void) {
     if (typeof window === "undefined" || !window.navigator?.clipboard) {
       onResult("Clipboard no disponible");
@@ -287,6 +393,25 @@ export function App() {
 
   return (
     <main className="app-shell">
+      <HeroSection
+        datasetState={datasetState}
+        onExplore={() => {
+          setStepIndex(0);
+          if (typeof document !== "undefined") {
+            document.getElementById("builder")?.scrollIntoView({ behavior: "smooth" });
+          }
+        }}
+        onFocusSheet={() => {
+          if (typeof document !== "undefined") {
+            document.getElementById("sheet-preview")?.scrollIntoView({ behavior: "smooth" });
+          }
+        }}
+      />
+
+      <PresetsBar onLoadPreset={loadPreset} />
+
+      <StoryBlock />
+
       <section className="hero hero-showcase">
         <div className="hero-copy-block">
           <div className="eyebrow">Bertini&apos;s Vault</div>
@@ -410,7 +535,7 @@ export function App() {
         </article>
       </section>
 
-      <section className="builder-layout">
+      <section className="builder-layout" id="builder">
         <section className="builder-panel">
           <div className="section-head">
             <span className="eyebrow">Builder Flow</span>
@@ -947,7 +1072,7 @@ export function App() {
           ) : null}
         </section>
 
-        <aside className="sheet-preview">
+        <aside className="sheet-preview" id="sheet-preview">
           <div className="section-head">
             <span className="eyebrow">Character Sheet</span>
             <h2>Vista compartible del personaje</h2>
