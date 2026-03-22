@@ -166,3 +166,22 @@ Estado:
 - ya existe una base real para la web app fuera de Foundry;
 - por ahora funciona como pantalla de producto y de estado del proyecto;
 - el siguiente paso sera convertirla en builder por pasos conectado a `contracts` y `domain`.
+
+### Primer builder web interactivo
+
+Se transformo `apps/web` desde una pantalla estatica a un builder inicial con estado local.
+
+Incluye:
+
+- pasos navegables;
+- datos de identidad;
+- raza, clase y nivel;
+- atributos editables;
+- personalidad basica;
+- preview viva de character summary.
+
+Estado:
+
+- ya no es solo scaffold;
+- ya existe una primera experiencia real de builder web;
+- el siguiente paso sera conectarlo al modelo canonico compartido y ampliar opciones del personaje.
