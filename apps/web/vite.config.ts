@@ -9,6 +9,9 @@ export default defineConfig({
       "@bertinis-vault/contracts": fileURLToPath(
         new URL("../../packages/contracts/src/index.ts", import.meta.url),
       ),
+      "@bertinis-vault/data-engine": fileURLToPath(
+        new URL("../../packages/data-engine/src/index.ts", import.meta.url),
+      ),
       "@bertinis-vault/domain": fileURLToPath(
         new URL("../../packages/domain/src/index.ts", import.meta.url),
       ),

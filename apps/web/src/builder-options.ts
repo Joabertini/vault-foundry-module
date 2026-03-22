@@ -79,14 +79,17 @@ export const fallbackBuilderOptions: BuilderOptionsPayload = {
 
 export async function loadBuilderOptions(): Promise<BuilderOptionsPayload> {
   const baseUrl = import.meta.env.VITE_BERTINIS_API_URL?.trim() || "http://127.0.0.1:3001";
+  const classesUrl = `${baseUrl}/datasets/classes?source=hybrid`;
+  const backgroundsUrl = `${baseUrl}/datasets/backgrounds?source=hybrid`;
+  const featsUrl = `${baseUrl}/datasets/feats?source=hybrid`;
   const [meta, classes, races, backgrounds, feats, equipment] = await Promise.all([
     fetchJson<DatasetEnvelope<SelectOption>>(`${baseUrl}/datasets/meta`),
-    fetchJson<DatasetEnvelope<SelectOption>>(`${baseUrl}/datasets/classes`),
+    fetchJson<DatasetEnvelope<SelectOption>>(classesUrl),
     fetchJson<DatasetEnvelope<SelectOption>>(`${baseUrl}/datasets/races`),
     fetchJson<DatasetEnvelope<SelectOption & { source?: string; grantedFeatIds?: string[] }>>(
-      `${baseUrl}/datasets/backgrounds`,
+      backgroundsUrl,
     ),
-    fetchJson<DatasetEnvelope<SelectOption>>(`${baseUrl}/datasets/feats`),
+    fetchJson<DatasetEnvelope<SelectOption>>(featsUrl),
     fetchJson<
       DatasetEnvelope<SelectOption> & {
         armor: Array<SelectOption & { armorFormula?: string; grantsShieldBonus?: boolean }>;

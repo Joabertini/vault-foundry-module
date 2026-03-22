@@ -10,6 +10,10 @@ Thumbs.db
 # Node (si en algún momento se agrega build step)
 node_modules/
 dist/
+packages/data-engine/src/*.js
+packages/data-engine/src/*.js.map
+packages/data-engine/src/*.d.ts
+packages/data-engine/src/*.d.ts.map
 
 # Foundry local
 *.db

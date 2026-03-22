@@ -16,6 +16,11 @@ import {
   normalizeUpstreamBackgroundsPayload,
 } from "./upstream-backgrounds.js";
 import {
+  buildHybridClassesDataset,
+  defaultUpstreamClassesPath,
+  normalizeUpstreamClassesPayload,
+} from "./upstream-classes.js";
+import {
   buildHybridFeatsDataset,
   defaultUpstreamFeatsPath,
   normalizeUpstreamFeatsPayload,
@@ -78,7 +83,59 @@ const server = createServer(async (request, response) => {
   }
 
   if (request.method === "GET" && url.pathname === "/datasets/classes") {
-    sendJson(response, 200, buildClassesDataset());
+    const sourceMode = url.searchParams.get("source") ?? "local";
+
+    if (sourceMode === "local") {
+      sendJson(response, 200, buildClassesDataset());
+      return;
+    }
+
+    const upstreamPath = url.searchParams.get("upstreamPath") ?? defaultUpstreamClassesPath;
+
+    if (!isAllowedUpstreamPath(upstreamPath)) {
+      sendJson(response, 400, {
+        error: "Upstream path not allowed for classes dataset",
+        path: upstreamPath,
+        allowedPrefixes: allowedUpstreamPrefixes,
+      });
+      return;
+    }
+
+    try {
+      const cacheKey = `classes:${upstreamPath}`;
+      const cachedPayload = upstreamCache.get(cacheKey);
+      const upstreamPayload =
+        cachedPayload ?? (await fiveToolsClient.get(upstreamPath));
+
+      if (cachedPayload === undefined) {
+        upstreamCache.set(cacheKey, upstreamPayload);
+      }
+
+      const normalized = normalizeUpstreamClassesPayload(upstreamPayload);
+
+      if (sourceMode === "upstream") {
+        sendJson(response, 200, normalized);
+        return;
+      }
+
+      sendJson(response, 200, buildHybridClassesDataset(normalized.items));
+    } catch (error) {
+      if (sourceMode === "upstream") {
+        sendJson(response, 502, {
+          error: "Upstream classes request failed",
+          path: upstreamPath,
+          detail: error instanceof Error ? error.message : "Unknown upstream error",
+        });
+        return;
+      }
+
+      sendJson(response, 200, {
+        ...buildClassesDataset(),
+        warning: "Hybrid upstream unavailable, local dataset returned",
+        attemptedUpstreamPath: upstreamPath,
+      });
+    }
+
     return;
   }
 

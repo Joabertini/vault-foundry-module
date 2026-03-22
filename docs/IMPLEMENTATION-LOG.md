@@ -518,3 +518,37 @@ Impacto:
 - confirmamos que el patron del BFF no depende de una sola categoria;
 - el builder gana otra categoria lista para enriquecerse desde 5etools;
 - seguimos convirtiendo el backend en una capa de producto real.
+
+### Classes con modo local/upstream/hibrido
+
+Se aplico el mismo patron de integracion controlada a la categoria de clases.
+
+Ahora incluye:
+
+- `source=local|upstream|hybrid` en `GET /datasets/classes`;
+- normalizacion flexible del payload externo;
+- merge local/upstream para modo hibrido;
+- fallback limpio a local cuando el upstream no responde.
+
+Impacto:
+
+- reforzamos una de las categorias mas importantes del builder;
+- acercamos el BFF a un consumo mas real de 5etools sin perder estabilidad;
+- dejamos lista una base mas solida para conectar web y exportacion a clases enriquecidas.
+- la web ahora puede empezar a consumir `classes`, `backgrounds` y `feats` en modo hibrido desde el BFF.
+
+### Resolucion compartida y builds del monorepo
+
+Se corrigio un hueco importante de tooling que estaba frenando compilaciones reales del workspace.
+
+Ahora incluye:
+
+- alias comun para `@bertinis-vault/data-engine` en Vite y `tsconfig.base.json`;
+- `apps/api` compila su dependencia `data-engine` antes de construir;
+- verificacion positiva de build para `@bertinis-vault/api` y `@bertinis-vault/web`.
+
+Impacto:
+
+- el repo queda bastante mas sano para seguir iterando sin romper compilacion;
+- la integracion nueva de datasets hibridos ya no vive solo en teoria;
+- reducimos friccion para previews, builds locales y proximas validaciones.
