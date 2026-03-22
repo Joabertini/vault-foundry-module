@@ -1,4 +1,9 @@
-import { type CharacterBuild, characterBuildSchema } from "@bertinis-vault/contracts";
+import {
+  type CharacterBuild,
+  type CharacterBuildInput,
+  characterBuildInputSchema,
+  characterBuildSchema,
+} from "@bertinis-vault/contracts";
 import { getArmorCatalogEntry } from "@bertinis-vault/data-engine";
 import { abilityModifierMap } from "./abilities.js";
 import { calculateArmorClass, calculateEstimatedHitPoints } from "./combat.js";
@@ -11,13 +16,14 @@ import {
 import { getCharacterLevel, getProficiencyBonus } from "./progression.js";
 
 export function deriveCharacterBuild(
-  input: Omit<CharacterBuild, "derived">,
+  input: CharacterBuildInput,
 ): CharacterBuild {
-  const level = getCharacterLevel(input.classing.classes.map((entry) => entry.level));
+  const parsedInput = characterBuildInputSchema.parse(input);
+  const level = getCharacterLevel(parsedInput.classing.classes.map((entry) => entry.level));
   const proficiencyBonus = getProficiencyBonus(level);
-  const modifiers = abilityModifierMap(input.abilities.final);
-  const primaryClassId = normalizeClassId(input.classing.classes[0]?.classId ?? "");
-  const primaryClassLevel = input.classing.classes[0]?.level ?? 1;
+  const modifiers = abilityModifierMap(parsedInput.abilities.final);
+  const primaryClassId = normalizeClassId(parsedInput.classing.classes[0]?.classId ?? "");
+  const primaryClassLevel = parsedInput.classing.classes[0]?.level ?? 1;
   const hitDie = getHitDieForClass(primaryClassId);
   const spellAbility = getSpellAbilityForClass(primaryClassId);
 
@@ -27,10 +33,10 @@ export function deriveCharacterBuild(
     constitutionModifier: modifiers.con,
   });
 
-  const armorEntry = input.choices.equipment
+  const armorEntry = parsedInput.choices.equipment
     .map((entry) => getArmorCatalogEntry(entry))
     .find((entry) => Boolean(entry));
-  const hasShield = input.choices.equipment
+  const hasShield = parsedInput.choices.equipment
     .map((entry) => getArmorCatalogEntry(entry))
     .some((entry) => entry?.grantsShieldBonus);
 
@@ -50,7 +56,7 @@ export function deriveCharacterBuild(
       : undefined;
 
   const build: CharacterBuild = {
-    ...input,
+    ...parsedInput,
     derived: {
       proficiencyBonus,
       hp,

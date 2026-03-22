@@ -137,11 +137,29 @@ function parseLineList(text) {
     .filter(Boolean);
 }
 
+function parseSpellEntry(raw) {
+  const match = String(raw || '').trim().match(/^Nv(\d+):\s*(.+)$/i);
+  if (!match) {
+    return { label: String(raw || '').trim(), level: 1 };
+  }
+
+  return {
+    label: match[2].trim(),
+    level: parseInt(match[1], 10) || 1,
+  };
+}
+
 export function createCanonicalCharacterBuild(formData, derived = {}) {
   const now = new Date().toISOString();
   const baseAbilities = toAbilityMap(formData);
   const backgroundFeatIds = formData.bgFeat ? [slugifyId(formData.bgFeat)] : [];
   const selectedFeatIds = [];
+  const cantripNames = parseLineList(formData.cantrips);
+  const spellLines = parseLineList(formData.spells);
+  const featureLines = parseLineList(formData.features);
+  const equipmentLines = [formData.armor, formData.weaponCustom || formData.weapon, formData.shield]
+    .filter(Boolean)
+    .map(item => String(item).trim());
 
   if (formData.dmFeat && formData.dmFeat !== 'Ninguna') {
     selectedFeatIds.push(slugifyId(formData.dmFeat));
@@ -197,13 +215,21 @@ export function createCanonicalCharacterBuild(formData, derived = {}) {
       feats: selectedFeatIds,
       proficiencies: [],
       spells: [
-        ...parseLineList(formData.cantrips).map(name => `Nv0: ${name}`),
-        ...parseLineList(formData.spells),
+        ...cantripNames.map(name => `Nv0: ${name}`),
+        ...spellLines,
       ],
-      equipment: [formData.armor, formData.weaponCustom || formData.weapon, formData.shield]
-        .filter(Boolean)
-        .map(item => String(item).trim()),
-      features: parseLineList(formData.features),
+      equipment: equipmentLines,
+      features: featureLines,
+      normalized: {
+        feats: selectedFeatIds,
+        proficiencies: [],
+        spells: [
+          ...cantripNames.map(label => ({ label, level: 0 })),
+          ...spellLines.map(parseSpellEntry),
+        ],
+        equipment: equipmentLines.map(label => ({ label, category: 'other' })),
+        features: featureLines.map(label => ({ label, source: 'other' })),
+      },
     },
     derived: {
       proficiencyBonus: derived.pb || 2,

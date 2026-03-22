@@ -1,7 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { characterBuildSchema } from "../dist/index.js";
+import {
+  characterBuildInputSchema,
+  characterBuildSchema,
+} from "../dist/index.js";
 
 function makeBuild() {
   return {
@@ -40,6 +43,22 @@ function makeBuild() {
       spells: ["Nv0: Mage Hand", "Nv1: Shield"],
       equipment: ["quarterstaff", "mage-armor"],
       features: ["Arcane Recovery"],
+      normalized: {
+        feats: ["magic-initiate"],
+        proficiencies: [
+          { kind: "skill", label: "Arcana" },
+          { kind: "language", label: "Elvish" },
+        ],
+        spells: [
+          { label: "Mage Hand", level: 0 },
+          { label: "Shield", level: 1 },
+        ],
+        equipment: [
+          { itemId: "quarterstaff", label: "quarterstaff", category: "weapon", quantity: 1 },
+          { itemId: "mage-armor", label: "mage-armor", category: "armor", quantity: 1 },
+        ],
+        features: [{ label: "Arcane Recovery", source: "class" }],
+      },
     },
     derived: {
       proficiencyBonus: 2,
@@ -65,6 +84,22 @@ test("characterBuildSchema accepts a valid canonical build", () => {
 test("characterBuildSchema rejects missing class entries", () => {
   const build = makeBuild();
   build.classing.classes = [];
+
+  assert.throws(() => characterBuildSchema.parse(build));
+});
+
+test("characterBuildInputSchema accepts a canonical build without derived block", () => {
+  const build = makeBuild();
+  delete build.derived;
+
+  const parsed = characterBuildInputSchema.parse(build);
+  assert.equal(parsed.choices.normalized.spells[0].level, 0);
+  assert.equal(parsed.choices.normalized.features[0].source, "class");
+});
+
+test("characterBuildSchema rejects normalized spell entries outside 0-9", () => {
+  const build = makeBuild();
+  build.choices.normalized.spells = [{ label: "Impossible Spell", level: 10 }];
 
   assert.throws(() => characterBuildSchema.parse(build));
 });

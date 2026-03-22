@@ -952,3 +952,37 @@ Impacto:
 - la pagina se aleja del look editorial pesado y se acerca a un producto mas directo;
 - la ficha queda mejor alineada con la estructura entregada para frontend;
 - el builder sigue conectado al estado real pero con una presentacion menos barroca.
+
+### Contratos canonicos reforzados
+
+Se avanzo de forma deliberada sobre `packages/contracts` para acercar la capa canonica a una version realmente reusable y mas completa.
+
+Ahora incluye:
+
+- descomposicion del contrato en sub-schemas exportados:
+  - `characterMetaSchema`
+  - `identitySchema`
+  - `ancestrySchema`
+  - `classingSchema`
+  - `backgroundSchema`
+  - `abilitiesSchema`
+  - `choicesSchema`
+  - `derivedSchema`
+- nuevo `characterBuildInputSchema` para representar el build canonico antes de `derived`;
+- nueva capa opcional `choices.normalized` con colecciones estructuradas para:
+  - feats
+  - proficiencies
+  - spells
+  - equipment
+  - features
+- integracion de esos datos normalizados desde:
+  - `apps/web/src/builder.ts`
+  - `scripts/model-bridge.js`
+- ajuste de `packages/domain/src/derive.ts` para validar entrada canonica tipada antes de derivar;
+- tests ampliados en `packages/contracts/test/character-build.test.mjs`.
+
+Impacto:
+
+- el contrato canonico deja de ser solo un schema plano minimo y pasa a ser una base mas seria para evolucion futura;
+- web y bridge legacy ya pueden poblar informacion estructurada sin romper consumidores actuales;
+- se reduce el riesgo de que cada capa siga inventando su propia forma de representar spells, equipment y proficiencies.

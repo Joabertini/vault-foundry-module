@@ -1,4 +1,4 @@
-import type { CharacterBuild } from "@bertinis-vault/contracts";
+import type { CharacterBuild, CharacterBuildInput } from "@bertinis-vault/contracts";
 import { deriveCharacterBuild } from "@bertinis-vault/domain";
 
 export type BuilderState = {
@@ -145,11 +145,24 @@ export function buildCanonicalSnapshot(state: BuilderState): CharacterBuild {
   const features = parseLineList(state.featuresText);
   const extraEquipment = uniqueEntries(parseLineList(state.extraEquipmentText));
   const proficiencies = uniqueEntries(parseLineList(state.proficienciesText));
-  const languages = uniqueEntries(parseLineList(state.languagesText)).map(
-    (entry) => `Language: ${entry}`,
-  );
+  const languageEntries = uniqueEntries(parseLineList(state.languagesText));
+  const languages = languageEntries.map((entry) => `Language: ${entry}`);
+  const spellEntries = [
+    ...parseLineList(state.cantripsText).map((entry) => ({ label: entry, level: 0 })),
+    ...leveledSpells.map((entry) => {
+      const match = entry.match(/^Nv(\d+):\s*(.+)$/i);
+      if (!match) {
+        return { label: entry, level: 1 };
+      }
 
-  const buildInput: Omit<CharacterBuild, "derived"> = {
+      return {
+        label: (match[2] ?? entry).trim(),
+        level: Number.parseInt(match[1] ?? "1", 10),
+      };
+    }),
+  ];
+
+  const buildInput: CharacterBuildInput = {
     meta: {
       rulesVersion: "5e-2014",
       sourceProfile: "vault-v1",
@@ -208,6 +221,27 @@ export function buildCanonicalSnapshot(state: BuilderState): CharacterBuild {
       spells: [...cantrips, ...leveledSpells],
       equipment: [state.weaponId, state.armorId, ...extraEquipment],
       features,
+      normalized: {
+        feats: [state.featId],
+        proficiencies: [
+          ...proficiencies.map((entry) => ({ kind: "skill" as const, label: entry })),
+          ...languageEntries.map((entry) => ({ kind: "language" as const, label: entry })),
+        ],
+        spells: spellEntries,
+        equipment: [
+          { itemId: state.weaponId, label: state.weaponId, quantity: 1, category: "weapon" as const },
+          { itemId: state.armorId, label: state.armorId, quantity: 1, category: "armor" as const },
+          ...extraEquipment.map((entry) => ({
+            label: entry,
+            quantity: 1,
+            category: "gear" as const,
+          })),
+        ],
+        features: features.map((entry) => ({
+          label: entry,
+          source: "class" as const,
+        })),
+      },
     },
   };
 
