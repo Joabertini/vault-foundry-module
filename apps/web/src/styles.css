@@ -308,6 +308,14 @@ body {
   border-color: rgba(155, 77, 40, 0.35);
 }
 
+.preset-card.active {
+  border-color: rgba(155, 77, 40, 0.48);
+  background:
+    linear-gradient(145deg, rgba(155, 77, 40, 0.14), rgba(255, 250, 241, 0.96)),
+    var(--panel);
+  box-shadow: 0 16px 34px rgba(103, 50, 26, 0.16);
+}
+
 .preset-title {
   font-weight: 600;
   font-size: 1rem;
@@ -397,6 +405,11 @@ body {
   background: rgba(103, 50, 26, 0.08);
   color: var(--accent-deep);
   font-size: 0.8rem;
+}
+
+.inline-status-accent {
+  background: rgba(155, 77, 40, 0.16);
+  border: 1px solid rgba(155, 77, 40, 0.18);
 }
 
 .grid-section {

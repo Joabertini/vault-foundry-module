@@ -827,3 +827,20 @@ Impacto:
 - la demo se puede mostrar con personajes mas intencionales y menos dependientes del estado que haya quedado guardado;
 - mejora la narrativa de producto sin tocar la logica central del builder;
 - queda una base mucho mejor para una futura segunda pasada puramente visual.
+
+### Pulido seguro de seleccion de presets
+
+Se hizo una pasada de refinamiento sin tocar la estructura central del builder.
+
+Ahora incluye:
+
+- preset activo visible dentro del hero principal;
+- highlight visual del preset seleccionado;
+- captura `docs/web-demo-financiers.png` regenerada despues del ajuste;
+- cambios limitados a `apps/web/src/App.tsx` y `apps/web/src/styles.css` para mantener bajo el riesgo.
+
+Impacto:
+
+- la demo comunica mejor que hay escenarios listos para mostrar;
+- se mejora la lectura de la home sin reabrir deuda de arquitectura;
+- el flujo sigue siendo facil de validar con `corepack pnpm web:verify`.

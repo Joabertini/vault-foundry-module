@@ -71,7 +71,13 @@ function HeroSection({
   );
 }
 
-function PresetsBar({ onLoadPreset }: { onLoadPreset: (presetId: string) => void }) {
+function PresetsBar({
+  activePresetId,
+  onLoadPreset,
+}: {
+  activePresetId: string | null;
+  onLoadPreset: (presetId: string) => void;
+}) {
   return (
     <section className="presets">
       <div className="section-head section-head-compact">
@@ -83,7 +89,7 @@ function PresetsBar({ onLoadPreset }: { onLoadPreset: (presetId: string) => void
         {DEMO_PRESETS.map((preset) => (
           <button
             key={preset.id}
-            className="preset-card"
+            className={`preset-card${activePresetId === preset.id ? " active" : ""}`}
             onClick={() => onLoadPreset(preset.id)}
             type="button"
           >
@@ -122,6 +128,7 @@ function StoryBlock() {
 export function App() {
   const [stepIndex, setStepIndex] = useState(0);
   const [showTechnicalView, setShowTechnicalView] = useState(false);
+  const [activePresetId, setActivePresetId] = useState<string | null>("wizard");
   const [builderOptions, setBuilderOptions] = useState<BuilderOptionsPayload>(
     fallbackBuilderOptions,
   );
@@ -278,6 +285,7 @@ export function App() {
 
   function resetDraft() {
     setState(initialState);
+    setActivePresetId(null);
     setStepIndex(0);
     setSaveState("Borrador reiniciado");
 
@@ -298,6 +306,7 @@ export function App() {
       ...preset.data,
       createdAt: new Date().toISOString(),
     }));
+    setActivePresetId(preset.id);
     setStepIndex(0);
     setSaveState(`Preset cargado: ${preset.name}`);
     setExportState("Listo para exportar");
@@ -408,7 +417,7 @@ export function App() {
         }}
       />
 
-      <PresetsBar onLoadPreset={loadPreset} />
+      <PresetsBar activePresetId={activePresetId} onLoadPreset={loadPreset} />
 
       <StoryBlock />
 
@@ -432,6 +441,11 @@ export function App() {
               {showTechnicalView ? "Ocultar vista técnica" : "Mostrar vista técnica"}
             </button>
             <span className="inline-status">{datasetState}</span>
+            {activePresetId ? (
+              <span className="inline-status inline-status-accent">
+                Preset activo: {DEMO_PRESETS.find((preset) => preset.id === activePresetId)?.name}
+              </span>
+            ) : null}
           </div>
         </div>
         <div className="hero-preview-card">
