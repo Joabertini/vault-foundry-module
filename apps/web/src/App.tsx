@@ -3,10 +3,14 @@ import { useEffect, useState } from "react";
 import {
   type BuilderState,
   abilityModifier,
+  appendUniqueLine,
   builderDraftStorageKey,
   buildCanonicalSnapshot,
   coerceBuilderState,
   initialState,
+  parseCantripLines,
+  parseSpellLines,
+  removeLine,
 } from "./builder";
 import {
   fallbackBuilderOptions,
@@ -89,9 +93,27 @@ export function App() {
   const cantripSuggestions = builderOptions.spells.cantrips
     .slice(0, 10)
     .map((entry) => entry.label);
+  const selectedCantrips = parseCantripLines(state.cantripsText);
+  const selectedSpells = parseSpellLines(state.spellsText);
 
   function updateField<K extends keyof BuilderState>(key: K, value: BuilderState[K]) {
     setState((current) => ({ ...current, [key]: value }));
+  }
+
+  function addCantrip(value: string) {
+    updateField("cantripsText", appendUniqueLine(state.cantripsText, value));
+  }
+
+  function addSpell(value: string) {
+    updateField("spellsText", appendUniqueLine(state.spellsText, value));
+  }
+
+  function removeCantrip(value: string) {
+    updateField("cantripsText", removeLine(state.cantripsText, value));
+  }
+
+  function removeSpell(value: string) {
+    updateField("spellsText", removeLine(state.spellsText, value));
   }
 
   function resetDraft() {
@@ -397,6 +419,28 @@ export function App() {
 
           {stepIndex === 4 ? (
             <div className="form-grid">
+              <div className="field field-full">
+                <span>Cantrips seleccionados</span>
+                <div className="selection-card">
+                  <div className="tag-list">
+                    {selectedCantrips.length ? (
+                      selectedCantrips.map((entry) => (
+                        <button
+                          className="sheet-tag removable-tag"
+                          key={entry}
+                          onClick={() => removeCantrip(entry)}
+                          type="button"
+                        >
+                          {entry}
+                          <strong>x</strong>
+                        </button>
+                      ))
+                    ) : (
+                      <span className="empty-note">Todavia no elegiste cantrips.</span>
+                    )}
+                  </div>
+                </div>
+              </div>
               <label className="field field-full">
                 <span>Cantrips</span>
                 <textarea
@@ -405,6 +449,28 @@ export function App() {
                   onChange={(event) => updateField("cantripsText", event.target.value)}
                 />
               </label>
+              <div className="field field-full">
+                <span>Spells seleccionados</span>
+                <div className="selection-card">
+                  <div className="tag-list">
+                    {selectedSpells.length ? (
+                      selectedSpells.map((entry) => (
+                        <button
+                          className="sheet-tag removable-tag"
+                          key={entry}
+                          onClick={() => removeSpell(entry)}
+                          type="button"
+                        >
+                          {entry}
+                          <strong>x</strong>
+                        </button>
+                      ))
+                    ) : (
+                      <span className="empty-note">Todavia no elegiste spells con nivel.</span>
+                    )}
+                  </div>
+                </div>
+              </div>
               <label className="field field-full">
                 <span>Spells</span>
                 <textarea
@@ -420,14 +486,7 @@ export function App() {
                     <button
                       className="sheet-tag"
                       key={entry}
-                      onClick={() =>
-                        updateField(
-                          "cantripsText",
-                          state.cantripsText.includes(entry)
-                            ? state.cantripsText
-                            : `${state.cantripsText}${state.cantripsText.trim() ? "\n" : ""}${entry}`,
-                        )
-                      }
+                      onClick={() => addCantrip(entry)}
                       type="button"
                     >
                       {entry}
@@ -437,14 +496,7 @@ export function App() {
                     <button
                       className="sheet-tag"
                       key={entry}
-                      onClick={() =>
-                        updateField(
-                          "spellsText",
-                          state.spellsText.includes(entry)
-                            ? state.spellsText
-                            : `${state.spellsText}${state.spellsText.trim() ? "\n" : ""}${entry}`,
-                        )
-                      }
+                      onClick={() => addSpell(entry)}
                       type="button"
                     >
                       {entry}

@@ -29,6 +29,17 @@ export type BuilderState = {
   notes: string;
 };
 
+function parseLineList(value: string) {
+  return value
+    .split("\n")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
+function uniqueEntries(values: string[]) {
+  return Array.from(new Set(values.filter(Boolean)));
+}
+
 export const builderDraftStorageKey = "bertinis-vault:web-builder:draft";
 
 export const initialState: BuilderState = {
@@ -111,19 +122,9 @@ export function proficiencyBonus(level: number) {
 }
 
 export function buildCanonicalSnapshot(state: BuilderState): CharacterBuild {
-  const cantrips = state.cantripsText
-    .split("\n")
-    .map((entry) => entry.trim())
-    .filter(Boolean)
-    .map((entry) => `Nv0: ${entry}`);
-  const leveledSpells = state.spellsText
-    .split("\n")
-    .map((entry) => entry.trim())
-    .filter(Boolean);
-  const features = state.featuresText
-    .split("\n")
-    .map((entry) => entry.trim())
-    .filter(Boolean);
+  const cantrips = parseLineList(state.cantripsText).map((entry) => `Nv0: ${entry}`);
+  const leveledSpells = parseLineList(state.spellsText);
+  const features = parseLineList(state.featuresText);
 
   const buildInput: Omit<CharacterBuild, "derived"> = {
     meta: {
@@ -188,4 +189,23 @@ export function buildCanonicalSnapshot(state: BuilderState): CharacterBuild {
   };
 
   return deriveCharacterBuild(buildInput);
+}
+
+export function parseCantripLines(value: string) {
+  return uniqueEntries(parseLineList(value));
+}
+
+export function parseSpellLines(value: string) {
+  return uniqueEntries(parseLineList(value));
+}
+
+export function appendUniqueLine(currentValue: string, nextValue: string) {
+  const entries = uniqueEntries([...parseLineList(currentValue), nextValue.trim()]);
+  return entries.join("\n");
+}
+
+export function removeLine(currentValue: string, targetValue: string) {
+  return parseLineList(currentValue)
+    .filter((entry) => entry !== targetValue)
+    .join("\n");
 }

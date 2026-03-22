@@ -603,3 +603,20 @@ Impacto:
 - el builder gana una base mas real para la parte magica del personaje;
 - acercamos la hoja y la exportacion a Foundry a un flujo mas creible;
 - dejamos listo el terreno para pasar luego de texto libre a seleccion mas estructurada.
+
+### Seleccion estructurada inicial de magia en web
+
+Se dio el siguiente paso en la UX del builder: la magia ya no depende solo de escribir texto manualmente.
+
+Ahora incluye:
+
+- chips visibles para cantrips y spells seleccionados;
+- agregar desde sugerencias rapidas con deduplicacion;
+- quitar picks directamente desde la UI;
+- sincronizacion con el texto que ya usa el snapshot canonico.
+
+Impacto:
+
+- el builder se siente menos como demo y mas como herramienta real;
+- mantenemos compatibilidad con el modelo actual sin rehacer todo el flujo;
+- preparamos la transicion a seleccion estructurada tambien para features y equipo.
