@@ -569,3 +569,20 @@ Impacto:
 - completamos otra de las selecciones centrales del builder;
 - la web ya depende menos de catalogos puramente locales;
 - seguimos acercando la experiencia final a una integracion real con tu API de 5etools.
+
+### Equipment con modo local/upstream/hibrido
+
+Se aplico el mismo patron al catalogo de equipo para armas y armaduras.
+
+Ahora incluye:
+
+- `source=local|upstream|hybrid` en `GET /datasets/equipment`;
+- normalizacion flexible del payload externo de items;
+- merge local/upstream para armas y armaduras;
+- consumo del modo hibrido desde la web.
+
+Impacto:
+
+- el builder queda mejor alineado con AC, armas y exportacion Foundry;
+- reducimos mas la dependencia de catalogos puramente embebidos;
+- preparamos mejor el terreno para una hoja visual y una exportacion mas fieles.

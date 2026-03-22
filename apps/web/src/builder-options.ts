@@ -83,6 +83,7 @@ export async function loadBuilderOptions(): Promise<BuilderOptionsPayload> {
   const racesUrl = `${baseUrl}/datasets/races?source=hybrid`;
   const backgroundsUrl = `${baseUrl}/datasets/backgrounds?source=hybrid`;
   const featsUrl = `${baseUrl}/datasets/feats?source=hybrid`;
+  const equipmentUrl = `${baseUrl}/datasets/equipment?source=hybrid`;
   const [meta, classes, races, backgrounds, feats, equipment] = await Promise.all([
     fetchJson<DatasetEnvelope<SelectOption>>(`${baseUrl}/datasets/meta`),
     fetchJson<DatasetEnvelope<SelectOption>>(classesUrl),
@@ -96,7 +97,7 @@ export async function loadBuilderOptions(): Promise<BuilderOptionsPayload> {
         armor: Array<SelectOption & { armorFormula?: string; grantsShieldBonus?: boolean }>;
         weapons: Array<SelectOption & { damage?: string; damageType?: string; attackType?: string }>;
       }
-    >(`${baseUrl}/datasets/equipment`),
+    >(equipmentUrl),
   ]);
 
   return {

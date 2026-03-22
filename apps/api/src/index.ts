@@ -26,6 +26,11 @@ import {
   normalizeUpstreamFeatsPayload,
 } from "./upstream-feats.js";
 import {
+  buildHybridEquipmentDataset,
+  defaultUpstreamEquipmentPath,
+  normalizeUpstreamEquipmentPayload,
+} from "./upstream-equipment.js";
+import {
   buildHybridRacesDataset,
   defaultUpstreamRacesPath,
   normalizeUpstreamRacesPayload,
@@ -318,7 +323,60 @@ const server = createServer(async (request, response) => {
   }
 
   if (request.method === "GET" && url.pathname === "/datasets/equipment") {
-    sendJson(response, 200, buildEquipmentDataset());
+    const sourceMode = url.searchParams.get("source") ?? "local";
+
+    if (sourceMode === "local") {
+      sendJson(response, 200, buildEquipmentDataset());
+      return;
+    }
+
+    const upstreamPath =
+      url.searchParams.get("upstreamPath") ?? defaultUpstreamEquipmentPath;
+
+    if (!isAllowedUpstreamPath(upstreamPath)) {
+      sendJson(response, 400, {
+        error: "Upstream path not allowed for equipment dataset",
+        path: upstreamPath,
+        allowedPrefixes: allowedUpstreamPrefixes,
+      });
+      return;
+    }
+
+    try {
+      const cacheKey = `equipment:${upstreamPath}`;
+      const cachedPayload = upstreamCache.get(cacheKey);
+      const upstreamPayload =
+        cachedPayload ?? (await fiveToolsClient.get(upstreamPath));
+
+      if (cachedPayload === undefined) {
+        upstreamCache.set(cacheKey, upstreamPayload);
+      }
+
+      const normalized = normalizeUpstreamEquipmentPayload(upstreamPayload);
+
+      if (sourceMode === "upstream") {
+        sendJson(response, 200, normalized);
+        return;
+      }
+
+      sendJson(response, 200, buildHybridEquipmentDataset(normalized));
+    } catch (error) {
+      if (sourceMode === "upstream") {
+        sendJson(response, 502, {
+          error: "Upstream equipment request failed",
+          path: upstreamPath,
+          detail: error instanceof Error ? error.message : "Unknown upstream error",
+        });
+        return;
+      }
+
+      sendJson(response, 200, {
+        ...buildEquipmentDataset(),
+        warning: "Hybrid upstream unavailable, local dataset returned",
+        attemptedUpstreamPath: upstreamPath,
+      });
+    }
+
     return;
   }
 
