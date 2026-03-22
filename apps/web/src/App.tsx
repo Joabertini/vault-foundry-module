@@ -1,38 +1,11 @@
 import { useState } from "react";
-
-type BuilderState = {
-  characterName: string;
-  playerName: string;
-  alignment: string;
-  raceId: string;
-  classId: string;
-  level: number;
-  str: number;
-  dex: number;
-  con: number;
-  int: number;
-  wis: number;
-  cha: number;
-  trait: string;
-  ideal: string;
-};
-
-const initialState: BuilderState = {
-  characterName: "Seraphina Vale",
-  playerName: "Martin",
-  alignment: "Neutral Bueno",
-  raceId: "human",
-  classId: "wizard",
-  level: 3,
-  str: 8,
-  dex: 14,
-  con: 13,
-  int: 17,
-  wis: 12,
-  cha: 10,
-  trait: "Siempre toma notas, incluso en medio del peligro.",
-  ideal: "El conocimiento es la mejor defensa contra el caos.",
-};
+import {
+  type BuilderState,
+  abilityModifier,
+  buildCanonicalSnapshot,
+  initialState,
+  proficiencyBonus,
+} from "./builder";
 
 const classOptions = [
   { value: "barbarian", label: "Barbarian" },
@@ -70,18 +43,6 @@ const steps = [
   { id: "persona", label: "Persona" },
 ];
 
-function abilityModifier(score: number) {
-  return Math.floor((score - 10) / 2);
-}
-
-function proficiencyBonus(level: number) {
-  if (level >= 17) return 6;
-  if (level >= 13) return 5;
-  if (level >= 9) return 4;
-  if (level >= 5) return 3;
-  return 2;
-}
-
 export function App() {
   const [stepIndex, setStepIndex] = useState(0);
   const [state, setState] = useState<BuilderState>(initialState);
@@ -92,6 +53,7 @@ export function App() {
   const conMod = abilityModifier(state.con);
   const ac = 10 + dexMod;
   const hp = 6 + conMod + Math.max(state.level - 1, 0) * (4 + conMod);
+  const canonicalSnapshot = buildCanonicalSnapshot(state);
 
   function updateField<K extends keyof BuilderState>(key: K, value: BuilderState[K]) {
     setState((current) => ({ ...current, [key]: value }));
@@ -311,6 +273,14 @@ export function App() {
               <p>
                 <strong>Ideal:</strong> {state.ideal}
               </p>
+            </div>
+
+            <div className="canonical-card">
+              <div className="canonical-head">
+                <span className="eyebrow">Canonical Build</span>
+                <strong>Snapshot</strong>
+              </div>
+              <pre>{JSON.stringify(canonicalSnapshot, null, 2)}</pre>
             </div>
           </div>
         </aside>

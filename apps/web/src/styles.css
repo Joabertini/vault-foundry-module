@@ -321,6 +321,32 @@ body {
   margin-top: 12px;
 }
 
+.canonical-card {
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: rgba(34, 23, 15, 0.95);
+  color: #f9efe2;
+}
+
+.canonical-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.canonical-card pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  font-family: "Consolas", "Courier New", monospace;
+  color: rgba(249, 239, 226, 0.9);
+}
+
 .hero-panels-builder {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }

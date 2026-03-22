@@ -185,3 +185,13 @@ Estado:
 - ya no es solo scaffold;
 - ya existe una primera experiencia real de builder web;
 - el siguiente paso sera conectarlo al modelo canonico compartido y ampliar opciones del personaje.
+
+### Snapshot canónico en web
+
+Se agrego `apps/web/src/builder.ts` para derivar un snapshot canonico desde el estado del builder.
+
+Impacto:
+
+- la web ya no solo edita campos visuales;
+- ahora tambien muestra una representacion estructurada del personaje;
+- eso acerca la UI web al `CharacterBuild` que ya usa la arquitectura nueva.
