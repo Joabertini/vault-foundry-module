@@ -143,6 +143,34 @@ Impacto:
 - el export deja de ser una accion ciega desde la UI;
 - el siguiente paso natural es exponer el mismo preflight en el runtime legacy de Foundry.
 
+### Preflight integrado al runtime legacy de Foundry
+
+Se conecto una primera capa de preflight al flujo real de creacion del actor dentro del modulo legacy.
+
+Ahora incluye:
+
+- nuevo `scripts/preflight-bridge.js` como espejo temporal del preflight compartido para el runtime Foundry actual;
+- chequeo previo dentro de `scripts/vault-app.js` antes de llamar a `buildActor(...)`;
+- bloqueo de creacion cuando existen blockers de preflight;
+- warnings mostrados al operador via `ui.notifications.warn(...)` cuando la exportacion puede continuar;
+- persistencia del resultado dentro de `flags.bertinis-vault.canonicalPreflight` desde `scripts/character-builder.js`.
+
+Validacion ejecutada:
+
+- `node --check scripts/preflight-bridge.js`;
+- `node --check scripts/character-builder.js`;
+- `node --check scripts/vault-app.js`.
+
+Limite actual:
+
+- esta sesion no puede validar el flujo completo dentro de Foundry VTT, asi que la confirmacion final del comportamiento runtime sigue pendiente de prueba manual en Foundry.
+
+Impacto:
+
+- Stage A ya cubre preflight en contrato, dominio, exporter, web y runtime legacy;
+- el camino operativo de import/export queda mucho mas cerca del benchmark procesal definido para el proyecto;
+- el siguiente paso natural es reemplazar este bridge temporal por consumo mas directo del carril compartido cuando el modulo legacy deje de ser el centro del runtime.
+
 ### Base architecture bootstrap
 
 Se agrego la base inicial del monorepo sin romper el prototipo actual de Foundry.

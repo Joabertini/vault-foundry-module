@@ -9,6 +9,7 @@ import {
 } from './data.js';
 import { createCanonicalCharacterBuild } from './model-bridge.js';
 import { buildFoundryActorPreview } from './foundry-export-bridge.js';
+import { buildFoundryPreflightPreview } from './preflight-bridge.js';
 
 /**
  * Calculates ability modifier
@@ -218,6 +219,7 @@ export function buildActor(formData) {
     ),
   });
   const canonicalFoundryPreview = buildFoundryActorPreview(canonicalBuild);
+  const canonicalPreflight = buildFoundryPreflightPreview(canonicalBuild);
   const previewSystem = canonicalFoundryPreview?.system || {};
   const previewAttributes = previewSystem.attributes || {};
   const previewDetails = previewSystem.details || {};
@@ -333,6 +335,7 @@ export function buildActor(formData) {
         version: '0.1.0',
         canonicalBuild,
         canonicalFoundryPreview,
+        canonicalPreflight,
       },
     },
     _stats: makeStats(),

@@ -11,6 +11,11 @@ import {
   PB_MIN, PB_MAX
 } from './data.js';
 import { buildActor } from './character-builder.js';
+import { createCanonicalCharacterBuild } from './model-bridge.js';
+import {
+  buildFoundryPreflightPreview,
+  formatPreflightIssues,
+} from './preflight-bridge.js';
 
 const TOTAL_STEPS = 9;
 
@@ -482,6 +487,29 @@ export class VaultCreatorApp extends Application {
 
   async _createCharacter(html) {
     this._saveStepData(html);
+
+    const canonicalBuild = createCanonicalCharacterBuild(this._formData, {});
+    const preflight = buildFoundryPreflightPreview(canonicalBuild);
+
+    if (!preflight.ok) {
+      const blockerSummary = formatPreflightIssues(preflight);
+      const blockerMessage = blockerSummary
+        ? `Preflight bloqueado: ${blockerSummary}`
+        : 'Preflight bloqueado por validaciones previas al export.';
+
+      ui.notifications.error(blockerMessage);
+      html.find('#vault-error').show().find('#vault-error-msg').text(blockerMessage);
+      return;
+    }
+
+    if (preflight.summary.warnings > 0) {
+      const warningSummary = formatPreflightIssues(preflight);
+      ui.notifications.warn(
+        warningSummary
+          ? `Vault preflight: ${warningSummary}`
+          : 'Vault preflight detecto advertencias en esta build.',
+      );
+    }
 
     // Show loading state
     html.find('#vault-step-9').hide();

@@ -26,7 +26,8 @@ This document is the fast-start guide for the next AI working on the repo.
 - Stage A from `docs/THREE-STAGE-ROADMAP.md`: stabilize preflight, import/export workflow, and exporter convergence before wider product polish;
 - shared preflight now exists in `packages/contracts` + `packages/domain`, and `packages/foundry-exporter` already consumes it;
 - `apps/web` now surfaces exporter preflight to the operator before download;
-- next work should expose the same result inside the legacy Foundry runtime instead of adding new validation layers elsewhere;
+- the legacy Foundry runtime now uses a temporary `scripts/preflight-bridge.js` to surface blockers and warnings before actor creation;
+- next work should reduce that bridge duplication and converge Foundry runtime on the shared preflight path instead of adding new validation layers elsewhere;
 - keep `apps/web` dual-purpose: financier-facing demo first, builder internals second;
 - keep extracting logic out of legacy Foundry JS and into shared packages;
 - tighten the contract between `CharacterBuild` and `FoundryActorPayload`;
