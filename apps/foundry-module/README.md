@@ -4,9 +4,9 @@ Este directorio representa el destino del modulo de Foundry dentro de la arquite
 
 Por ahora, el prototipo funcional sigue viviendo en la raiz del repo:
 
-- [module.json](C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/module.json)
-- [scripts/vault-app.js](C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/scripts/vault-app.js)
-- [scripts/character-builder.js](C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/scripts/character-builder.js)
+- [module.json](../../module.json)
+- [scripts/vault-app.js](../../scripts/vault-app.js)
+- [scripts/character-builder.js](../../scripts/character-builder.js)
 
 La migracion correcta sera:
 
@@ -16,7 +16,7 @@ La migracion correcta sera:
 
 Como referencia procedural para esa reconstruccion, usar tambien:
 
-- [`docs/DDIMPORT-COMPARISON.md`](/D:/Users/Martin/Desktop/RESPALDO/D&D%205e/Documents/web%20builder/bertinis-vault-github-ready/bertinis-vault/docs/DDIMPORT-COMPARISON.md)
+- [`docs/DDIMPORT-COMPARISON.md`](../../docs/DDIMPORT-COMPARISON.md)
 
 La leccion principal de esa comparativa es que este modulo no solo debe "importar un payload".
 

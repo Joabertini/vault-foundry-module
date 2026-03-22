@@ -73,6 +73,22 @@ Impacto:
 - existe una capa compartida que puede ser consumida por exporter, web y Foundry runtime;
 - el siguiente paso natural es cablear este resultado a la experiencia de export/import y ampliar la matriz de checks.
 
+### Limpieza de rutas locales en documentacion
+
+Se corrigieron referencias absolutas a rutas locales y de sandbox que no deberian vivir dentro del repo.
+
+Ahora incluye:
+
+- reemplazo de rutas locales absolutas y referencias de sandbox;
+- conversion a links relativos portables dentro de `README.md`, `ARCHITECTURE-PLAN.md`, `docs/`, y `apps/foundry-module/README.md`;
+- eliminacion de referencias locales a `ddimport.js` como path absoluto.
+
+Impacto:
+
+- la documentacion deja de filtrar rutas de maquina;
+- los links quedan portables para cualquier clon del repo;
+- los commits futuros ya no deberian arrastrar este problema salvo que se vuelva a introducir manualmente.
+
 ### Base architecture bootstrap
 
 Se agrego la base inicial del monorepo sin romper el prototipo actual de Foundry.

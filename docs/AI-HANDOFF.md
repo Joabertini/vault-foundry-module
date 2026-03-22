@@ -7,19 +7,19 @@ This document is the fast-start guide for the next AI working on the repo.
 - Active Git branch: usually `main` unless a feature branch is created for a focused task.
 - Active production-like Foundry prototype: repo root.
 - New target architecture: `apps/` plus `packages/`.
-- Canonical character model: [`packages/contracts/src/character-build.ts`](/C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/packages/contracts/src/character-build.ts).
-- Shared derivations: [`packages/domain/src/derive.ts`](/C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/packages/domain/src/derive.ts).
-- Shared Foundry exporter: [`packages/foundry-exporter/src/index.ts`](/C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/packages/foundry-exporter/src/index.ts).
-- Legacy-to-canonical bridges: [`scripts/model-bridge.js`](/C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/scripts/model-bridge.js) and [`scripts/foundry-export-bridge.js`](/C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/scripts/foundry-export-bridge.js).
+- Canonical character model: [`packages/contracts/src/character-build.ts`](../packages/contracts/src/character-build.ts).
+- Shared derivations: [`packages/domain/src/derive.ts`](../packages/domain/src/derive.ts).
+- Shared Foundry exporter: [`packages/foundry-exporter/src/index.ts`](../packages/foundry-exporter/src/index.ts).
+- Legacy-to-canonical bridges: [`scripts/model-bridge.js`](../scripts/model-bridge.js) and [`scripts/foundry-export-bridge.js`](../scripts/foundry-export-bridge.js).
 
 ## Read These First
 
-1. [`ARCHITECTURE-PLAN.md`](/C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/ARCHITECTURE-PLAN.md)
-2. [`docs/IMPLEMENTATION-LOG.md`](/C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/docs/IMPLEMENTATION-LOG.md)
-3. [`docs/MIGRATION-MATRIX.md`](/C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/docs/MIGRATION-MATRIX.md)
-4. [`docs/THREE-STAGE-ROADMAP.md`](/D:/Users/Martin/Desktop/RESPALDO/D&D%205e/Documents/web%20builder/bertinis-vault-github-ready/bertinis-vault/docs/THREE-STAGE-ROADMAP.md)
+1. [`ARCHITECTURE-PLAN.md`](../ARCHITECTURE-PLAN.md)
+2. [`docs/IMPLEMENTATION-LOG.md`](./IMPLEMENTATION-LOG.md)
+3. [`docs/MIGRATION-MATRIX.md`](./MIGRATION-MATRIX.md)
+4. [`docs/THREE-STAGE-ROADMAP.md`](./THREE-STAGE-ROADMAP.md)
 5. `docs/FRONTEND-INTEGRATION.md` if visual/frontend work is being split across agents
-6. [`docs/DDIMPORT-COMPARISON.md`](/D:/Users/Martin/Desktop/RESPALDO/D&D%205e/Documents/web%20builder/bertinis-vault-github-ready/bertinis-vault/docs/DDIMPORT-COMPARISON.md) for import/export workflow benchmarking
+6. [`docs/DDIMPORT-COMPARISON.md`](./DDIMPORT-COMPARISON.md) for import/export workflow benchmarking
 
 ## Current Technical Priorities
 

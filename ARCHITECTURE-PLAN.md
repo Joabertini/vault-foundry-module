@@ -18,11 +18,11 @@ Hoy existe un modulo de Foundry funcional que:
 
 Archivos principales del estado actual:
 
-- [README.md](C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/cf72cb7dc21aaf7e/README.md)
-- [scripts/vault-app.js](C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/cf72cb7dc21aaf7e/scripts/vault-app.js)
-- [scripts/character-builder.js](C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/cf72cb7dc21aaf7e/scripts/character-builder.js)
-- [scripts/data.js](C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/cf72cb7dc21aaf7e/scripts/data.js)
-- [templates/vault-creator.html](C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/cf72cb7dc21aaf7e/templates/vault-creator.html)
+- [README.md](./README.md)
+- [scripts/vault-app.js](./scripts/vault-app.js)
+- [scripts/character-builder.js](./scripts/character-builder.js)
+- [scripts/data.js](./scripts/data.js)
+- [templates/vault-creator.html](./templates/vault-creator.html)
 
 ## 3. Diagnostico
 

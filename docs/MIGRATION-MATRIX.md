@@ -11,15 +11,15 @@ This document tracks how the legacy Foundry module is being replaced by the shar
 ## Current Flow
 
 1. The active Foundry workflow still starts in the legacy root module.
-2. The legacy form is transformed into a canonical `CharacterBuild` through [`scripts/model-bridge.js`](/C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/scripts/model-bridge.js).
-3. A Foundry-like preview is derived from that canonical build through [`scripts/foundry-export-bridge.js`](/C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/scripts/foundry-export-bridge.js).
-4. The actor is still finalized by the legacy builder in [`scripts/character-builder.js`](/C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/scripts/character-builder.js), but it already reuses selected pieces from the canonical preview.
+2. The legacy form is transformed into a canonical `CharacterBuild` through [`scripts/model-bridge.js`](../scripts/model-bridge.js).
+3. A Foundry-like preview is derived from that canonical build through [`scripts/foundry-export-bridge.js`](../scripts/foundry-export-bridge.js).
+4. The actor is still finalized by the legacy builder in [`scripts/character-builder.js`](../scripts/character-builder.js), but it already reuses selected pieces from the canonical preview.
 
 ## State by Area
 
 | Area | Current source of truth | Status | Notes |
 | --- | --- | --- | --- |
-| Canonical character contract | `packages/contracts` | Shared | [`packages/contracts/src/character-build.ts`](/C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/packages/contracts/src/character-build.ts) is the canonical schema. |
+| Canonical character contract | `packages/contracts` | Shared | [`packages/contracts/src/character-build.ts`](../packages/contracts/src/character-build.ts) is the canonical schema. |
 | Core derivations | `packages/domain` | Shared | HP, AC, proficiency bonus and spellcasting are derived in shared code. |
 | Curated datasets | `packages/data-engine` | Shared | Classes, races, backgrounds, feats, spells, weapons, armor and gear now live outside the legacy module. |
 | BFF datasets | `apps/api` | Shared | Web already consumes semantic dataset endpoints with local/upstream/hybrid modes. |
@@ -53,7 +53,7 @@ The legacy builder already reuses canonical preview data for these sections:
 - `items` of type `spell`
 - main weapon item when it can be resolved from preview
 
-These integrations are visible in [`scripts/character-builder.js`](/C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/scripts/character-builder.js).
+These integrations are visible in [`scripts/character-builder.js`](../scripts/character-builder.js).
 
 ## Still Legacy-Driven
 
@@ -68,9 +68,9 @@ The following areas still need deliberate migration work:
 
 These files should be treated as temporary mirrors that must converge over time:
 
-- [`scripts/model-bridge.js`](/C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/scripts/model-bridge.js)
-- [`scripts/foundry-export-bridge.js`](/C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/scripts/foundry-export-bridge.js)
-- [`packages/foundry-exporter/src/index.ts`](/C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/packages/foundry-exporter/src/index.ts)
+- [`scripts/model-bridge.js`](../scripts/model-bridge.js)
+- [`scripts/foundry-export-bridge.js`](../scripts/foundry-export-bridge.js)
+- [`packages/foundry-exporter/src/index.ts`](../packages/foundry-exporter/src/index.ts)
 
 Whenever a Foundry-facing rule changes, compare all three before assuming the migration is complete.
 
@@ -83,7 +83,7 @@ Whenever a Foundry-facing rule changes, compare all three before assuming the mi
 
 ## Procedural Gap Compared With `ddimport.js`
 
-[`docs/DDIMPORT-COMPARISON.md`](/D:/Users/Martin/Desktop/RESPALDO/D&D%205e/Documents/web%20builder/bertinis-vault-github-ready/bertinis-vault/docs/DDIMPORT-COMPARISON.md) should now be treated as the operational benchmark for future import/export work.
+[`docs/DDIMPORT-COMPARISON.md`](./DDIMPORT-COMPARISON.md) should now be treated as the operational benchmark for future import/export work.
 
 The main migration gap is no longer only "which file owns which actor field".
 

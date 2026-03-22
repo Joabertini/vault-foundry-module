@@ -1,6 +1,6 @@
 # Bertini's Vault - `ddimport.js` Procedural Comparison
 
-This document treats [`ddimport.js`](D:/Users/Martin/Desktop/RESPALDO/D&D%205e/Documents/web%20builder/ddimport.js) as an external procedural anchor.
+This document treats `ddimport.js` as an external procedural anchor.
 
 The goal is not to copy its domain behavior directly. The goal is to compare how it structures an import pipeline and use that to harden Bertini's Vault.
 
@@ -33,7 +33,7 @@ The external importer follows a clean sequence:
 10. settings persistence for the next run;
 11. user notifications throughout the flow.
 
-Key examples in [`ddimport.js`](D:/Users/Martin/Desktop/RESPALDO/D&D%205e/Documents/web%20builder/ddimport.js):
+Key examples in `ddimport.js`:
 
 - settings registration: lines 11-39;
 - form context hydration: lines 78-119;
@@ -53,11 +53,11 @@ Bertini's Vault currently does this:
 
 Primary files:
 
-- web orchestration: [`apps/web/src/App.tsx`](/D:/Users/Martin/Desktop/RESPALDO/D&D%205e/Documents/web%20builder/bertinis-vault-github-ready/bertinis-vault/apps/web/src/App.tsx)
-- canonical bridge: [`scripts/model-bridge.js`](/D:/Users/Martin/Desktop/RESPALDO/D&D%205e/Documents/web%20builder/bertinis-vault-github-ready/bertinis-vault/scripts/model-bridge.js)
-- shared exporter: [`packages/foundry-exporter/src/index.ts`](/D:/Users/Martin/Desktop/RESPALDO/D&D%205e/Documents/web%20builder/bertinis-vault-github-ready/bertinis-vault/packages/foundry-exporter/src/index.ts)
-- legacy Foundry preview bridge: [`scripts/foundry-export-bridge.js`](/D:/Users/Martin/Desktop/RESPALDO/D&D%205e/Documents/web%20builder/bertinis-vault-github-ready/bertinis-vault/scripts/foundry-export-bridge.js)
-- legacy runtime actor creation: [`scripts/character-builder.js`](/D:/Users/Martin/Desktop/RESPALDO/D&D%205e/Documents/web%20builder/bertinis-vault-github-ready/bertinis-vault/scripts/character-builder.js)
+- web orchestration: [`apps/web/src/App.tsx`](../apps/web/src/App.tsx)
+- canonical bridge: [`scripts/model-bridge.js`](../scripts/model-bridge.js)
+- shared exporter: [`packages/foundry-exporter/src/index.ts`](../packages/foundry-exporter/src/index.ts)
+- legacy Foundry preview bridge: [`scripts/foundry-export-bridge.js`](../scripts/foundry-export-bridge.js)
+- legacy runtime actor creation: [`scripts/character-builder.js`](../scripts/character-builder.js)
 
 ## Comparative Read
 

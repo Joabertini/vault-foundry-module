@@ -6,11 +6,11 @@ A D&D 5e 2014 character creation module that builds fully populated actors direc
 
 This repository now also contains the first shared foundation for the broader Bertini's Vault product:
 
-- [ARCHITECTURE-PLAN.md](C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/ARCHITECTURE-PLAN.md)
-- [docs/IMPLEMENTATION-LOG.md](C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/docs/IMPLEMENTATION-LOG.md)
-- [docs/MIGRATION-MATRIX.md](C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/docs/MIGRATION-MATRIX.md)
-- [docs/AI-HANDOFF.md](C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/docs/AI-HANDOFF.md)
-- [docs/THREE-STAGE-ROADMAP.md](D:/Users/Martin/Desktop/RESPALDO/D&D 5e/Documents/web builder/bertinis-vault-github-ready/bertinis-vault/docs/THREE-STAGE-ROADMAP.md)
+- [ARCHITECTURE-PLAN.md](./ARCHITECTURE-PLAN.md)
+- [docs/IMPLEMENTATION-LOG.md](./docs/IMPLEMENTATION-LOG.md)
+- [docs/MIGRATION-MATRIX.md](./docs/MIGRATION-MATRIX.md)
+- [docs/AI-HANDOFF.md](./docs/AI-HANDOFF.md)
+- [docs/THREE-STAGE-ROADMAP.md](./docs/THREE-STAGE-ROADMAP.md)
 - `apps/` for future product surfaces
 - `packages/contracts` for shared schemas
 - `packages/domain` for reusable rules and derivations
