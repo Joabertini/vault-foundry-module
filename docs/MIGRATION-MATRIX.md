@@ -81,6 +81,20 @@ Whenever a Foundry-facing rule changes, compare all three before assuming the mi
 3. Replace label-based free text in the bridges with canonical ids wherever possible.
 4. Move the active Foundry module runtime into `apps/foundry-module` only after the shared exporter is trusted by tests.
 
+## Procedural Gap Compared With `ddimport.js`
+
+[`docs/DDIMPORT-COMPARISON.md`](/D:/Users/Martin/Desktop/RESPALDO/D&D%205e/Documents/web%20builder/bertinis-vault-github-ready/bertinis-vault/docs/DDIMPORT-COMPARISON.md) should now be treated as the operational benchmark for future import/export work.
+
+The main migration gap is no longer only "which file owns which actor field".
+
+We also need to formalize these stages across web, exporter and Foundry module:
+
+- preflight validation before final export/import;
+- resolved export package as explicit intermediate aggregate;
+- persisted import/export settings;
+- status reporting for validation, export and Foundry-side import;
+- final Foundry sync as a first-class workflow phase.
+
 ## Exit Criteria for This Migration
 
 The legacy transition is effectively finished when:

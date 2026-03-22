@@ -18,6 +18,7 @@ This document is the fast-start guide for the next AI working on the repo.
 2. [`docs/IMPLEMENTATION-LOG.md`](/C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/docs/IMPLEMENTATION-LOG.md)
 3. [`docs/MIGRATION-MATRIX.md`](/C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/docs/MIGRATION-MATRIX.md)
 4. `docs/FRONTEND-INTEGRATION.md` if visual/frontend work is being split across agents
+5. [`docs/DDIMPORT-COMPARISON.md`](/D:/Users/Martin/Desktop/RESPALDO/D&D%205e/Documents/web%20builder/bertinis-vault-github-ready/bertinis-vault/docs/DDIMPORT-COMPARISON.md) for import/export workflow benchmarking
 
 ## Current Technical Priorities
 
@@ -67,6 +68,7 @@ For frontend-only demo work, use:
 - The legacy module is still the active actor creation runtime.
 - Some user-facing choices are still text-based and only later normalized into structured data.
 - The monorepo is ahead architecturally of its test coverage, even after the new baseline tests.
+- Import/export orchestration is still weaker than the canonical modeling itself; use `ddimport.js` comparison doc as the process benchmark.
 
 ## Good Next Tasks
 

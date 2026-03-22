@@ -879,3 +879,24 @@ Impacto:
 - la preview se acerca mas al lenguaje visual de una hoja jugable;
 - mejora el valor de la demo para mostrar producto, no solo formulario;
 - la integracion mantiene intactos builder, datasets y exportador compartido.
+
+### Comparativa procedural contra `ddimport.js`
+
+Se incorporo una comparativa formal entre el pipeline de `ddimport.js` y el flujo actual de Bertini's Vault.
+
+Ahora incluye:
+
+- nuevo documento `docs/DDIMPORT-COMPARISON.md`;
+- lectura de `ddimport.js` como benchmark operacional, no como plantilla de dominio;
+- comparacion de etapas `entrada -> validacion -> normalizacion -> agregado -> transformacion -> persistencia -> post-proceso`;
+- definicion de brechas concretas en nuestro servicio:
+  - falta de preflight fuerte;
+  - falta de un resolved export package;
+  - falta de settings persistidos de import/export;
+  - falta de una fase Foundry-side de sync/import realmente orquestada.
+
+Impacto:
+
+- el criterio para evolucionar `apps/foundry-module` queda mucho mas claro;
+- futuras IAs ya no tienen que deducir desde cero que nos falta alrededor del exportador;
+- la migracion deja de ser solo una lista de archivos y pasa a ser tambien una lista de etapas operacionales.
