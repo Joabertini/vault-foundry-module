@@ -147,3 +147,90 @@ test("buildPreflightResult warns on spell id mismatches and equipment category m
     ["SPELL_ID_LABEL_MISMATCH", "SPELL_LEVEL_MISMATCH", "EQUIPMENT_CATEGORY_MISMATCH"],
   );
 });
+
+test("buildPreflightResult warns on duplicate multiclass entries and stale derived spellcasting", () => {
+  const result = buildPreflightResult({
+    ...makeInput({
+      classing: {
+        classes: [
+          { classId: "wizard", level: 2 },
+          { classId: "wizard", level: 1 },
+        ],
+      },
+    }),
+    derived: {
+      proficiencyBonus: 3,
+      hp: 14,
+      ac: 15,
+      spellcasting: {
+        ability: "wis",
+        attackBonus: 7,
+        saveDC: 15,
+        slots: {
+          spell1: 2,
+          spell2: 0,
+          spell3: 0,
+          spell4: 0,
+          spell5: 0,
+          spell6: 0,
+          spell7: 0,
+          spell8: 0,
+          spell9: 0,
+        },
+      },
+    },
+  }, {
+    generatedAt: "2026-03-22T00:00:00.000Z",
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.summary.warnings, 6);
+  assert.deepEqual(
+    result.issues.map((issue) => issue.code),
+    [
+      "DUPLICATE_CLASS_ID",
+      "DERIVED_PROFICIENCY_BONUS_MISMATCH",
+      "DERIVED_SPELL_ABILITY_MISMATCH",
+      "DERIVED_SPELL_ATTACK_BONUS_MISMATCH",
+      "DERIVED_SPELL_SAVE_DC_MISMATCH",
+      "DERIVED_SPELL_SLOTS_MISMATCH",
+    ],
+  );
+});
+
+test("buildPreflightResult warns when non-caster builds carry derived spellcasting", () => {
+  const result = buildPreflightResult({
+    ...makeInput({
+      classing: {
+        classes: [{ classId: "fighter", level: 3 }],
+      },
+    }),
+    derived: {
+      proficiencyBonus: 2,
+      hp: 22,
+      ac: 16,
+      spellcasting: {
+        ability: "int",
+        attackBonus: 4,
+        saveDC: 12,
+        slots: {
+          spell1: 2,
+          spell2: 0,
+          spell3: 0,
+          spell4: 0,
+          spell5: 0,
+          spell6: 0,
+          spell7: 0,
+          spell8: 0,
+          spell9: 0,
+        },
+      },
+    },
+  }, {
+    generatedAt: "2026-03-22T00:00:00.000Z",
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.summary.warnings, 1);
+  assert.equal(result.issues[0].code, "UNEXPECTED_DERIVED_SPELLCASTING");
+});

@@ -197,6 +197,36 @@ Impacto:
 - exporter y runtime heredan mejores diagnosticos sin agregar logica paralela;
 - el siguiente paso natural es ampliar fixtures reales de spellcasting, proficiencies y multiclass antes de converger mas codigo legacy.
 
+### Consistencia de multiclass y derived dentro del preflight
+
+Se agrego una segunda capa de edge cases orientada a detectar snapshots canonicos stale o internamente inconsistentes.
+
+Ahora incluye:
+
+- warning nuevo `DUPLICATE_CLASS_ID` cuando una misma clase aparece repetida dentro de `classing.classes`;
+- warning nuevo `DERIVED_PROFICIENCY_BONUS_MISMATCH` cuando `derived.proficiencyBonus` no coincide con el nivel total;
+- warning nuevo `UNEXPECTED_DERIVED_SPELLCASTING` cuando una clase no caster arrastra `derived.spellcasting`;
+- warnings nuevos para spellcasting derivado inconsistente:
+  - `DERIVED_SPELL_ABILITY_MISMATCH`
+  - `DERIVED_SPELL_ATTACK_BONUS_MISMATCH`
+  - `DERIVED_SPELL_SAVE_DC_MISMATCH`
+  - `DERIVED_SPELL_SLOTS_MISMATCH`
+- tests ampliados en `packages/domain/test/preflight.test.mjs` con fixtures de multiclass duplicado y non-caster stale;
+- tests ampliados en `packages/foundry-exporter/test/index.test.mjs` para verificar propagacion de warnings de `derived`.
+
+Validacion ejecutada:
+
+- build de `packages/domain` correcto;
+- build de `packages/foundry-exporter` correcto;
+- `node --test packages/domain/test/preflight.test.mjs` pasando;
+- `node --test packages/foundry-exporter/test/index.test.mjs` pasando.
+
+Impacto:
+
+- el preflight ya no valida solo la entrada canonica, tambien detecta snapshots derivados desalineados con las reglas compartidas;
+- esto ayuda a identificar exportaciones potencialmente "correctas de schema pero stale de calculo";
+- el siguiente paso natural es ampliar la matriz a proficiencies y fixtures mas realistas de caster/non-caster antes de reducir mas duplicacion legacy.
+
 ### Base architecture bootstrap
 
 Se agrego la base inicial del monorepo sin romper el prototipo actual de Foundry.

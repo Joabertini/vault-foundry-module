@@ -152,3 +152,42 @@ test("buildFoundryExportResult propagates richer warnings from preflight", () =>
     ["SPELL_ID_LABEL_MISMATCH", "SPELL_LEVEL_MISMATCH", "EQUIPMENT_CATEGORY_MISMATCH"],
   );
 });
+
+test("buildFoundryExportResult propagates derived consistency warnings", () => {
+  const build = makeCharacterBuild();
+  build.classing.classes = [
+    { classId: "wizard", level: 2 },
+    { classId: "wizard", level: 1 },
+  ];
+  build.derived.proficiencyBonus = 3;
+  build.derived.spellcasting = {
+    ability: "wis",
+    attackBonus: 7,
+    saveDC: 13,
+    slots: {
+      spell1: 2,
+      spell2: 0,
+      spell3: 0,
+      spell4: 0,
+      spell5: 0,
+      spell6: 0,
+      spell7: 0,
+      spell8: 0,
+      spell9: 0,
+    },
+  };
+
+  const result = buildFoundryExportResult(build);
+
+  assert.equal(result.preflight.ok, true);
+  assert.deepEqual(
+    result.preflight.issues.map((issue) => issue.code),
+    [
+      "DUPLICATE_CLASS_ID",
+      "DERIVED_PROFICIENCY_BONUS_MISMATCH",
+      "DERIVED_SPELL_ABILITY_MISMATCH",
+      "DERIVED_SPELL_ATTACK_BONUS_MISMATCH",
+      "DERIVED_SPELL_SLOTS_MISMATCH",
+    ],
+  );
+});

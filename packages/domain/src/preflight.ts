@@ -1,6 +1,7 @@
 import {
   type CharacterBuild,
   type CharacterBuildInput,
+  characterBuildSchema,
   characterBuildInputSchema,
   preflightResultSchema,
   type PreflightIssue,
@@ -16,6 +17,9 @@ import {
   getSpellCatalogEntry,
   getWeaponCatalogEntry,
 } from "@bertinis-vault/data-engine";
+import { abilityModifierMap } from "./abilities.js";
+import { getSpellAbilityForClass, getSpellSlotsForClassLevel } from "./dnd5e-2014.js";
+import { getCharacterLevel, getProficiencyBonus } from "./progression.js";
 
 type PreflightOptions = {
   generatedAt?: string;
@@ -56,6 +60,7 @@ function makeIssue(issue: PreflightIssue): PreflightIssue {
 function validateCanonicalCatalogs(character: CharacterBuild) {
   const issues: PreflightIssue[] = [];
   const totalLevels = character.classing.classes.reduce((sum, entry) => sum + entry.level, 0);
+  const seenClassIds = new Set<string>();
 
   if (totalLevels > 20) {
     issues.push(makeIssue({
@@ -72,6 +77,20 @@ function validateCanonicalCatalogs(character: CharacterBuild) {
   }
 
   for (const [index, entry] of character.classing.classes.entries()) {
+    if (seenClassIds.has(entry.classId)) {
+      issues.push(makeIssue({
+        code: "DUPLICATE_CLASS_ID",
+        message: `Class id "${entry.classId}" appears more than once in classing.classes; multiclass entries should be unique per class.` ,
+        severity: "warning",
+        scope: "canonical-build",
+        path: `classing.classes[${index}].classId`,
+        source: "domain",
+        canonicalId: entry.classId,
+      }));
+    } else {
+      seenClassIds.add(entry.classId);
+    }
+
     if (!getClassCatalogEntry(entry.classId)) {
       issues.push(makeIssue({
         code: "UNKNOWN_CLASS_ID",
@@ -247,12 +266,122 @@ function validateNormalizedChoices(character: CharacterBuild) {
   return issues;
 }
 
+function validateDerivedState(character: CharacterBuild) {
+  const issues: PreflightIssue[] = [];
+  const totalLevels = getCharacterLevel(character.classing.classes.map((entry) => entry.level));
+  const expectedProficiencyBonus = getProficiencyBonus(totalLevels);
+
+  if (character.derived.proficiencyBonus !== expectedProficiencyBonus) {
+    issues.push(makeIssue({
+      code: "DERIVED_PROFICIENCY_BONUS_MISMATCH",
+      message: `Derived proficiency bonus is ${character.derived.proficiencyBonus}, but level ${totalLevels} expects ${expectedProficiencyBonus}.`,
+      severity: "warning",
+      scope: "canonical-build",
+      path: "derived.proficiencyBonus",
+      source: "domain",
+      details: {
+        expectedProficiencyBonus,
+        providedProficiencyBonus: character.derived.proficiencyBonus,
+        totalLevels,
+      },
+    }));
+  }
+
+  const primaryClass = character.classing.classes[0];
+  const expectedSpellAbility = primaryClass ? getSpellAbilityForClass(primaryClass.classId) : undefined;
+
+  if (!expectedSpellAbility && character.derived.spellcasting) {
+    issues.push(makeIssue({
+      code: "UNEXPECTED_DERIVED_SPELLCASTING",
+      message: `Primary class "${primaryClass?.classId ?? "unknown"}" does not normally derive spellcasting, but derived.spellcasting is present.`,
+      severity: "warning",
+      scope: "canonical-build",
+      path: "derived.spellcasting",
+      source: "domain",
+    }));
+
+    return issues;
+  }
+
+  if (!expectedSpellAbility || !character.derived.spellcasting || !primaryClass) {
+    return issues;
+  }
+
+  const modifiers = abilityModifierMap(character.abilities.final);
+  const expectedAttackBonus = expectedProficiencyBonus + modifiers[expectedSpellAbility];
+  const expectedSaveDc = 8 + expectedProficiencyBonus + modifiers[expectedSpellAbility];
+  const expectedSlots = getSpellSlotsForClassLevel(primaryClass.classId, primaryClass.level);
+
+  if (character.derived.spellcasting.ability !== expectedSpellAbility) {
+    issues.push(makeIssue({
+      code: "DERIVED_SPELL_ABILITY_MISMATCH",
+      message: `Derived spellcasting ability is "${character.derived.spellcasting.ability}", but primary class "${primaryClass.classId}" expects "${expectedSpellAbility}".`,
+      severity: "warning",
+      scope: "canonical-build",
+      path: "derived.spellcasting.ability",
+      source: "domain",
+      details: {
+        expectedAbility: expectedSpellAbility,
+        providedAbility: character.derived.spellcasting.ability,
+      },
+    }));
+  }
+
+  if (character.derived.spellcasting.attackBonus !== expectedAttackBonus) {
+    issues.push(makeIssue({
+      code: "DERIVED_SPELL_ATTACK_BONUS_MISMATCH",
+      message: `Derived spell attack bonus is ${character.derived.spellcasting.attackBonus}, but expected ${expectedAttackBonus}.`,
+      severity: "warning",
+      scope: "canonical-build",
+      path: "derived.spellcasting.attackBonus",
+      source: "domain",
+      details: {
+        expectedAttackBonus,
+        providedAttackBonus: character.derived.spellcasting.attackBonus,
+      },
+    }));
+  }
+
+  if (character.derived.spellcasting.saveDC !== expectedSaveDc) {
+    issues.push(makeIssue({
+      code: "DERIVED_SPELL_SAVE_DC_MISMATCH",
+      message: `Derived spell save DC is ${character.derived.spellcasting.saveDC}, but expected ${expectedSaveDc}.`,
+      severity: "warning",
+      scope: "canonical-build",
+      path: "derived.spellcasting.saveDC",
+      source: "domain",
+      details: {
+        expectedSaveDC: expectedSaveDc,
+        providedSaveDC: character.derived.spellcasting.saveDC,
+      },
+    }));
+  }
+
+  if (JSON.stringify(character.derived.spellcasting.slots) !== JSON.stringify(expectedSlots)) {
+    issues.push(makeIssue({
+      code: "DERIVED_SPELL_SLOTS_MISMATCH",
+      message: `Derived spell slots do not match the expected progression for ${primaryClass.classId} level ${primaryClass.level}.`,
+      severity: "warning",
+      scope: "canonical-build",
+      path: "derived.spellcasting.slots",
+      source: "domain",
+      details: {
+        expectedSlots,
+        providedSlots: character.derived.spellcasting.slots,
+      },
+    }));
+  }
+
+  return issues;
+}
+
 export function buildPreflightResult(
   input: CharacterBuildInput | CharacterBuild | unknown,
   options: PreflightOptions = {},
 ): PreflightResult {
   const generatedAt = options.generatedAt ?? new Date().toISOString();
   const parsed = characterBuildInputSchema.safeParse(input);
+  const parsedWithDerived = characterBuildSchema.safeParse(input);
 
   if (!parsed.success) {
     const issues: PreflightIssue[] = parsed.error.issues.map((issue) => makeIssue({
@@ -281,6 +410,7 @@ export function buildPreflightResult(
   const issues = [
     ...validateCanonicalCatalogs(character as CharacterBuild),
     ...validateNormalizedChoices(character as CharacterBuild),
+    ...(parsedWithDerived.success ? validateDerivedState(parsedWithDerived.data) : []),
   ];
   const summary = summarizeIssues(issues);
 
