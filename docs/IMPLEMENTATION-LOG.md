@@ -986,3 +986,23 @@ Impacto:
 - el contrato canonico deja de ser solo un schema plano minimo y pasa a ser una base mas seria para evolucion futura;
 - web y bridge legacy ya pueden poblar informacion estructurada sin romper consumidores actuales;
 - se reduce el riesgo de que cada capa siga inventando su propia forma de representar spells, equipment y proficiencies.
+
+### Exportador orientado a contrato estructurado
+
+Se tomo una decision de mantenimiento importante: desde ahora el flujo compartido debe tratar `choices.normalized` como fuente principal cuando exista.
+
+Ahora incluye:
+
+- `packages/foundry-exporter/src/index.ts` actualizado para preferir:
+  - `choices.normalized.proficiencies`
+  - `choices.normalized.spells`
+  - `choices.normalized.equipment`
+  - `choices.normalized.features`
+- arrays string-based mantenidos solo como fallback transicional;
+- tests nuevos en `packages/foundry-exporter/test/index.test.mjs` para verificar que el exporter use la forma normalizada por encima del legado.
+
+Impacto:
+
+- la arquitectura ya no solo acepta el contrato enriquecido: tambien lo consume de verdad;
+- mejora mantenimiento y escalabilidad porque el exporter deja de depender primero de labels sueltos;
+- el siguiente tramo de migracion puede reducir strings legacy sin bloquear el runtime actual.

@@ -317,10 +317,92 @@ function parseToolEntry(value: string) {
   return TOOL_ALIAS_TO_ID[normalized];
 }
 
+function getNormalizedProficiencyLabels(
+  character: CharacterBuild,
+  kind: "skill" | "language" | "tool",
+) {
+  const entries = character.choices.normalized?.proficiencies ?? [];
+  return entries
+    .filter((entry) => entry.kind === kind)
+    .map((entry) => entry.label);
+}
+
+function getProficiencyLabels(
+  character: CharacterBuild,
+  kind: "skill" | "language" | "tool",
+) {
+  const normalizedLabels = getNormalizedProficiencyLabels(character, kind);
+  if (normalizedLabels.length) {
+    return normalizedLabels;
+  }
+
+  if (kind === "language") {
+    return character.choices.proficiencies
+      .filter((entry) => /^language:/i.test(entry))
+      .map((entry) => entry.replace(/^language:\s*/i, "").trim());
+  }
+
+  if (kind === "tool") {
+    return character.choices.proficiencies
+      .filter((entry) => /^tool:/i.test(entry))
+      .map((entry) => entry.replace(/^tool:\s*/i, "").trim());
+  }
+
+  return character.choices.proficiencies.filter(
+    (entry) => !/^language:/i.test(entry) && !/^tool:/i.test(entry),
+  );
+}
+
+function getSpellEntries(character: CharacterBuild) {
+  const normalizedSpells = character.choices.normalized?.spells ?? [];
+  if (normalizedSpells.length) {
+    return normalizedSpells.map((entry) => ({
+      name: entry.label,
+      level: entry.level,
+    }));
+  }
+
+  return character.choices.spells.map((rawSpell) => parseSpellEntry(rawSpell));
+}
+
+function getFeatureEntries(character: CharacterBuild) {
+  const normalizedFeatures = character.choices.normalized?.features ?? [];
+  if (normalizedFeatures.length) {
+    return normalizedFeatures.map((entry) => ({
+      name: entry.label,
+      source: entry.source,
+    }));
+  }
+
+  return character.choices.features.map((feature) => ({
+    name: feature,
+    source: "class" as const,
+  }));
+}
+
+function getEquipmentEntries(character: CharacterBuild) {
+  const normalizedEquipment = character.choices.normalized?.equipment ?? [];
+  if (normalizedEquipment.length) {
+    return normalizedEquipment.map((entry) => ({
+      lookupName: entry.itemId ?? entry.label,
+      label: entry.label,
+      category: entry.category,
+      quantity: entry.quantity,
+    }));
+  }
+
+  return character.choices.equipment.map((entry) => ({
+    lookupName: entry,
+    label: entry,
+    category: "other" as const,
+    quantity: 1,
+  }));
+}
+
 function buildSkills(character: CharacterBuild) {
   const skills = makeSkills();
   const backgroundSkillIds = BACKGROUND_SKILL_PROFS_BY_ID[character.background.backgroundId] ?? [];
-  const selectedSkillIds = character.choices.proficiencies
+  const selectedSkillIds = getProficiencyLabels(character, "skill")
     .map((entry) => resolveSkillId(entry))
     .filter((entry): entry is string => Boolean(entry));
 
@@ -349,7 +431,7 @@ function makeTool(ability: string, customLabel?: string) {
 function buildTools(character: CharacterBuild) {
   const tools: Record<string, ReturnType<typeof makeTool>> = {};
   const backgroundToolEntries = BACKGROUND_TOOL_PROFS_BY_ID[character.background.backgroundId] ?? [];
-  const toolEntries = [...backgroundToolEntries, ...character.choices.proficiencies];
+  const toolEntries = [...backgroundToolEntries, ...getProficiencyLabels(character, "tool")];
 
   for (const entry of toolEntries) {
     const tool = parseToolEntry(entry);
@@ -365,7 +447,7 @@ function buildTools(character: CharacterBuild) {
 
 function buildLanguages(character: CharacterBuild) {
   const backgroundLanguageIds = BACKGROUND_LANGUAGE_PROFS_BY_ID[character.background.backgroundId] ?? [];
-  const selectedLanguageIds = character.choices.proficiencies
+  const selectedLanguageIds = getProficiencyLabels(character, "language")
     .map((entry) => parseLanguageEntry(entry))
     .filter((entry): entry is string => Boolean(entry));
   const uniqueLanguageIds = Array.from(new Set([...backgroundLanguageIds, ...selectedLanguageIds]));
@@ -579,10 +661,9 @@ function buildSpellItem(name: string, level: number, classId: string): FoundryIt
 function buildSpellItems(character: CharacterBuild): FoundryItem[] {
   const primaryClassId = normalizeClassId(character.classing.classes[0]?.classId ?? "");
 
-  return character.choices.spells.map((rawSpell) => {
-    const { name, level } = parseSpellEntry(rawSpell);
-    return buildSpellItem(name, level, primaryClassId);
-  });
+  return getSpellEntries(character).map((entry) =>
+    buildSpellItem(entry.name, entry.level, primaryClassId),
+  );
 }
 
 function buildFeatItems(character: CharacterBuild): FoundryItem[] {
@@ -590,7 +671,9 @@ function buildFeatItems(character: CharacterBuild): FoundryItem[] {
     buildFeatItem(featId, "background"),
   );
   const chosenFeats = character.choices.feats.map((featId) => buildFeatItem(featId, "feat"));
-  const featureItems = character.choices.features.map((feature) => buildFeatItem(feature, "class"));
+  const featureItems = getFeatureEntries(character).map((feature) =>
+    buildFeatItem(feature.name, feature.source),
+  );
 
   return [...backgroundFeats, ...chosenFeats, ...featureItems];
 }
@@ -806,16 +889,16 @@ function buildTraitData(character: CharacterBuild) {
 }
 
 function buildItems(character: CharacterBuild): FoundryItem[] {
-  const equipment = character.choices.equipment;
-  const primaryWeapon = equipment.find((item) => Boolean(findWeaponData(item)));
-  const primaryArmor = equipment.find((item) => Boolean(findArmorData(item)));
+  const equipment = getEquipmentEntries(character);
+  const primaryWeapon = equipment.find((item) => Boolean(findWeaponData(item.lookupName)));
+  const primaryArmor = equipment.find((item) => Boolean(findArmorData(item.lookupName)));
   const extraGear = equipment.filter(
-    (item) => !findWeaponData(item) && !findArmorData(item),
+    (item) => !findWeaponData(item.lookupName) && !findArmorData(item.lookupName),
   );
 
-  const weaponItems = primaryWeapon ? [buildWeaponItem(primaryWeapon)] : [];
-  const armorItems = primaryArmor ? [buildArmorItem(primaryArmor, true)] : [];
-  const gearItems = extraGear.map((item) => buildGearItem(item));
+  const weaponItems = primaryWeapon ? [buildWeaponItem(primaryWeapon.lookupName)] : [];
+  const armorItems = primaryArmor ? [buildArmorItem(primaryArmor.lookupName, true)] : [];
+  const gearItems = extraGear.map((item) => buildGearItem(item.lookupName));
 
   return [
     ...buildClassItems(character),

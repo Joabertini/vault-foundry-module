@@ -40,6 +40,26 @@ function makeCharacterBuild() {
       spells: ["Nv0: Mage Hand", "Nv1: Shield"],
       equipment: ["quarterstaff", "mage-armor", "spellbook", "component-pouch"],
       features: ["Arcane Recovery"],
+      normalized: {
+        feats: ["alert"],
+        proficiencies: [
+          { kind: "skill", label: "Arcana" },
+          { kind: "skill", label: "Investigation" },
+          { kind: "language", label: "Elvish" },
+          { kind: "tool", label: "Thieves' Tools" },
+        ],
+        spells: [
+          { label: "Mage Hand", level: 0 },
+          { label: "Shield", level: 1 },
+        ],
+        equipment: [
+          { itemId: "quarterstaff", label: "Quarterstaff", quantity: 1, category: "weapon" },
+          { itemId: "mage-armor", label: "Mage Armor", quantity: 1, category: "armor" },
+          { label: "spellbook", quantity: 1, category: "gear" },
+          { label: "component-pouch", quantity: 1, category: "gear" },
+        ],
+        features: [{ label: "Arcane Recovery", source: "class" }],
+      },
     },
     derived: {
       proficiencyBonus: 2,
@@ -79,4 +99,20 @@ test("buildFoundryActorPayload maps canonical build into a richer Foundry actor"
   assert.equal(itemTypes.includes("spell"), true);
   assert.equal(itemTypes.includes("weapon"), true);
   assert.equal(itemTypes.includes("loot"), true);
+});
+
+test("buildFoundryActorPayload prefers normalized choices when present", () => {
+  const build = makeCharacterBuild();
+  build.choices.proficiencies = ["Language: Draconic"];
+  build.choices.spells = ["Nv9: Wrong Spell"];
+  build.choices.equipment = ["wrong-item"];
+  build.choices.features = ["Wrong Feature"];
+
+  const payload = buildFoundryActorPayload(build);
+
+  assert.equal(payload.system.traits.languages.value.includes("draconic"), false);
+  assert.equal(payload.items.some((item) => item.name === "Shield" && item.type === "spell"), true);
+  assert.equal(payload.items.some((item) => item.name === "Wrong Spell"), false);
+  assert.equal(payload.items.some((item) => item.name === "Arcane Recovery" && item.type === "feat"), true);
+  assert.equal(payload.items.some((item) => item.name === "wrong-item"), false);
 });
