@@ -21,6 +21,8 @@ Comandos utiles:
 ```bash
 corepack pnpm install
 corepack pnpm --filter @bertinis-vault/web dev
+corepack pnpm web:typecheck
+corepack pnpm web:build
 ```
 
 Preview local esperada:

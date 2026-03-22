@@ -17,6 +17,7 @@ This document is the fast-start guide for the next AI working on the repo.
 1. [`ARCHITECTURE-PLAN.md`](/C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/ARCHITECTURE-PLAN.md)
 2. [`docs/IMPLEMENTATION-LOG.md`](/C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/docs/IMPLEMENTATION-LOG.md)
 3. [`docs/MIGRATION-MATRIX.md`](/C:/Users/CodexSandboxOffline/.codex/.sandbox/cwd/2ccd18d90a51fd7a/bertinis-vault/docs/MIGRATION-MATRIX.md)
+4. `docs/FRONTEND-INTEGRATION.md` if visual/frontend work is being split across agents
 
 ## Current Technical Priorities
 
@@ -40,6 +41,12 @@ Recommended validation order after code changes:
 1. build shared packages;
 2. run shared package tests;
 3. only then touch legacy Foundry integration or web/api integration points.
+
+For frontend-only demo work, use:
+
+1. `corepack pnpm web:typecheck`
+2. `corepack pnpm web:build`
+3. refresh `docs/web-demo-financiers.png` if the visual changed materially
 
 ## Rules of Thumb for Future Work
 

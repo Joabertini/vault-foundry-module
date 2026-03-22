@@ -792,3 +792,20 @@ Impacto:
 - la web deja de verse solo como herramienta interna y pasa a comunicar mejor el producto;
 - se puede mostrar el proyecto a financiadores sin exponer inmediatamente el ruido de implementacion;
 - queda mas claro para la siguiente IA que `apps/web` tiene doble funcion: demo visible y builder operativo.
+
+### Flujo explicito para handoff de frontend e integracion
+
+Se dejo preparado un carril de trabajo para dividir visual/frontend por un lado y validacion/build por otro.
+
+Ahora incluye:
+
+- scripts root `web:typecheck`, `web:build` y `web:verify`;
+- uso explicito de `corepack pnpm` en scripts root para evitar fallos de entorno en Windows;
+- nueva guia `docs/FRONTEND-INTEGRATION.md` con alcance, restricciones y secuencia de integracion;
+- referencias en `docs/AI-HANDOFF.md` y `apps/web/README.md` a este flujo.
+
+Impacto:
+
+- la integracion de cambios visuales ya no depende de memoria o comandos sueltos;
+- se reduce friccion al recibir trabajo de otra IA enfocada solo en frontend;
+- el repo queda mejor preparado para iteraciones rapidas sobre la demo sin perder disciplina de validacion.
