@@ -18,6 +18,11 @@ Estado actual:
 - cliente base preparado para la API externa de 5etools en Render;
 - proxy selectivo `GET /upstream/json?path=...` con caché en memoria.
 
+Notas de integración:
+
+- `GET /datasets/backgrounds?source=local|upstream|hybrid`
+- `upstreamPath` es configurable por query string o por `BERTINIS_5E_UPSTREAM_BACKGROUNDS_PATH`
+
 Comandos útiles:
 
 ```bash

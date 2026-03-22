@@ -484,3 +484,20 @@ Impacto:
 - la web queda lista para evolucionar datasets por categoria;
 - el frontend empieza a parecerse mas al flujo real de producto;
 - prepara mejor la integracion futura con upstream semantico desde 5etools.
+
+### Backgrounds con modo local/upstream/hibrido
+
+Se convirtio `backgrounds` en el primer dataset semantico preparado para mezclar curado local con upstream.
+
+Ahora incluye:
+
+- `source=local|upstream|hybrid` en `GET /datasets/backgrounds`;
+- normalizacion flexible del payload externo;
+- merge local/upstream para modo hibrido;
+- fallback limpio a local cuando upstream no responde.
+
+Impacto:
+
+- el BFF ya tiene una primera ruta de integracion real, no solo teórica, con 5etools;
+- valida el enfoque de mezclar estabilidad local con datos externos;
+- abre el camino para repetir el mismo patron en clases, feats, spells y equipo.

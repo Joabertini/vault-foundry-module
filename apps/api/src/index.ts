@@ -10,6 +10,11 @@ import {
   buildFeatsDataset,
   buildRacesDataset,
 } from "./datasets.js";
+import {
+  buildHybridBackgroundsDataset,
+  defaultUpstreamBackgroundsPath,
+  normalizeUpstreamBackgroundsPayload,
+} from "./upstream-backgrounds.js";
 
 const port = Number.parseInt(process.env.PORT ?? "3001", 10);
 const fiveToolsClient = createFiveToolsClient();
@@ -78,7 +83,60 @@ const server = createServer(async (request, response) => {
   }
 
   if (request.method === "GET" && url.pathname === "/datasets/backgrounds") {
-    sendJson(response, 200, buildBackgroundsDataset());
+    const sourceMode = url.searchParams.get("source") ?? "local";
+
+    if (sourceMode === "local") {
+      sendJson(response, 200, buildBackgroundsDataset());
+      return;
+    }
+
+    const upstreamPath =
+      url.searchParams.get("upstreamPath") ?? defaultUpstreamBackgroundsPath;
+
+    if (!isAllowedUpstreamPath(upstreamPath)) {
+      sendJson(response, 400, {
+        error: "Upstream path not allowed for backgrounds dataset",
+        path: upstreamPath,
+        allowedPrefixes: allowedUpstreamPrefixes,
+      });
+      return;
+    }
+
+    try {
+      const cacheKey = `backgrounds:${upstreamPath}`;
+      const cachedPayload = upstreamCache.get(cacheKey);
+      const upstreamPayload =
+        cachedPayload ?? (await fiveToolsClient.get(upstreamPath));
+
+      if (cachedPayload === undefined) {
+        upstreamCache.set(cacheKey, upstreamPayload);
+      }
+
+      const normalized = normalizeUpstreamBackgroundsPayload(upstreamPayload);
+
+      if (sourceMode === "upstream") {
+        sendJson(response, 200, normalized);
+        return;
+      }
+
+      sendJson(response, 200, buildHybridBackgroundsDataset(normalized.items));
+    } catch (error) {
+      if (sourceMode === "upstream") {
+        sendJson(response, 502, {
+          error: "Upstream backgrounds request failed",
+          path: upstreamPath,
+          detail: error instanceof Error ? error.message : "Unknown upstream error",
+        });
+        return;
+      }
+
+      sendJson(response, 200, {
+        ...buildBackgroundsDataset(),
+        warning: "Hybrid upstream unavailable, local dataset returned",
+        attemptedUpstreamPath: upstreamPath,
+      });
+    }
+
     return;
   }
 
