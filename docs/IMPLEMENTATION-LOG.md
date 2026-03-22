@@ -552,3 +552,20 @@ Impacto:
 - el repo queda bastante mas sano para seguir iterando sin romper compilacion;
 - la integracion nueva de datasets hibridos ya no vive solo en teoria;
 - reducimos friccion para previews, builds locales y proximas validaciones.
+
+### Races con modo local/upstream/hibrido
+
+Se extendio el mismo patron hibrido a la categoria de razas.
+
+Ahora incluye:
+
+- `source=local|upstream|hybrid` en `GET /datasets/races`;
+- normalizacion flexible del payload externo;
+- merge local/upstream para modo hibrido;
+- consumo del modo hibrido desde la web.
+
+Impacto:
+
+- completamos otra de las selecciones centrales del builder;
+- la web ya depende menos de catalogos puramente locales;
+- seguimos acercando la experiencia final a una integracion real con tu API de 5etools.
