@@ -100,6 +100,7 @@ export function App() {
     }
   });
   const [saveState, setSaveState] = useState("Borrador local activo");
+  const [exportState, setExportState] = useState("Listo para exportar");
 
   const pb = proficiencyBonus(state.level);
   const intMod = abilityModifier(state.int);
@@ -124,6 +125,43 @@ export function App() {
     if (typeof window !== "undefined") {
       window.localStorage.removeItem(builderDraftStorageKey);
     }
+  }
+
+  async function copyCanonicalSnapshot() {
+    const payload = JSON.stringify(canonicalSnapshot, null, 2);
+
+    if (typeof window === "undefined" || !window.navigator?.clipboard) {
+      setExportState("Clipboard no disponible");
+      return;
+    }
+
+    try {
+      await window.navigator.clipboard.writeText(payload);
+      setExportState("JSON copiado al portapapeles");
+    } catch {
+      setExportState("No se pudo copiar el JSON");
+    }
+  }
+
+  function downloadCanonicalSnapshot() {
+    if (typeof window === "undefined" || typeof document === "undefined") {
+      setExportState("Descarga no disponible");
+      return;
+    }
+
+    const payload = JSON.stringify(canonicalSnapshot, null, 2);
+    const fileNameBase = state.characterName.trim() || "bertinis-vault-character";
+    const fileName = `${fileNameBase.toLowerCase().replace(/\s+/g, "-")}.canonical.json`;
+    const blob = new Blob([payload], { type: "application/json" });
+    const url = window.URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+
+    anchor.href = url;
+    anchor.download = fileName;
+    anchor.click();
+
+    window.URL.revokeObjectURL(url);
+    setExportState("JSON descargado");
   }
 
   useEffect(() => {
@@ -496,6 +534,25 @@ export function App() {
               <div className="canonical-head">
                 <span className="eyebrow">Canonical Build</span>
                 <strong>Snapshot</strong>
+              </div>
+              <div className="export-toolbar">
+                <span className="save-pill">{exportState}</span>
+                <div className="button-row">
+                  <button
+                    className="secondary-button"
+                    onClick={copyCanonicalSnapshot}
+                    type="button"
+                  >
+                    Copiar JSON
+                  </button>
+                  <button
+                    className="secondary-button secondary-button-accent"
+                    onClick={downloadCanonicalSnapshot}
+                    type="button"
+                  >
+                    Descargar JSON
+                  </button>
+                </div>
               </div>
               <pre>{JSON.stringify(canonicalSnapshot, null, 2)}</pre>
             </div>

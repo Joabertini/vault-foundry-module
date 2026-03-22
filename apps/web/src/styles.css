@@ -197,6 +197,11 @@ body {
   font: inherit;
 }
 
+.secondary-button-accent {
+  background: rgba(155, 77, 40, 0.16);
+  border-color: rgba(155, 77, 40, 0.32);
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -421,6 +426,21 @@ body {
   margin-bottom: 10px;
 }
 
+.export-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
 .canonical-card pre {
   margin: 0;
   white-space: pre-wrap;
@@ -519,5 +539,14 @@ body {
   .builder-toolbar {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .export-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .button-row {
+    justify-content: stretch;
   }
 }

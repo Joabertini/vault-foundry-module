@@ -252,3 +252,19 @@ Impacto:
 - la web ya no se siente como una demo descartable;
 - permite iterar un personaje sin perder progreso al refrescar;
 - deja lista una base simple para futuras capas de autosave real o cuentas de usuario.
+
+### Export inicial desde la web
+
+Se agrego una primera salida util del personaje directamente desde el builder web.
+
+Ahora incluye:
+
+- copia del snapshot canonico al portapapeles;
+- descarga del personaje como archivo `.canonical.json`;
+- estado visual simple para confirmar si la exportacion salio bien.
+
+Impacto:
+
+- el builder web ya produce una salida portable;
+- acerca la web al flujo real de exportacion futura hacia Foundry;
+- deja una base simple para agregar exportadores mas adelante sin rehacer la UI.
