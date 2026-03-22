@@ -861,3 +861,21 @@ Impacto:
 - mejora la narrativa cuando se comparte la pantalla o una captura;
 - baja la friccion para entender por que ese preset es util como demo;
 - conserva el builder intacto mientras mejora el framing comercial.
+
+### Character sheet inspirada en Foundry para la preview
+
+Se adapto una nueva hoja visual para la columna de preview sin reemplazar la logica real del builder.
+
+Ahora incluye:
+
+- nuevo componente `apps/web/src/components/CharacterSheet.tsx`;
+- integracion en `apps/web/src/App.tsx` alimentada por `state` y `canonicalSnapshot`, no por un mock paralelo;
+- layout de ficha con header fuerte, stats en grilla, secundarios compactos y cards de magia/rasgos;
+- acciones de export conectadas al snapshot canonico y al actor Foundry ya existentes;
+- captura `docs/web-demo-financiers.png` actualizada para reflejar la nueva ficha.
+
+Impacto:
+
+- la preview se acerca mas al lenguaje visual de una hoja jugable;
+- mejora el valor de la demo para mostrar producto, no solo formulario;
+- la integracion mantiene intactos builder, datasets y exportador compartido.

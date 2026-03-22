@@ -20,6 +20,7 @@ import {
   loadBuilderOptions,
   type BuilderOptionsPayload,
 } from "./builder-options";
+import { CharacterSheet } from "./components/CharacterSheet";
 import { DEMO_PRESETS } from "./demo-presets";
 import { getFeatureSuggestions } from "./feature-suggestions";
 
@@ -256,6 +257,27 @@ export function App() {
     "Herbalism Kit",
   ];
   const languageSuggestions = ["Common", "Elvish", "Dwarvish", "Draconic", "Infernal", "Sylvan"];
+  const previewCharacter = {
+    name: state.characterName,
+    race: selectedRaceLabel,
+    className: selectedClassLabel,
+    level: state.level,
+    stats: {
+      str: state.str,
+      dex: state.dex,
+      con: state.con,
+      int: state.int,
+      wis: state.wis,
+      cha: state.cha,
+    },
+    hp,
+    ac,
+    speed: "30 ft",
+    features: presentationFeatures,
+    spells: presentationSpells,
+    onExportJson: copyCanonicalSnapshot,
+    onExportFoundry: downloadFoundryPreview,
+  };
 
   function updateField<K extends keyof BuilderState>(key: K, value: BuilderState[K]) {
     setState((current) => ({ ...current, [key]: value }));
@@ -1114,11 +1136,13 @@ export function App() {
           ) : null}
         </section>
 
-        <aside className="sheet-preview" id="sheet-preview">
+        <aside className="sheet-preview preview-column" id="sheet-preview">
           <div className="section-head">
             <span className="eyebrow">Character Sheet</span>
             <h2>Vista compartible del personaje</h2>
           </div>
+
+          <CharacterSheet character={previewCharacter} />
 
           <div className="sheet-card">
             <div className="sheet-banner">
