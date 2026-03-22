@@ -433,3 +433,19 @@ Impacto:
 - el BFF ya puede consultar tu API de Render sin exponer directamente toda la UI al upstream;
 - empezamos a tener una base real para sincronizaciones o lecturas selectivas de 5etools;
 - mantenemos una integracion controlada en vez de llamadas crudas desde frontend.
+
+### Feats dentro del flujo de datasets
+
+Se saco la lista de feats del hardcodeo local de la web y se paso a la capa de datos compartida.
+
+Ahora incluye:
+
+- catalogo inicial de feats en `data-engine`;
+- inclusion de feats en `apps/api/src/builder-options.ts`;
+- consumo de feats desde `builder-options` en la UI web.
+
+Impacto:
+
+- el builder web depende menos de listas embebidas en componentes;
+- la arquitectura de datos del builder queda mas consistente;
+- deja mejor preparado el terreno para enriquecer feats desde upstream o datasets versionados.

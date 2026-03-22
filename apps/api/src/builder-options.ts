@@ -2,6 +2,7 @@ import {
   armorCatalog,
   backgroundCatalog,
   classCatalog,
+  featCatalog,
   raceCatalog,
   weaponCatalog,
 } from "@bertinis-vault/data-engine";
@@ -25,6 +26,10 @@ export function buildBuilderOptionsPayload() {
       label: entry.label,
       source: entry.source,
       grantedFeatIds: entry.grantedFeatIds,
+    })),
+    feats: featCatalog.map((entry) => ({
+      id: entry.id,
+      label: entry.label,
     })),
     equipment: {
       armor: armorCatalog.map((entry) => ({

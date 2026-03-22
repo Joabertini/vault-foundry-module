@@ -2,6 +2,7 @@ import {
   armorCatalog,
   backgroundCatalog,
   classCatalog,
+  featCatalog,
   raceCatalog,
   weaponCatalog,
 } from "@bertinis-vault/data-engine";
@@ -19,6 +20,7 @@ export type BuilderOptionsPayload = {
   classes: SelectOption[];
   races: SelectOption[];
   backgrounds: Array<SelectOption & { source?: string; grantedFeatIds?: string[] }>;
+  feats: SelectOption[];
   equipment: {
     armor: Array<SelectOption & { armorFormula?: string; grantsShieldBonus?: boolean }>;
     weapons: Array<SelectOption & { damage?: string; damageType?: string; attackType?: string }>;
@@ -43,6 +45,10 @@ export const fallbackBuilderOptions: BuilderOptionsPayload = {
     label: entry.label,
     source: entry.source,
     grantedFeatIds: entry.grantedFeatIds,
+  })),
+  feats: featCatalog.map((entry) => ({
+    id: entry.id,
+    label: entry.label,
   })),
   equipment: {
     armor: armorCatalog.map((entry) => ({

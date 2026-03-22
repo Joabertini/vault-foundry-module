@@ -14,14 +14,6 @@ import {
   type BuilderOptionsPayload,
 } from "./builder-options";
 
-const featOptions = [
-  { value: "alert", label: "Alert" },
-  { value: "magic-initiate", label: "Magic Initiate" },
-  { value: "resilient", label: "Resilient" },
-  { value: "telekinetic", label: "Telekinetic" },
-  { value: "war-caster", label: "War Caster" },
-];
-
 const steps = [
   { id: "identity", label: "Identidad" },
   { id: "build", label: "Base" },
@@ -76,6 +68,10 @@ export function App() {
     label: entry.label,
   }));
   const backgroundOptions = builderOptions.backgrounds.map((entry) => ({
+    value: entry.id,
+    label: entry.label,
+  }));
+  const featOptions = builderOptions.feats.map((entry) => ({
     value: entry.id,
     label: entry.label,
   }));
