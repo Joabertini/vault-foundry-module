@@ -33,6 +33,7 @@ const steps = [
 
 export function App() {
   const [stepIndex, setStepIndex] = useState(0);
+  const [showTechnicalView, setShowTechnicalView] = useState(false);
   const [builderOptions, setBuilderOptions] = useState<BuilderOptionsPayload>(
     fallbackBuilderOptions,
   );
@@ -106,6 +107,25 @@ export function App() {
   const selectedSpells = parseSpellLines(state.spellsText);
   const selectedProficiencies = parseProficiencyLines(state.proficienciesText);
   const selectedLanguages = parseProficiencyLines(state.languagesText);
+  const selectedClassLabel =
+    classOptions.find((entry) => entry.value === state.classId)?.label ?? state.classId;
+  const selectedRaceLabel =
+    raceOptions.find((entry) => entry.value === state.raceId)?.label ?? state.raceId;
+  const selectedBackgroundLabel =
+    backgroundOptions.find((entry) => entry.value === state.backgroundId)?.label ?? state.backgroundId;
+  const selectedFeatLabel =
+    featOptions.find((entry) => entry.value === state.featId)?.label ?? state.featId;
+  const selectedWeaponLabel =
+    weaponOptions.find((entry) => entry.value === state.weaponId)?.label ?? state.weaponId;
+  const selectedArmorLabel =
+    armorOptions.find((entry) => entry.value === state.armorId)?.label ?? state.armorId;
+  const presentationSpells = listedSpells.slice(0, 5);
+  const presentationFeatures = listedFeatures.slice(0, 5);
+  const presentationEquipment = [
+    selectedWeaponLabel,
+    selectedArmorLabel,
+    ...selectedExtraEquipment,
+  ].filter(Boolean);
   const proficiencySuggestions = [
     "Arcana",
     "Investigation",
@@ -267,13 +287,89 @@ export function App() {
 
   return (
     <main className="app-shell">
-      <section className="hero">
-        <div className="eyebrow">Bertini's Vault</div>
-        <h1>Primer builder web jugable</h1>
-        <p className="hero-copy">
-          Ya existe una base web separada de Foundry. Este primer paso convierte esa base
-          en un builder inicial con estado real, pasos y preview de personaje.
-        </p>
+      <section className="hero hero-showcase">
+        <div className="hero-copy-block">
+          <div className="eyebrow">Bertini&apos;s Vault</div>
+          <h1>Character builder web listo para mostrar</h1>
+          <p className="hero-copy">
+            Una experiencia web para crear personajes de D&amp;D 5e, visualizar una ficha clara
+            y exportar el resultado hacia Foundry VTT desde un modelo canónico propio.
+          </p>
+          <div className="hero-actions">
+            <button className="primary-button" onClick={() => setStepIndex(0)} type="button">
+              Explorar demo
+            </button>
+            <button
+              className="secondary-button"
+              onClick={() => setShowTechnicalView((current) => !current)}
+              type="button"
+            >
+              {showTechnicalView ? "Ocultar vista técnica" : "Mostrar vista técnica"}
+            </button>
+            <span className="inline-status">{datasetState}</span>
+          </div>
+        </div>
+        <div className="hero-preview-card">
+          <span className="eyebrow">Investor Snapshot</span>
+          <div className="hero-preview-head">
+            <div>
+              <h2>{state.characterName}</h2>
+              <p>
+                {selectedClassLabel} · {selectedRaceLabel} · Nivel {state.level}
+              </p>
+            </div>
+            <div className="hero-preview-badge">Foundry Ready</div>
+          </div>
+          <div className="hero-preview-stats">
+            <article>
+              <span>PB</span>
+              <strong>+{pb}</strong>
+            </article>
+            <article>
+              <span>AC</span>
+              <strong>{ac}</strong>
+            </article>
+            <article>
+              <span>HP</span>
+              <strong>{hp}</strong>
+            </article>
+            <article>
+              <span>Items</span>
+              <strong>{foundryItemCount}</strong>
+            </article>
+          </div>
+          <div className="hero-preview-tags">
+            <span className="sheet-tag">{selectedBackgroundLabel}</span>
+            <span className="sheet-tag">{selectedFeatLabel}</span>
+            <span className="sheet-tag">{selectedWeaponLabel}</span>
+            <span className="sheet-tag">{selectedArmorLabel}</span>
+          </div>
+        </div>
+        <div className="hero-highlights">
+          {[
+            {
+              label: "Builder guiado",
+              value: "6 pasos",
+              text: "Flujo claro desde la idea del personaje hasta una ficha usable.",
+            },
+            {
+              label: "Modelo",
+              value: "Canonico",
+              text: "Web, API y Foundry ya comparten la misma estructura base.",
+            },
+            {
+              label: "Exportacion",
+              value: "Lista",
+              text: "La demo ya genera actor Foundry desde la capa compartida.",
+            },
+          ].map((item) => (
+            <article className="highlight-card" key={item.label}>
+              <span className="highlight-label">{item.label}</span>
+              <strong>{item.value}</strong>
+              <p>{item.text}</p>
+            </article>
+          ))}
+        </div>
         <div className="hero-panels hero-panels-builder">
           <article className="panel panel-highlight">
             <h2>Motor del proyecto</h2>
@@ -293,11 +389,32 @@ export function App() {
         </div>
       </section>
 
+      <section className="grid-section pitch-grid">
+        <article className="pitch-card">
+          <span className="eyebrow">Producto</span>
+          <h2>De builder tecnico a experiencia compartible</h2>
+          <p>
+            Esta demo ya presenta el producto como una experiencia navegable: elecciones
+            guiadas, preview inmediata de ficha y salida compatible con el ecosistema de
+            Foundry.
+          </p>
+        </article>
+        <article className="pitch-card pitch-card-accent">
+          <span className="eyebrow">Ventaja</span>
+          <h2>Una sola fuente de verdad</h2>
+          <p>
+            El personaje existe primero como objeto canonico. Eso permite que la web, la
+            exportacion y la futura persistencia evolucionen sin rehacer la logica en cada
+            superficie.
+          </p>
+        </article>
+      </section>
+
       <section className="builder-layout">
         <section className="builder-panel">
           <div className="section-head">
             <span className="eyebrow">Builder Flow</span>
-            <h2>Construcción inicial</h2>
+            <h2>Demo interactiva del builder</h2>
           </div>
 
           <div className="step-row">
@@ -832,8 +949,8 @@ export function App() {
 
         <aside className="sheet-preview">
           <div className="section-head">
-            <span className="eyebrow">Live Preview</span>
-            <h2>Resumen del personaje</h2>
+            <span className="eyebrow">Character Sheet</span>
+            <h2>Vista compartible del personaje</h2>
           </div>
 
           <div className="sheet-card">
@@ -841,10 +958,15 @@ export function App() {
               <div>
                 <span className="eyebrow">Character</span>
                 <h3>{state.characterName}</h3>
+                <p className="sheet-banner-copy">
+                  Una lectura inmediata del personaje para mostrar la propuesta del producto
+                  sin exponer el detalle técnico del builder.
+                </p>
               </div>
               <div className="sheet-meta">
-                <strong>{state.classId}</strong>
-                <span>{state.raceId}</span>
+                <strong>{selectedClassLabel}</strong>
+                <span>{selectedRaceLabel}</span>
+                <span>Nivel {state.level}</span>
               </div>
             </div>
 
@@ -897,12 +1019,12 @@ export function App() {
             <div className="sheet-section">
               <div className="sheet-section-head">
                 <span className="eyebrow">Build</span>
-                <strong>Origen y equipo</strong>
+                <strong>Origen y loadout</strong>
               </div>
               <div className="tag-list">
-                <span className="sheet-tag">{state.backgroundId}</span>
-                <span className="sheet-tag">{state.featId}</span>
-                {listedEquipment.map((item) => (
+                <span className="sheet-tag">{selectedBackgroundLabel}</span>
+                <span className="sheet-tag">{selectedFeatLabel}</span>
+                {presentationEquipment.map((item) => (
                   <span className="sheet-tag" key={item}>
                     {item}
                   </span>
@@ -933,10 +1055,10 @@ export function App() {
               <div className="sheet-section">
                 <div className="sheet-section-head">
                   <span className="eyebrow">Spellbook</span>
-                  <strong>Magia</strong>
+                  <strong>Magia destacada</strong>
                 </div>
                 <div className="list-stack">
-                  {listedSpells.map((spell) => (
+                  {presentationSpells.map((spell) => (
                     <div className="list-row" key={spell}>
                       <span className="list-bullet">*</span>
                       <span>{spell}</span>
@@ -948,10 +1070,10 @@ export function App() {
               <div className="sheet-section">
                 <div className="sheet-section-head">
                   <span className="eyebrow">Core Traits</span>
-                  <strong>Features</strong>
+                  <strong>Features visibles</strong>
                 </div>
                 <div className="list-stack">
-                  {listedFeatures.map((feature) => (
+                  {presentationFeatures.map((feature) => (
                     <div className="list-row" key={feature}>
                       <span className="list-bullet">*</span>
                       <span>{feature}</span>
@@ -961,89 +1083,124 @@ export function App() {
               </div>
             </div>
 
-            <div className="canonical-card">
+            <div className="delivery-card">
               <div className="canonical-head">
-                <span className="eyebrow">Canonical Build</span>
-                <strong>Snapshot</strong>
+                <span className="eyebrow">Deliverables</span>
+                <strong>Salida lista para demo</strong>
               </div>
-              <div className="export-toolbar">
-                <span className="save-pill">{exportState}</span>
-                <div className="button-row">
-                  <button
-                    className="secondary-button"
-                    onClick={copyCanonicalSnapshot}
-                    type="button"
-                  >
-                    Copiar JSON
-                  </button>
-                  <button
-                    className="secondary-button secondary-button-accent"
-                    onClick={downloadCanonicalSnapshot}
-                    type="button"
-                  >
-                    Descargar JSON
-                  </button>
-                </div>
+              <div className="delivery-grid">
+                <article>
+                  <span>Modelo canónico</span>
+                  <strong>{exportState}</strong>
+                  <p>La demo genera un snapshot estable para persistencia, API y evolución futura.</p>
+                </article>
+                <article>
+                  <span>Foundry actor</span>
+                  <strong>{foundryExportState}</strong>
+                  <p>El export comparte la misma base y ya produce un actor con {foundryItemCount} items.</p>
+                </article>
               </div>
-              <pre>{JSON.stringify(canonicalSnapshot, null, 2)}</pre>
+              <div className="button-row">
+                <button className="secondary-button" onClick={copyCanonicalSnapshot} type="button">
+                  Copiar JSON canónico
+                </button>
+                <button
+                  className="secondary-button secondary-button-accent"
+                  onClick={downloadFoundryPreview}
+                  type="button"
+                >
+                  Descargar actor Foundry
+                </button>
+              </div>
             </div>
 
-            <div className="canonical-card foundry-card">
-              <div className="canonical-head">
-                <span className="eyebrow">Foundry Preview</span>
-                <strong>Actor listo ({foundryItemCount} items)</strong>
-              </div>
-              <div className="export-toolbar">
-                <span className="save-pill">{foundryExportState}</span>
-                <div className="button-row">
-                  <button
-                    className="secondary-button"
-                    onClick={copyFoundryPreview}
-                    type="button"
-                  >
-                    Copiar actor
-                  </button>
-                  <button
-                    className="secondary-button secondary-button-accent"
-                    onClick={downloadFoundryPreview}
-                    type="button"
-                  >
-                    Descargar actor
-                  </button>
+            {showTechnicalView ? (
+              <>
+                <div className="canonical-card">
+                  <div className="canonical-head">
+                    <span className="eyebrow">Canonical Build</span>
+                    <strong>Snapshot</strong>
+                  </div>
+                  <div className="export-toolbar">
+                    <span className="save-pill">{exportState}</span>
+                    <div className="button-row">
+                      <button
+                        className="secondary-button"
+                        onClick={copyCanonicalSnapshot}
+                        type="button"
+                      >
+                        Copiar JSON
+                      </button>
+                      <button
+                        className="secondary-button secondary-button-accent"
+                        onClick={downloadCanonicalSnapshot}
+                        type="button"
+                      >
+                        Descargar JSON
+                      </button>
+                    </div>
+                  </div>
+                  <pre>{JSON.stringify(canonicalSnapshot, null, 2)}</pre>
                 </div>
-              </div>
-              <pre>{JSON.stringify(foundryPreview, null, 2)}</pre>
-            </div>
+
+                <div className="canonical-card foundry-card">
+                  <div className="canonical-head">
+                    <span className="eyebrow">Foundry Preview</span>
+                    <strong>Actor listo ({foundryItemCount} items)</strong>
+                  </div>
+                  <div className="export-toolbar">
+                    <span className="save-pill">{foundryExportState}</span>
+                    <div className="button-row">
+                      <button
+                        className="secondary-button"
+                        onClick={copyFoundryPreview}
+                        type="button"
+                      >
+                        Copiar actor
+                      </button>
+                      <button
+                        className="secondary-button secondary-button-accent"
+                        onClick={downloadFoundryPreview}
+                        type="button"
+                      >
+                        Descargar actor
+                      </button>
+                    </div>
+                  </div>
+                  <pre>{JSON.stringify(foundryPreview, null, 2)}</pre>
+                </div>
+              </>
+            ) : null}
           </div>
         </aside>
       </section>
 
       <section className="grid-section">
         <div className="section-head">
-          <span className="eyebrow">Builder Status</span>
-          <h2>Qué ya valida este MVP web</h2>
+          <span className="eyebrow">Product Signals</span>
+          <h2>Lo que esta demo ya puede demostrar</h2>
         </div>
         <div className="milestone-grid">
           {[
             {
-              title: "Estado Local",
-              status: "Ready",
-              text: "La app ya tiene estado vivo para identidad, build base, atributos, equipo, magia y personalidad.",
-            },
-            {
-              title: "Preview Visual",
+              title: "Flujo guiado",
               status: "Live",
-              text: "Cada cambio actualiza una vista de hoja resumida y un snapshot canónico del personaje.",
+              text: "La demo ya convierte el armado del personaje en un recorrido navegable y entendible fuera de Foundry.",
             },
             {
-              title: "Salida Portable",
+              title: "Preview visual",
               status: "Ready",
-              text: "La web ya produce JSON canonico y una preview inicial de actor para Foundry.",
+              text: "Cada decisión actualiza una ficha clara, útil para compartir la propuesta con usuarios o inversores.",
             },
             {
-              title: "Datasets Hibridos",
-              status: "Live",
-              text: "Clases, razas, backgrounds, feats, equipo y magia ya pueden venir del BFF con mezcla local/upstream.",
+              title: "Salida portable",
+              status: "Ready",
+              text: "El mismo personaje se serializa como modelo canónico y como actor para Foundry, sin duplicar la base.",
+            },
+            {
+              title: "Arquitectura compartida",
+              status: "Active",
+              text: "Web, datasets y exportador ya trabajan sobre piezas comunes, lo que acelera producto y reduce retrabajo.",
             },
           ].map((milestone) => (
             <article className="milestone-card" key={milestone.title}>
@@ -1057,14 +1214,14 @@ export function App() {
 
       <section className="grid-section">
         <div className="section-head">
-          <span className="eyebrow">Next Build</span>
-          <h2>Lo que sigue</h2>
+          <span className="eyebrow">Prioridades</span>
+          <h2>El siguiente tramo de producción</h2>
         </div>
         <div className="roadmap-panel">
           {[
-            "Usar el exportador Foundry compartido como puente real entre builder web y modulo.",
-            "Expandir decisiones del personaje con opciones y validaciones mas cercanas a 5e real.",
-            "Llevar esta preview hacia una character sheet visual exportable y mas pulida.",
+            "Cerrar una demo visual lista para financiadores con narrativa de producto y capturas compartibles.",
+            "Estructurar mejor spells, features y equipment para depender menos de texto libre en el builder.",
+            "Usar el exportador compartido como puente definitivo entre web, API y módulo Foundry.",
           ].map((item) => (
             <div className="roadmap-item" key={item}>
               <span className="roadmap-index">+</span>

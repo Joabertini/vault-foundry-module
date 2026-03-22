@@ -20,6 +20,7 @@ This document is the fast-start guide for the next AI working on the repo.
 
 ## Current Technical Priorities
 
+- keep `apps/web` dual-purpose: financier-facing demo first, builder internals second;
 - keep extracting logic out of legacy Foundry JS and into shared packages;
 - tighten the contract between `CharacterBuild` and `FoundryActorPayload`;
 - keep datasets canonical and id-based instead of label-based;
@@ -43,6 +44,7 @@ Recommended validation order after code changes:
 ## Rules of Thumb for Future Work
 
 - Prefer changing `packages/` before changing `scripts/`.
+- Preserve the financier demo framing in `apps/web/src/App.tsx`; hide raw JSON and low-level details behind `showTechnicalView`.
 - Treat `scripts/foundry-export-bridge.js` as temporary duplication, not a permanent API.
 - If a new field is added to the canonical build, update:
   - contracts;
@@ -61,6 +63,7 @@ Recommended validation order after code changes:
 
 ## Good Next Tasks
 
+- turn the web demo into a capture-ready surface with screenshots, tighter spacing, and a dedicated demo route if needed;
 - converge shared exporter and legacy Foundry preview bridge;
 - add more fixtures for classes/backgrounds/spellcasting edge cases;
 - move more final actor sections from `scripts/character-builder.js` to shared exporter output;

@@ -773,3 +773,22 @@ Impacto:
 - los paquetes compartidos ya compilan de forma mas predecible en el repo real;
 - los tests de `contracts`, `data-engine`, `domain` y `foundry-exporter` pueden ejecutarse contra `dist` sin romper por resolucion ESM;
 - baja bastante la friccion para que la siguiente IA valide cambios sin reencontrarse con el mismo set de problemas de tooling.
+
+### Demo web orientada a financiadores
+
+Se reposiciono la pantalla principal de `apps/web` para que funcione como demo compartible, sin perder el builder real debajo.
+
+Ahora incluye:
+
+- hero principal con narrativa de producto en lugar de foco puramente tecnico;
+- tarjeta de snapshot del personaje con stats, tags y estado de exportacion;
+- bloques de valor pensados para explicar builder, modelo canonico y salida a Foundry;
+- preview de character sheet mas legible para compartir en capturas o reuniones;
+- `showTechnicalView` para esconder JSON y detalle de diagnostico por defecto;
+- bloque de entregables separado de la vista tecnica.
+
+Impacto:
+
+- la web deja de verse solo como herramienta interna y pasa a comunicar mejor el producto;
+- se puede mostrar el proyecto a financiadores sin exponer inmediatamente el ruido de implementacion;
+- queda mas claro para la siguiente IA que `apps/web` tiene doble funcion: demo visible y builder operativo.
