@@ -844,3 +844,20 @@ Impacto:
 - la demo comunica mejor que hay escenarios listos para mostrar;
 - se mejora la lectura de la home sin reabrir deuda de arquitectura;
 - el flujo sigue siendo facil de validar con `corepack pnpm web:verify`.
+
+### Resumen visible del preset activo
+
+Se sumo una capa mas de lectura de demo arriba del builder para que el preset seleccionado no quede solo como un boton marcado.
+
+Ahora incluye:
+
+- bloque `ActivePresetSummary` debajo de la barra de presets;
+- contexto rapido sobre el personaje de demo cargado;
+- estados vacios mas claros en magia y rasgos dentro de la preview;
+- captura de referencia actualizada otra vez en `docs/web-demo-financiers.png`.
+
+Impacto:
+
+- mejora la narrativa cuando se comparte la pantalla o una captura;
+- baja la friccion para entender por que ese preset es util como demo;
+- conserva el builder intacto mientras mejora el framing comercial.

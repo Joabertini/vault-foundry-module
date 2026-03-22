@@ -102,6 +102,32 @@ function PresetsBar({
   );
 }
 
+function ActivePresetSummary({ presetId }: { presetId: string | null }) {
+  const preset = DEMO_PRESETS.find((entry) => entry.id === presetId);
+
+  if (!preset) {
+    return null;
+  }
+
+  return (
+    <section className="active-preset">
+      <div className="active-preset-copy">
+        <span className="eyebrow">Preset Activo</span>
+        <h2>{preset.name}</h2>
+        <p>
+          {preset.subtitle}. Una build lista para demo, captura y conversación de producto sin
+          depender del borrador anterior.
+        </p>
+      </div>
+      <div className="active-preset-tags">
+        <span className="sheet-tag">Nivel {preset.data.level}</span>
+        <span className="sheet-tag">{preset.data.classId}</span>
+        <span className="sheet-tag">{preset.data.backgroundId}</span>
+      </div>
+    </section>
+  );
+}
+
 function StoryBlock() {
   return (
     <section className="story">
@@ -418,6 +444,8 @@ export function App() {
       />
 
       <PresetsBar activePresetId={activePresetId} onLoadPreset={loadPreset} />
+
+      <ActivePresetSummary presetId={activePresetId} />
 
       <StoryBlock />
 
@@ -1197,12 +1225,16 @@ export function App() {
                   <strong>Magia destacada</strong>
                 </div>
                 <div className="list-stack">
-                  {presentationSpells.map((spell) => (
-                    <div className="list-row" key={spell}>
-                      <span className="list-bullet">*</span>
-                      <span>{spell}</span>
-                    </div>
-                  ))}
+                  {presentationSpells.length ? (
+                    presentationSpells.map((spell) => (
+                      <div className="list-row" key={spell}>
+                        <span className="list-bullet">*</span>
+                        <span>{spell}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="empty-note">Este preset no depende de magia para mostrar su valor.</p>
+                  )}
                 </div>
               </div>
 
@@ -1212,12 +1244,16 @@ export function App() {
                   <strong>Features visibles</strong>
                 </div>
                 <div className="list-stack">
-                  {presentationFeatures.map((feature) => (
-                    <div className="list-row" key={feature}>
-                      <span className="list-bullet">*</span>
-                      <span>{feature}</span>
-                    </div>
-                  ))}
+                  {presentationFeatures.length ? (
+                    presentationFeatures.map((feature) => (
+                      <div className="list-row" key={feature}>
+                        <span className="list-bullet">*</span>
+                        <span>{feature}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="empty-note">Todavía no agregaste rasgos destacados para esta build.</p>
+                  )}
                 </div>
               </div>
             </div>
