@@ -222,6 +222,7 @@ export function buildActor(formData) {
   const previewAttributes = previewSystem.attributes || {};
   const previewDetails = previewSystem.details || {};
   const previewTraits = previewSystem.traits || {};
+  const previewSkills = previewSystem.skills || {};
 
   // ── Items ──
   const items = [];
@@ -248,14 +249,14 @@ export function buildActor(formData) {
   const system = {
     currency: { pp: 0, gp: 0, ep: 0, sp: 0, cp: 0 },
     abilities: canonicalFoundryPreview?.system?.abilities || abilities,
-    bonuses: {
+    bonuses: previewSystem?.bonuses || {
       mwak: { attack: '', damage: '' }, rwak: { attack: '', damage: '' },
       msak: { attack: '', damage: '' }, rsak: { attack: '', damage: '' },
       abilities: { check: '', save: '', skill: '' },
       spell: { dc: '' },
     },
-    skills,
-    tools: {},
+    skills: Object.keys(previewSkills).length ? previewSkills : skills,
+    tools: previewSystem?.tools || {},
     spells: canonicalFoundryPreview?.system?.spells || spellSlots,
     attributes: {
       ac: {
@@ -309,12 +310,12 @@ export function buildActor(formData) {
       weaponProf: previewTraits?.weaponProf ?? { value: [], custom: '', mastery: { value: [], bonus: [] } },
       armorProf:  previewTraits?.armorProf ?? { value: [], custom: '' },
     },
-    resources: {
+    resources: previewSystem?.resources || {
       primary:   { value: 0, max: 0, sr: false, lr: false, label: '' },
       secondary: { value: 0, max: 0, sr: false, lr: false, label: '' },
       tertiary:  { value: 0, max: 0, sr: false, lr: false, label: '' },
     },
-    favorites: [],
+    favorites: previewSystem?.favorites || [],
   };
 
   return {

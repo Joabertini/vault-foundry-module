@@ -22,6 +22,76 @@ const CLASS_PROFS_BY_ID = {
   artificer: { armor: ['light', 'medium', 'shields'], weapons: ['simple'] },
 };
 
+const CLASS_SAVE_PROFS_BY_ID = {
+  barbarian: ['str', 'con'],
+  bard: ['dex', 'cha'],
+  cleric: ['wis', 'cha'],
+  druid: ['int', 'wis'],
+  fighter: ['str', 'con'],
+  monk: ['str', 'dex'],
+  paladin: ['wis', 'cha'],
+  ranger: ['str', 'dex'],
+  rogue: ['dex', 'int'],
+  sorcerer: ['con', 'cha'],
+  warlock: ['wis', 'cha'],
+  wizard: ['int', 'wis'],
+  artificer: ['con', 'int'],
+};
+
+const BACKGROUND_SKILL_PROFS_BY_ID = {
+  acolyte: ['ins', 'rel'],
+  charlatan: ['dec', 'slt'],
+  criminal: ['dec', 'ste'],
+  entertainer: ['acr', 'prf'],
+  'folk-hero': ['ani', 'sur'],
+  'guild-artisan': ['ins', 'per'],
+  hermit: ['med', 'rel'],
+  noble: ['his', 'per'],
+  outlander: ['ath', 'sur'],
+  sage: ['arc', 'his'],
+  sailor: ['ath', 'prc'],
+  soldier: ['ath', 'itm'],
+  urchin: ['slt', 'ste'],
+};
+
+const SKILL_ALIAS_TO_ID = {
+  acrobatics: 'acr',
+  acrobacia: 'acr',
+  'animal handling': 'ani',
+  'manejo de animales': 'ani',
+  arcana: 'arc',
+  athletics: 'ath',
+  atletismo: 'ath',
+  deception: 'dec',
+  engano: 'dec',
+  history: 'his',
+  historia: 'his',
+  insight: 'ins',
+  intuicion: 'ins',
+  intimidation: 'itm',
+  intimidacion: 'itm',
+  investigation: 'inv',
+  investigacion: 'inv',
+  medicine: 'med',
+  medicina: 'med',
+  nature: 'nat',
+  naturaleza: 'nat',
+  perception: 'prc',
+  percepcion: 'prc',
+  performance: 'prf',
+  interpretacion: 'prf',
+  persuasion: 'per',
+  persuasión: 'per',
+  religion: 'rel',
+  religione: 'rel',
+  'sleight of hand': 'slt',
+  'juego de manos': 'slt',
+  stealth: 'ste',
+  sigilo: 'ste',
+  survival: 'sur',
+  supervivencia: 'sur',
+};
+
 function makeId() {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   return Array.from({ length: 16 }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join('');
@@ -113,15 +183,81 @@ function getSpellProgression(classId) {
 
 function buildAbilities(canonicalBuild) {
   const final = canonicalBuild?.abilities?.final || {};
+  const primaryClassId = canonicalBuild?.classing?.classes?.[0]?.classId || '';
+  const saveProfs = new Set(CLASS_SAVE_PROFS_BY_ID[primaryClassId] || []);
 
   return {
-    str: { value: final.str || 10, mod: abilityMod(final.str), proficient: 0, bonuses: { check: '', save: '' } },
-    dex: { value: final.dex || 10, mod: abilityMod(final.dex), proficient: 0, bonuses: { check: '', save: '' } },
-    con: { value: final.con || 10, mod: abilityMod(final.con), proficient: 0, bonuses: { check: '', save: '' } },
-    int: { value: final.int || 10, mod: abilityMod(final.int), proficient: 0, bonuses: { check: '', save: '' } },
-    wis: { value: final.wis || 10, mod: abilityMod(final.wis), proficient: 0, bonuses: { check: '', save: '' } },
-    cha: { value: final.cha || 10, mod: abilityMod(final.cha), proficient: 0, bonuses: { check: '', save: '' } },
+    str: { value: final.str || 10, mod: abilityMod(final.str), proficient: saveProfs.has('str') ? 1 : 0, bonuses: { check: '', save: '' } },
+    dex: { value: final.dex || 10, mod: abilityMod(final.dex), proficient: saveProfs.has('dex') ? 1 : 0, bonuses: { check: '', save: '' } },
+    con: { value: final.con || 10, mod: abilityMod(final.con), proficient: saveProfs.has('con') ? 1 : 0, bonuses: { check: '', save: '' } },
+    int: { value: final.int || 10, mod: abilityMod(final.int), proficient: saveProfs.has('int') ? 1 : 0, bonuses: { check: '', save: '' } },
+    wis: { value: final.wis || 10, mod: abilityMod(final.wis), proficient: saveProfs.has('wis') ? 1 : 0, bonuses: { check: '', save: '' } },
+    cha: { value: final.cha || 10, mod: abilityMod(final.cha), proficient: saveProfs.has('cha') ? 1 : 0, bonuses: { check: '', save: '' } },
   };
+}
+
+function makeSkill(ability) {
+  return {
+    ability,
+    roll: { min: null, max: null, mode: 0 },
+    value: 0,
+    bonuses: { check: '', passive: '' },
+  };
+}
+
+function makeSkills() {
+  return {
+    acr: makeSkill('dex'),
+    ani: makeSkill('wis'),
+    arc: makeSkill('int'),
+    ath: makeSkill('str'),
+    dec: makeSkill('cha'),
+    his: makeSkill('int'),
+    ins: makeSkill('wis'),
+    itm: makeSkill('cha'),
+    inv: makeSkill('int'),
+    med: makeSkill('wis'),
+    nat: makeSkill('int'),
+    prc: makeSkill('wis'),
+    prf: makeSkill('cha'),
+    per: makeSkill('cha'),
+    rel: makeSkill('int'),
+    slt: makeSkill('dex'),
+    ste: makeSkill('dex'),
+    sur: makeSkill('wis'),
+  };
+}
+
+function normalizeSkillLabel(value) {
+  return String(value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function resolveSkillId(value) {
+  return SKILL_ALIAS_TO_ID[normalizeSkillLabel(value)];
+}
+
+function buildSkills(canonicalBuild) {
+  const skills = makeSkills();
+  const backgroundId = canonicalBuild?.background?.backgroundId || '';
+  const backgroundSkillIds = BACKGROUND_SKILL_PROFS_BY_ID[backgroundId] || [];
+  const selectedSkillIds = (canonicalBuild?.choices?.proficiencies || [])
+    .map(resolveSkillId)
+    .filter(Boolean);
+  const proficientSkills = new Set([...backgroundSkillIds, ...selectedSkillIds]);
+
+  proficientSkills.forEach(skillId => {
+    if (skills[skillId]) {
+      skills[skillId].value = 1;
+    }
+  });
+
+  return skills;
 }
 
 function buildClassItems(canonicalBuild) {
@@ -406,7 +542,17 @@ export function buildFoundryActorPreview(canonicalBuild) {
     type: 'character',
     img: 'systems/dnd5e/icons/svg/actors/character.svg',
     system: {
+      bonuses: {
+        mwak: { attack: '', damage: '' },
+        rwak: { attack: '', damage: '' },
+        msak: { attack: '', damage: '' },
+        rsak: { attack: '', damage: '' },
+        abilities: { check: '', save: '', skill: '' },
+        spell: { dc: '' },
+      },
       abilities: buildAbilities(canonicalBuild),
+      skills: buildSkills(canonicalBuild),
+      tools: {},
       attributes: {
         ac: { flat: canonicalBuild?.derived?.ac || 10 },
         hp: {
@@ -429,6 +575,12 @@ export function buildFoundryActorPreview(canonicalBuild) {
       },
       spells: canonicalBuild?.derived?.spellcasting?.slots || {},
       traits: buildTraitData(canonicalBuild),
+      resources: {
+        primary: { value: 0, max: 0, sr: false, lr: false, label: '' },
+        secondary: { value: 0, max: 0, sr: false, lr: false, label: '' },
+        tertiary: { value: 0, max: 0, sr: false, lr: false, label: '' },
+      },
+      favorites: [],
     },
     items: buildItems(canonicalBuild),
     effects: [],

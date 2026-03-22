@@ -703,3 +703,19 @@ Impacto:
 - el actor exportado refleja mejor lo que el personaje sabe hacer;
 - reducimos una diferencia importante entre "personaje armado" y "actor realmente jugable";
 - dejamos preparada la base para exponer estas elecciones con mas detalle en la UI mas adelante.
+
+### Puente legacy alineado con la nueva exportacion
+
+Se actualizo el puente del modulo actual para aprovechar mejor lo que ya sabe el exportador compartido.
+
+Ahora incluye:
+
+- `skills` provenientes de la preview canonica;
+- `bonuses`, `tools`, `resources` y `favorites` reutilizados desde la capa nueva cuando existen;
+- mejor continuidad entre el actor creado hoy en Foundry y la estructura del exportador compartido.
+
+Impacto:
+
+- el flujo legacy empieza a beneficiarse de la nueva logica sin esperar una migracion total;
+- reducimos divergencias entre "lo que exporta la web" y "lo que crea el modulo";
+- damos otro paso hacia una unica fuente de verdad para el actor Foundry.
