@@ -637,3 +637,19 @@ Impacto:
 - el personaje web ya se parece mas a una hoja real con inventario base;
 - mejoramos la fidelidad del `CharacterBuild` sin romper el flujo existente;
 - dejamos mucho mejor preparado el salto a exportacion Foundry mas completa.
+
+### Exportacion Foundry mas cercana a actor real
+
+Se reforzo el exportador compartido para que la salida hacia Foundry deje de depender solo de clase, feats, spells y un arma principal.
+
+Ahora incluye:
+
+- item de armadura/equipo defensivo cuando corresponde;
+- items de gear/loot para equipo extra del personaje;
+- conteo visible de items generados dentro de la preview web.
+
+Impacto:
+
+- la exportacion empieza a parecerse mas a un actor utilizable en Foundry;
+- el trabajo reciente sobre `choices.equipment` ya se refleja en el destino final;
+- reducimos la distancia entre builder web y export real del personaje.

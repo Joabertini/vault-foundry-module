@@ -5,6 +5,10 @@ import {
 } from "@bertinis-vault/contracts";
 import { findWeaponCatalogEntry } from "@bertinis-vault/data-engine";
 import {
+  getArmorCatalogEntry,
+  getGearCatalogEntry,
+} from "../../data-engine/src/equipment.ts";
+import {
   abilityModifierMap,
   getHitDieForClass,
   getSpellAbilityForClass,
@@ -247,6 +251,14 @@ function findWeaponData(name: string) {
   return findWeaponCatalogEntry(name);
 }
 
+function findArmorData(name: string) {
+  return getArmorCatalogEntry(name);
+}
+
+function findGearData(name: string) {
+  return getGearCatalogEntry(name);
+}
+
 function buildWeaponItem(name: string): FoundryItem {
   const weaponData = findWeaponData(name);
   const activityId = "dnd5eactivity000";
@@ -333,6 +345,71 @@ function buildWeaponItem(name: string): FoundryItem {
   };
 }
 
+function buildArmorItem(name: string, equipped: boolean): FoundryItem {
+  const armorData = findArmorData(name);
+
+  return {
+    _id: makeId(),
+    name: armorData?.label ?? name,
+    type: "equipment",
+    img: "icons/svg/shield.svg",
+    system: {
+      source: { custom: "", book: "", page: "", license: "", rules: "2014", revision: 1 },
+      description: { value: "", chat: "" },
+      quantity: 1,
+      weight: { value: 0, units: "lb" },
+      price: { value: 0, denomination: "gp" },
+      attunement: { required: false },
+      equipped,
+      identified: true,
+      rarity: "common",
+      uses: { max: "", recovery: [], spent: 0 },
+      armor: {
+        type: armorData?.grantsShieldBonus ? "shield" : "light",
+        value: armorData?.armorFormula ?? "",
+      },
+      strength: 0,
+      stealth: false,
+      proficient: null,
+      identifier: slugify(name),
+    },
+    flags: {},
+    effects: [],
+    _stats: makeStats(),
+    folder: null,
+    sort: 0,
+    ownership: { default: 0 },
+  };
+}
+
+function buildGearItem(name: string): FoundryItem {
+  const gearData = findGearData(name);
+
+  return {
+    _id: makeId(),
+    name: gearData?.label ?? name,
+    type: "loot",
+    img: "icons/svg/item-bag.svg",
+    system: {
+      source: { custom: "", book: "", page: "", license: "", rules: "2014", revision: 1 },
+      description: { value: "", chat: "" },
+      quantity: 1,
+      weight: { value: 0, units: "lb" },
+      price: { value: 0, denomination: "gp" },
+      rarity: "common",
+      identified: true,
+      container: null,
+      identifier: slugify(name),
+    },
+    flags: {},
+    effects: [],
+    _stats: makeStats(),
+    folder: null,
+    sort: 0,
+    ownership: { default: 0 },
+  };
+}
+
 function buildBiography(character: CharacterBuild) {
   const biography = character.identity.biography ?? {};
   const lines: string[] = [];
@@ -371,14 +448,24 @@ function buildTraitData(character: CharacterBuild) {
 }
 
 function buildItems(character: CharacterBuild): FoundryItem[] {
-  const primaryWeapon = character.choices.equipment.find((item) => Boolean(findWeaponData(item)));
+  const equipment = character.choices.equipment;
+  const primaryWeapon = equipment.find((item) => Boolean(findWeaponData(item)));
+  const primaryArmor = equipment.find((item) => Boolean(findArmorData(item)));
+  const extraGear = equipment.filter(
+    (item) => !findWeaponData(item) && !findArmorData(item),
+  );
+
   const weaponItems = primaryWeapon ? [buildWeaponItem(primaryWeapon)] : [];
+  const armorItems = primaryArmor ? [buildArmorItem(primaryArmor, true)] : [];
+  const gearItems = extraGear.map((item) => buildGearItem(item));
 
   return [
     ...buildClassItems(character),
     ...buildFeatItems(character),
     ...buildSpellItems(character),
+    ...armorItems,
     ...weaponItems,
+    ...gearItems,
   ];
 }
 

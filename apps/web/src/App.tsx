@@ -57,6 +57,7 @@ export function App() {
 
   const canonicalSnapshot = buildCanonicalSnapshot(state);
   const foundryPreview = buildFoundryActorPayload(canonicalSnapshot);
+  const foundryItemCount = foundryPreview.items.length;
   const pb = canonicalSnapshot.derived.proficiencyBonus;
   const ac = canonicalSnapshot.derived.ac;
   const hp = canonicalSnapshot.derived.hp;
@@ -804,7 +805,7 @@ export function App() {
             <div className="canonical-card foundry-card">
               <div className="canonical-head">
                 <span className="eyebrow">Foundry Preview</span>
-                <strong>Actor Payload</strong>
+                <strong>Actor listo ({foundryItemCount} items)</strong>
               </div>
               <div className="export-toolbar">
                 <span className="save-pill">{foundryExportState}</span>
