@@ -29,6 +29,8 @@ Notas de integración:
 - `upstreamPath` es configurable por query string
 - variables soportadas: `BERTINIS_5E_UPSTREAM_CLASSES_PATH`, `BERTINIS_5E_UPSTREAM_RACES_PATH`, `BERTINIS_5E_UPSTREAM_BACKGROUNDS_PATH`, `BERTINIS_5E_UPSTREAM_FEATS_PATH`, `BERTINIS_5E_UPSTREAM_EQUIPMENT_PATH` y `BERTINIS_5E_UPSTREAM_SPELLS_PATH`
 
+`/datasets/equipment` devuelve `gear`, `armor` y `weapons`.
+
 Comandos útiles:
 
 ```bash

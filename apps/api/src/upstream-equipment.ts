@@ -1,5 +1,7 @@
 import {
   armorCatalog,
+  gearCatalog,
+  resolveGearId,
   resolveArmorId,
   resolveWeaponId,
   weaponCatalog,
@@ -21,6 +23,11 @@ type WeaponDatasetItem = {
   damage: string | undefined;
   damageType: string | undefined;
   attackType: string | undefined;
+};
+
+type GearDatasetItem = {
+  id: string;
+  label: string;
 };
 
 function withOptionalProps<T extends Record<string, unknown>>(value: T): T {
@@ -122,6 +129,7 @@ function normalizeWeaponDamage(record: Record<string, unknown>) {
 export function normalizeUpstreamEquipmentPayload(payload: unknown) {
   const armor: ArmorDatasetItem[] = [];
   const weapons: WeaponDatasetItem[] = [];
+  const gear: GearDatasetItem[] = [];
 
   for (const entry of pickArrayPayload(payload)) {
     const record = asRecord(entry);
@@ -167,7 +175,13 @@ export function normalizeUpstreamEquipmentPayload(payload: unknown) {
             : "melee",
         }),
       );
+      continue;
     }
+
+    gear.push({
+      id: resolveGearId(label),
+      label,
+    });
   }
 
   return {
@@ -175,16 +189,28 @@ export function normalizeUpstreamEquipmentPayload(payload: unknown) {
       mode: "upstream-normalized",
       upstream: "5etools-render",
     },
+    gear,
     armor,
     weapons,
   };
 }
 
 export function buildHybridEquipmentDataset(
-  upstreamPayload: Pick<ReturnType<typeof normalizeUpstreamEquipmentPayload>, "armor" | "weapons">,
+  upstreamPayload: Pick<
+    ReturnType<typeof normalizeUpstreamEquipmentPayload>,
+    "gear" | "armor" | "weapons"
+  >,
 ) {
+  const mergedGear = new Map<string, GearDatasetItem>();
   const mergedArmor = new Map<string, ArmorDatasetItem>();
   const mergedWeapons = new Map<string, WeaponDatasetItem>();
+
+  for (const entry of gearCatalog) {
+    mergedGear.set(entry.id, {
+      id: entry.id,
+      label: entry.label,
+    });
+  }
 
   for (const entry of armorCatalog) {
     mergedArmor.set(entry.id, {
@@ -202,6 +228,14 @@ export function buildHybridEquipmentDataset(
       damage: entry.damage,
       damageType: entry.damageType,
       attackType: entry.attackType,
+    });
+  }
+
+  for (const entry of upstreamPayload.gear) {
+    const current = mergedGear.get(entry.id);
+    mergedGear.set(entry.id, {
+      id: entry.id,
+      label: entry.label || current?.label || entry.id,
     });
   }
 
@@ -237,6 +271,9 @@ export function buildHybridEquipmentDataset(
       mode: "hybrid-equipment",
       upstream: "5etools-render",
     },
+    gear: Array.from(mergedGear.values()).sort((left, right) =>
+      left.label.localeCompare(right.label),
+    ),
     armor: Array.from(mergedArmor.values()).sort((left, right) =>
       left.label.localeCompare(right.label),
     ),

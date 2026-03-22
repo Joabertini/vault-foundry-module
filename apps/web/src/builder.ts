@@ -12,6 +12,7 @@ export type BuilderState = {
   featId: string;
   weaponId: string;
   armorId: string;
+  extraEquipmentText: string;
   cantripsText: string;
   spellsText: string;
   featuresText: string;
@@ -53,6 +54,7 @@ export const initialState: BuilderState = {
   featId: "magic-initiate",
   weaponId: "quarterstaff",
   armorId: "mage-armor",
+  extraEquipmentText: "spellbook\ncomponent-pouch",
   cantripsText: "Mage Hand\nPrestidigitation",
   spellsText: "Nv1: Shield\nNv1: Magic Missile\nNv2: Misty Step",
   featuresText: "Arcane Recovery\nSculpt Spells",
@@ -89,6 +91,10 @@ export function coerceBuilderState(value: unknown): BuilderState {
     featId: typeof candidate.featId === "string" ? candidate.featId : initialState.featId,
     weaponId: typeof candidate.weaponId === "string" ? candidate.weaponId : initialState.weaponId,
     armorId: typeof candidate.armorId === "string" ? candidate.armorId : initialState.armorId,
+    extraEquipmentText:
+      typeof candidate.extraEquipmentText === "string"
+        ? candidate.extraEquipmentText
+        : initialState.extraEquipmentText,
     cantripsText:
       typeof candidate.cantripsText === "string" ? candidate.cantripsText : initialState.cantripsText,
     spellsText: typeof candidate.spellsText === "string" ? candidate.spellsText : initialState.spellsText,
@@ -125,6 +131,7 @@ export function buildCanonicalSnapshot(state: BuilderState): CharacterBuild {
   const cantrips = parseLineList(state.cantripsText).map((entry) => `Nv0: ${entry}`);
   const leveledSpells = parseLineList(state.spellsText);
   const features = parseLineList(state.featuresText);
+  const extraEquipment = uniqueEntries(parseLineList(state.extraEquipmentText));
 
   const buildInput: Omit<CharacterBuild, "derived"> = {
     meta: {
@@ -183,7 +190,7 @@ export function buildCanonicalSnapshot(state: BuilderState): CharacterBuild {
       feats: [state.featId],
       proficiencies: [],
       spells: [...cantrips, ...leveledSpells],
-      equipment: [state.weaponId, state.armorId],
+      equipment: [state.weaponId, state.armorId, ...extraEquipment],
       features,
     },
   };
@@ -196,6 +203,10 @@ export function parseCantripLines(value: string) {
 }
 
 export function parseSpellLines(value: string) {
+  return uniqueEntries(parseLineList(value));
+}
+
+export function parseEquipmentLines(value: string) {
   return uniqueEntries(parseLineList(value));
 }
 

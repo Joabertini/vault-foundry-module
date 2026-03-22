@@ -7,6 +7,7 @@ import {
   spellCatalog,
   weaponCatalog,
 } from "@bertinis-vault/data-engine";
+import { gearCatalog } from "../../../packages/data-engine/src/equipment.ts";
 
 export type SelectOption = {
   id: string;
@@ -27,6 +28,7 @@ export type BuilderOptionsPayload = {
     spells: Array<SelectOption & { level: number }>;
   };
   equipment: {
+    gear: SelectOption[];
     armor: Array<SelectOption & { armorFormula?: string; grantsShieldBonus?: boolean }>;
     weapons: Array<SelectOption & { damage?: string; damageType?: string; attackType?: string }>;
   };
@@ -40,6 +42,7 @@ type DatasetEnvelope<T> = {
   items?: T[];
   cantrips?: Array<SelectOption & { level: number }>;
   spells?: Array<SelectOption & { level: number }>;
+  gear?: SelectOption[];
   armor?: Array<SelectOption & { armorFormula?: string; grantsShieldBonus?: boolean }>;
   weapons?: Array<SelectOption & { damage?: string; damageType?: string; attackType?: string }>;
 };
@@ -76,6 +79,10 @@ export const fallbackBuilderOptions: BuilderOptionsPayload = {
       .map((entry) => ({ id: entry.id, label: entry.label, level: entry.level })),
   },
   equipment: {
+    gear: gearCatalog.map((entry) => ({
+      id: entry.id,
+      label: entry.label,
+    })),
     armor: armorCatalog.map((entry) => ({
       id: entry.id,
       label: entry.label,
@@ -116,6 +123,7 @@ export async function loadBuilderOptions(): Promise<BuilderOptionsPayload> {
     >(spellsUrl),
     fetchJson<
       DatasetEnvelope<SelectOption> & {
+        gear: SelectOption[];
         armor: Array<SelectOption & { armorFormula?: string; grantsShieldBonus?: boolean }>;
         weapons: Array<SelectOption & { damage?: string; damageType?: string; attackType?: string }>;
       }
@@ -133,6 +141,7 @@ export async function loadBuilderOptions(): Promise<BuilderOptionsPayload> {
       spells: spells.spells ?? [],
     },
     equipment: {
+      gear: equipment.gear ?? [],
       armor: equipment.armor ?? [],
       weapons: equipment.weapons ?? [],
     },

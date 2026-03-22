@@ -620,3 +620,20 @@ Impacto:
 - el builder se siente menos como demo y mas como herramienta real;
 - mantenemos compatibilidad con el modelo actual sin rehacer todo el flujo;
 - preparamos la transicion a seleccion estructurada tambien para features y equipo.
+
+### Equipo extra estructurado en web
+
+Se expandio la seccion de elecciones para soportar mas que arma principal y proteccion.
+
+Ahora incluye:
+
+- catalogo compartido inicial de gear/adventuring equipment;
+- `gear` dentro de `/datasets/equipment`;
+- chips para equipo extra seleccionado;
+- sugerencias rapidas y texto sincronizado para mantener compatibilidad con el snapshot actual.
+
+Impacto:
+
+- el personaje web ya se parece mas a una hoja real con inventario base;
+- mejoramos la fidelidad del `CharacterBuild` sin romper el flujo existente;
+- dejamos mucho mejor preparado el salto a exportacion Foundry mas completa.

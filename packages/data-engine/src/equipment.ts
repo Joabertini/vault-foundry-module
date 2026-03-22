@@ -18,6 +18,12 @@ export type WeaponCatalogEntry = {
   aliases: string[];
 };
 
+export type GearCatalogEntry = {
+  id: string;
+  label: string;
+  aliases: string[];
+};
+
 export const armorCatalog: ArmorCatalogEntry[] = [
   {
     id: "unarmored",
@@ -100,8 +106,23 @@ export const weaponCatalog: WeaponCatalogEntry[] = [
   },
 ];
 
+export const gearCatalog: GearCatalogEntry[] = [
+  { id: "spellbook", label: "Spellbook", aliases: ["grimorio", "libro de conjuros"] },
+  { id: "component-pouch", label: "Component Pouch", aliases: ["bolsa de componentes"] },
+  { id: "arcane-focus", label: "Arcane Focus", aliases: ["foco arcano"] },
+  { id: "holy-symbol", label: "Holy Symbol", aliases: ["simbolo sagrado"] },
+  { id: "thieves-tools", label: "Thieves' Tools", aliases: ["herramientas de ladron"] },
+  { id: "explorers-pack", label: "Explorer's Pack", aliases: ["mochila de explorador"] },
+  { id: "dungeoneers-pack", label: "Dungeoneer's Pack", aliases: ["mochila de dungeonero"] },
+  { id: "rope-hempen", label: "Hempen Rope", aliases: ["cuerda de canamo", "cuerda"] },
+  { id: "torch", label: "Torch", aliases: ["antorcha"] },
+  { id: "rations", label: "Rations", aliases: ["raciones"] },
+  { id: "waterskin", label: "Waterskin", aliases: ["odre"] },
+];
+
 const armorAliasMap = new Map<string, string>();
 const weaponAliasMap = new Map<string, string>();
+const gearAliasMap = new Map<string, string>();
 
 for (const entry of armorCatalog) {
   armorAliasMap.set(normalizeLabel(entry.id), entry.id);
@@ -118,6 +139,15 @@ for (const entry of weaponCatalog) {
 
   for (const alias of entry.aliases) {
     weaponAliasMap.set(normalizeLabel(alias), entry.id);
+  }
+}
+
+for (const entry of gearCatalog) {
+  gearAliasMap.set(normalizeLabel(entry.id), entry.id);
+  gearAliasMap.set(normalizeLabel(entry.label), entry.id);
+
+  for (const alias of entry.aliases) {
+    gearAliasMap.set(normalizeLabel(alias), entry.id);
   }
 }
 
@@ -147,4 +177,13 @@ export function findWeaponCatalogEntry(value: string): WeaponCatalogEntry | unde
       normalized.includes(normalizeLabel(candidate)),
     ),
   );
+}
+
+export function resolveGearId(value: string): string {
+  return gearAliasMap.get(normalizeLabel(value)) ?? normalizeLabel(value).replace(/\s+/g, "-");
+}
+
+export function getGearCatalogEntry(value: string): GearCatalogEntry | undefined {
+  const resolvedId = resolveGearId(value);
+  return gearCatalog.find((entry) => entry.id === resolvedId);
 }

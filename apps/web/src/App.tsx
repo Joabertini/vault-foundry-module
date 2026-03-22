@@ -9,6 +9,7 @@ import {
   coerceBuilderState,
   initialState,
   parseCantripLines,
+  parseEquipmentLines,
   parseSpellLines,
   removeLine,
 } from "./builder";
@@ -87,6 +88,7 @@ export function App() {
     value: entry.id,
     label: entry.label,
   }));
+  const gearSuggestions = builderOptions.equipment.gear.slice(0, 10).map((entry) => entry.label);
   const spellSuggestions = builderOptions.spells.spells
     .slice(0, 10)
     .map((entry) => `Nv${entry.level}: ${entry.label}`);
@@ -94,6 +96,7 @@ export function App() {
     .slice(0, 10)
     .map((entry) => entry.label);
   const selectedCantrips = parseCantripLines(state.cantripsText);
+  const selectedExtraEquipment = parseEquipmentLines(state.extraEquipmentText);
   const selectedSpells = parseSpellLines(state.spellsText);
 
   function updateField<K extends keyof BuilderState>(key: K, value: BuilderState[K]) {
@@ -114,6 +117,14 @@ export function App() {
 
   function removeSpell(value: string) {
     updateField("spellsText", removeLine(state.spellsText, value));
+  }
+
+  function addExtraEquipment(value: string) {
+    updateField("extraEquipmentText", appendUniqueLine(state.extraEquipmentText, value));
+  }
+
+  function removeExtraEquipment(value: string) {
+    updateField("extraEquipmentText", removeLine(state.extraEquipmentText, value));
   }
 
   function resetDraft() {
@@ -292,6 +303,51 @@ export function App() {
                   onChange={(event) => updateField("alignment", event.target.value)}
                 />
               </label>
+              <div className="field field-full">
+                <span>Equipo extra seleccionado</span>
+                <div className="selection-card">
+                  <div className="tag-list">
+                    {selectedExtraEquipment.length ? (
+                      selectedExtraEquipment.map((entry) => (
+                        <button
+                          className="sheet-tag removable-tag"
+                          key={entry}
+                          onClick={() => removeExtraEquipment(entry)}
+                          type="button"
+                        >
+                          {entry}
+                          <strong>x</strong>
+                        </button>
+                      ))
+                    ) : (
+                      <span className="empty-note">Todavia no agregaste equipo extra.</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <label className="field field-full">
+                <span>Notas de equipo extra</span>
+                <textarea
+                  rows={3}
+                  value={state.extraEquipmentText}
+                  onChange={(event) => updateField("extraEquipmentText", event.target.value)}
+                />
+              </label>
+              <div className="field field-full">
+                <span>Sugerencias de equipo</span>
+                <div className="tag-list">
+                  {gearSuggestions.slice(0, 6).map((entry) => (
+                    <button
+                      className="sheet-tag"
+                      key={entry}
+                      onClick={() => addExtraEquipment(entry)}
+                      type="button"
+                    >
+                      {entry}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           ) : null}
 
@@ -414,6 +470,51 @@ export function App() {
                   ))}
                 </select>
               </label>
+              <div className="field field-full">
+                <span>Equipo extra seleccionado</span>
+                <div className="selection-card">
+                  <div className="tag-list">
+                    {selectedExtraEquipment.length ? (
+                      selectedExtraEquipment.map((entry) => (
+                        <button
+                          className="sheet-tag removable-tag"
+                          key={entry}
+                          onClick={() => removeExtraEquipment(entry)}
+                          type="button"
+                        >
+                          {entry}
+                          <strong>x</strong>
+                        </button>
+                      ))
+                    ) : (
+                      <span className="empty-note">Todavia no agregaste equipo extra.</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <label className="field field-full">
+                <span>Notas de equipo extra</span>
+                <textarea
+                  rows={3}
+                  value={state.extraEquipmentText}
+                  onChange={(event) => updateField("extraEquipmentText", event.target.value)}
+                />
+              </label>
+              <div className="field field-full">
+                <span>Sugerencias de equipo</span>
+                <div className="tag-list">
+                  {gearSuggestions.slice(0, 6).map((entry) => (
+                    <button
+                      className="sheet-tag"
+                      key={entry}
+                      onClick={() => addExtraEquipment(entry)}
+                      type="button"
+                    >
+                      {entry}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           ) : null}
 

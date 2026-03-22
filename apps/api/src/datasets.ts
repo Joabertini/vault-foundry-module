@@ -3,6 +3,7 @@ import {
   backgroundCatalog,
   classCatalog,
   featCatalog,
+  gearCatalog,
   raceCatalog,
   spellCatalog,
   weaponCatalog,
@@ -62,6 +63,10 @@ export function buildFeatsDataset() {
 export function buildEquipmentDataset() {
   return {
     ...buildDatasetMeta(),
+    gear: gearCatalog.map((entry) => ({
+      id: entry.id,
+      label: entry.label,
+    })),
     armor: armorCatalog.map((entry) => ({
       id: entry.id,
       label: entry.label,
