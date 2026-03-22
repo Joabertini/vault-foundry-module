@@ -1,4 +1,5 @@
 import { buildFoundryActorPayload } from "@bertinis-vault/foundry-exporter";
+import { armorCatalog, weaponCatalog } from "@bertinis-vault/data-engine";
 import { useEffect, useState } from "react";
 import {
   type BuilderState,
@@ -55,21 +56,15 @@ const featOptions = [
   { value: "war-caster", label: "War Caster" },
 ];
 
-const weaponOptions = [
-  { value: "quarterstaff", label: "Quarterstaff" },
-  { value: "dagger", label: "Dagger" },
-  { value: "longsword", label: "Longsword" },
-  { value: "shortbow", label: "Shortbow" },
-  { value: "mace", label: "Mace" },
-];
+const weaponOptions = weaponCatalog.map((entry) => ({
+  value: entry.id,
+  label: entry.label,
+}));
 
-const armorOptions = [
-  { value: "unarmored", label: "Unarmored" },
-  { value: "mage-armor", label: "Mage Armor" },
-  { value: "leather", label: "Leather Armor" },
-  { value: "chain-mail", label: "Chain Mail" },
-  { value: "shield", label: "Shield" },
-];
+const armorOptions = armorCatalog.map((entry) => ({
+  value: entry.id,
+  label: entry.label,
+}));
 
 const steps = [
   { id: "identity", label: "Identidad" },

@@ -366,3 +366,19 @@ Impacto:
 - la web y Foundry quedan mas alineados en defensa real del personaje;
 - el dominio deja de asumir siempre `10 + DEX`;
 - seguimos moviendo reglas concretas al motor compartido del proyecto.
+
+### Catalogo de armas compartido
+
+Se movio la informacion basica de armas a `data-engine` para evitar duplicacion.
+
+Ahora incluye:
+
+- catalogo inicial de armas reutilizable;
+- resolucion y busqueda compartida de armas;
+- uso del catalogo desde la UI web y desde el exportador Foundry.
+
+Impacto:
+
+- web y exportador comparten la misma fuente de verdad para armas;
+- baja el riesgo de que una opcion exista en la UI pero no se exporte bien;
+- seguimos consolidando reglas y datos fuera de capas aisladas.

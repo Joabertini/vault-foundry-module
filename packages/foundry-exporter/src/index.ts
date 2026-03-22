@@ -3,6 +3,7 @@ import {
   type FoundryActorPayload,
   foundryActorPayloadSchema,
 } from "@bertinis-vault/contracts";
+import { findWeaponCatalogEntry } from "@bertinis-vault/data-engine";
 import {
   abilityModifierMap,
   getHitDieForClass,
@@ -31,14 +32,6 @@ const CLASS_PROFS_BY_ID: Record<string, { armor: string[]; weapons: string[] }> 
   wizard: { armor: [], weapons: ["daggers", "darts", "slings", "quarterstaffs", "light crossbows"] },
   artificer: { armor: ["light", "medium", "shields"], weapons: ["simple"] },
 };
-
-const WEAPON_CATALOG = [
-  { name: "dagger", itemType: "simpleM", damage: "1d4", damageType: "piercing", attackType: "melee" },
-  { name: "mace", itemType: "simpleM", damage: "1d6", damageType: "bludgeoning", attackType: "melee" },
-  { name: "quarterstaff", itemType: "simpleM", damage: "1d6", damageType: "bludgeoning", attackType: "melee" },
-  { name: "longsword", itemType: "martialM", damage: "1d8", damageType: "slashing", attackType: "melee" },
-  { name: "shortbow", itemType: "simpleR", damage: "1d6", damageType: "piercing", attackType: "ranged" },
-];
 
 function makeId(): string {
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -251,8 +244,7 @@ function parseDamageFormula(formula: string) {
 }
 
 function findWeaponData(name: string) {
-  const normalizedName = name.trim().toLowerCase();
-  return WEAPON_CATALOG.find((weapon) => normalizedName.includes(weapon.name));
+  return findWeaponCatalogEntry(name);
 }
 
 function buildWeaponItem(name: string): FoundryItem {
