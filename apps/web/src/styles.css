@@ -9,7 +9,12 @@
   --accent-deep: #67321a;
   --line: rgba(58, 35, 19, 0.14);
   --shadow: 0 18px 45px rgba(75, 40, 15, 0.12);
-  font-family: "Georgia", "Times New Roman", serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
 }
 
 * {
@@ -29,6 +34,12 @@ body,
 
 body {
   min-height: 100vh;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
 }
 
 .app-shell {
@@ -966,6 +977,250 @@ body {
   background: transparent;
   border: 1px solid #ccc;
   color: #333;
+}
+
+.btn.primary {
+  background: #111;
+  color: white;
+}
+
+/* Visual simplification overrides */
+
+.app-shell {
+  width: min(1200px, calc(100vw - 32px));
+  padding: 32px 0 64px;
+}
+
+.hero-product,
+.presets,
+.story {
+  max-width: 1100px;
+  margin: 0 auto 20px;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.hero {
+  padding: 0 24px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.hero-product {
+  padding-top: 8px;
+  padding-bottom: 0;
+}
+
+.hero-product .hero-content {
+  max-width: 760px;
+}
+
+.hero-product h1 {
+  max-width: none;
+  font-size: 40px;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.hero-copy,
+.hero-product .hero-copy {
+  max-width: 680px;
+  color: #5f5f5f;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.hero-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.hero-badges span {
+  min-height: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #6b6b6b;
+  letter-spacing: 0;
+  text-transform: none;
+  font-size: 0.95rem;
+}
+
+.presets {
+  display: block;
+}
+
+.preset-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.preset-card {
+  min-width: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: none;
+  padding: 12px;
+}
+
+.preset-card.active {
+  background: #f7f7f7;
+  border-color: #bdbdbd;
+  box-shadow: none;
+}
+
+.story {
+  padding-top: 0;
+  padding-bottom: 0;
+  border: 0;
+  background: transparent;
+}
+
+.story-grid {
+  padding: 24px;
+  border: 1px solid #ddd;
+  border-radius: 18px;
+  background: white;
+}
+
+.builder-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 32px;
+  max-width: 1200px;
+  margin: 20px auto 0;
+  padding: 0 24px;
+}
+
+.builder-panel,
+.sheet-preview {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.section-head {
+  padding: 0 0 18px;
+}
+
+.section-head h2 {
+  font-size: 30px;
+  line-height: 1.15;
+}
+
+.sheet {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd;
+}
+
+.sheet-header {
+  background: linear-gradient(135deg, #1f1f1f, #3a3a3a);
+  color: white;
+  padding: 28px;
+}
+
+.sheet-header-content {
+  display: grid;
+  gap: 6px;
+}
+
+.sheet-header h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.sheet-sub {
+  margin-top: 0;
+  opacity: 0.8;
+}
+
+.sheet-main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 16px;
+}
+
+.stat-box {
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+}
+
+.secondary-stats {
+  display: flex;
+  justify-content: space-around;
+  padding: 16px;
+  border-top: 1px solid #eee;
+  gap: 12px;
+}
+
+.secondary-stat {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+}
+
+.secondary-stat span {
+  font-size: 12px;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.sheet .sheet-card {
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.tag {
+  background: #eee;
+  padding: 4px 8px;
+  border-radius: 6px;
+  margin: 2px;
+  display: inline-block;
+}
+
+.sheet-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-top: 1px solid #eee;
+}
+
+.sheet-footer-text {
+  color: #555;
+}
+
+.sheet-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  box-shadow: none;
 }
 
 .hero-panels-builder {

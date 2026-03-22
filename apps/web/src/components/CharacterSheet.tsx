@@ -15,32 +15,44 @@ type CharacterSheetData = {
 
 export function CharacterSheet({ character }: { character: CharacterSheetData }) {
   const stats = character.stats || {};
+  const orderedStats = ["str", "dex", "con", "int", "wis", "cha"] as const;
 
   return (
     <div className="sheet">
       <div className="sheet-header">
-        <h1>{character.name || "Nombre del personaje"}</h1>
-        <div className="sheet-sub">
-          {character.race || "Raza"} / {character.className || "Clase"} / Nivel{" "}
-          {character.level || 1}
+        <div className="sheet-header-content">
+          <h1>{character.name || "Nombre del personaje"}</h1>
+          <div className="sheet-sub">
+            {character.race || "Raza"} / {character.className || "Clase"} / Nivel{" "}
+            {character.level || 1}
+          </div>
         </div>
       </div>
 
       <div className="sheet-main">
         <div className="sheet-left">
           <div className="stats-grid">
-            {Object.entries(stats).map(([key, value]) => (
+            {orderedStats.map((key) => (
               <div key={key} className="stat-box">
-                <div className="stat-value">{value}</div>
+                <div className="stat-value">{stats[key] ?? "-"}</div>
                 <div className="stat-label">{key.toUpperCase()}</div>
               </div>
             ))}
           </div>
 
           <div className="secondary-stats">
-            <div>HP: {character.hp ?? "-"}</div>
-            <div>AC: {character.ac ?? "-"}</div>
-            <div>Speed: {character.speed ?? "-"}</div>
+            <div className="secondary-stat">
+              <span>HP</span>
+              <strong>{character.hp ?? "-"}</strong>
+            </div>
+            <div className="secondary-stat">
+              <span>AC</span>
+              <strong>{character.ac ?? "-"}</strong>
+            </div>
+            <div className="secondary-stat">
+              <span>Speed</span>
+              <strong>{character.speed ?? "-"}</strong>
+            </div>
           </div>
         </div>
 
@@ -78,12 +90,12 @@ export function CharacterSheet({ character }: { character: CharacterSheetData })
       </div>
 
       <div className="sheet-footer">
-        <div>Snapshot listo para compartir</div>
-        <div className="button-row">
+        <div className="sheet-footer-text">Snapshot listo para compartir</div>
+        <div className="sheet-actions">
           <button className="btn secondary" onClick={character.onExportJson} type="button">
             Exportar JSON
           </button>
-          <button className="btn" onClick={character.onExportFoundry} type="button">
+          <button className="btn primary" onClick={character.onExportFoundry} type="button">
             Exportar a Foundry
           </button>
         </div>

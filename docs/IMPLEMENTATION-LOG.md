@@ -935,3 +935,20 @@ Impacto:
 - baja la friccion visual entre demo comercial y builder real;
 - la pagina ya no compite con una segunda landing dentro de la misma ruta;
 - la ficha y el builder quedan como protagonistas reales de la experiencia.
+
+### Simplificacion del lenguaje visual general
+
+Se aplico una pasada de simplificacion visual usando como referencia directa los bloques segmentados de frontend.
+
+Ahora incluye:
+
+- tipografia general sans-serif para toda la pagina;
+- `CharacterSheet` mas cercana al componente de referencia;
+- presets con copy actualizado y acentos visibles;
+- overrides en `styles.css` para llevar hero, presets, layout principal y sheet a una lectura mas simple.
+
+Impacto:
+
+- la pagina se aleja del look editorial pesado y se acerca a un producto mas directo;
+- la ficha queda mejor alineada con la estructura entregada para frontend;
+- el builder sigue conectado al estado real pero con una presentacion menos barroca.
