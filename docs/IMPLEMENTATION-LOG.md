@@ -382,3 +382,20 @@ Impacto:
 - web y exportador comparten la misma fuente de verdad para armas;
 - baja el riesgo de que una opcion exista en la UI pero no se exporte bien;
 - seguimos consolidando reglas y datos fuera de capas aisladas.
+
+### Base inicial de `apps/api`
+
+Se abrio la base del backend/BFF para empezar a formalizar la relacion con 5etools.
+
+Ahora incluye:
+
+- scaffold del servicio API;
+- endpoint de salud;
+- endpoint de opciones del builder usando datasets compartidos;
+- cliente base configurado para la API de 5etools en Render.
+
+Impacto:
+
+- la estrategia de datos deja de ser solo conceptual;
+- empezamos a materializar el BFF que va a desacoplar web y fuentes externas;
+- prepara el camino para sincronizaciones y proxies mas selectivos contra 5etools.
