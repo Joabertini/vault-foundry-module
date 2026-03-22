@@ -893,6 +893,30 @@ body {
   display: grid;
 }
 
+
+.preview-support-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.preview-support-card {
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 250, 244, 0.92);
+  box-shadow: 0 16px 30px rgba(35, 20, 12, 0.08);
+}
+
+.preview-support-card-wide {
+  grid-column: 1 / -1;
+}
+
+.persona-card-compact {
+  margin-top: 14px;
+}
+
 .sheet-card .sheet-card {
   border-radius: 0;
 }
@@ -1019,6 +1043,7 @@ body {
   .hero-highlights,
   .pitch-grid,
   .active-preset,
+  .preview-support-grid,
   .sheet-main,
   .hero-preview-stats,
   .delivery-grid,
@@ -1076,3 +1101,4 @@ body {
     justify-content: stretch;
   }
 }
+

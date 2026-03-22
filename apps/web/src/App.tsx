@@ -1144,70 +1144,47 @@ export function App() {
 
           <CharacterSheet character={previewCharacter} />
 
-          <div className="sheet-card">
-            <div className="sheet-banner">
-              <div>
-                <span className="eyebrow">Character</span>
-                <h3>{state.characterName}</h3>
-                <p className="sheet-banner-copy">
-                  Una lectura inmediata del personaje para mostrar la propuesta del producto
-                  sin exponer el detalle técnico del builder.
+          <div className="preview-support-grid">
+            <div className="preview-support-card">
+              <div className="sheet-section-head">
+                <span className="eyebrow">Resumen</span>
+                <strong>Lectura rapida</strong>
+              </div>
+              <div className="stat-strip">
+                <div>
+                  <span>PB</span>
+                  <strong>+{pb}</strong>
+                </div>
+                <div>
+                  <span>AC</span>
+                  <strong>{ac}</strong>
+                </div>
+                <div>
+                  <span>HP</span>
+                  <strong>{hp}</strong>
+                </div>
+                <div>
+                  <span>Spell DC</span>
+                  <strong>{spellDc || "-"}</strong>
+                </div>
+              </div>
+              <div className="persona-card persona-card-compact">
+                <p>
+                  <strong>Trait:</strong> {state.trait}
+                </p>
+                <p>
+                  <strong>Ideal:</strong> {state.ideal}
+                </p>
+                <p>
+                  <strong>Bond:</strong> {state.bond}
+                </p>
+                <p>
+                  <strong>Flaw:</strong> {state.flaw}
                 </p>
               </div>
-              <div className="sheet-meta">
-                <strong>{selectedClassLabel}</strong>
-                <span>{selectedRaceLabel}</span>
-                <span>Nivel {state.level}</span>
-              </div>
             </div>
 
-            <div className="stat-strip">
-              <div>
-                <span>PB</span>
-                <strong>+{pb}</strong>
-              </div>
-              <div>
-                <span>AC</span>
-                <strong>{ac}</strong>
-              </div>
-              <div>
-                <span>HP</span>
-                <strong>{hp}</strong>
-              </div>
-              <div>
-                <span>Spell DC</span>
-                <strong>{spellDc || "-"}</strong>
-              </div>
-            </div>
-
-            <div className="ability-preview-grid">
-              {(["str", "dex", "con", "int", "wis", "cha"] as const).map((abilityKey) => (
-                <div className="ability-preview" key={abilityKey}>
-                  <span>{abilityKey.toUpperCase()}</span>
-                  <strong>{state[abilityKey]}</strong>
-                </div>
-              ))}
-            </div>
-
-            <div className="persona-card">
-              <p>
-                <strong>Trait:</strong> {state.trait}
-              </p>
-              <p>
-                <strong>Ideal:</strong> {state.ideal}
-              </p>
-              <p>
-                <strong>Bond:</strong> {state.bond}
-              </p>
-              <p>
-                <strong>Flaw:</strong> {state.flaw}
-              </p>
-              <p>
-                <strong>Notas:</strong> {state.notes}
-              </p>
-            </div>
-
-            <div className="sheet-section">
+            <div className="preview-support-card">
               <div className="sheet-section-head">
                 <span className="eyebrow">Build</span>
                 <strong>Origen y loadout</strong>
@@ -1223,7 +1200,7 @@ export function App() {
               </div>
             </div>
 
-            <div className="sheet-section">
+            <div className="preview-support-card preview-support-card-wide">
               <div className="sheet-section-head">
                 <span className="eyebrow">Training</span>
                 <strong>Skills, tools y lenguajes</strong>
@@ -1242,56 +1219,16 @@ export function App() {
               </div>
             </div>
 
-            <div className="sheet-columns">
-              <div className="sheet-section">
-                <div className="sheet-section-head">
-                  <span className="eyebrow">Spellbook</span>
-                  <strong>Magia destacada</strong>
-                </div>
-                <div className="list-stack">
-                  {presentationSpells.length ? (
-                    presentationSpells.map((spell) => (
-                      <div className="list-row" key={spell}>
-                        <span className="list-bullet">*</span>
-                        <span>{spell}</span>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="empty-note">Este preset no depende de magia para mostrar su valor.</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="sheet-section">
-                <div className="sheet-section-head">
-                  <span className="eyebrow">Core Traits</span>
-                  <strong>Features visibles</strong>
-                </div>
-                <div className="list-stack">
-                  {presentationFeatures.length ? (
-                    presentationFeatures.map((feature) => (
-                      <div className="list-row" key={feature}>
-                        <span className="list-bullet">*</span>
-                        <span>{feature}</span>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="empty-note">Todavía no agregaste rasgos destacados para esta build.</p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="delivery-card">
+            <div className="preview-support-card preview-support-card-wide">
               <div className="canonical-head">
                 <span className="eyebrow">Deliverables</span>
                 <strong>Salida lista para demo</strong>
               </div>
               <div className="delivery-grid">
                 <article>
-                  <span>Modelo canónico</span>
+                  <span>Modelo canonico</span>
                   <strong>{exportState}</strong>
-                  <p>La demo genera un snapshot estable para persistencia, API y evolución futura.</p>
+                  <p>La demo genera un snapshot estable para persistencia, API y evolucion futura.</p>
                 </article>
                 <article>
                   <span>Foundry actor</span>
@@ -1301,7 +1238,7 @@ export function App() {
               </div>
               <div className="button-row">
                 <button className="secondary-button" onClick={copyCanonicalSnapshot} type="button">
-                  Copiar JSON canónico
+                  Copiar JSON canonico
                 </button>
                 <button
                   className="secondary-button secondary-button-accent"
@@ -1312,8 +1249,8 @@ export function App() {
                 </button>
               </div>
             </div>
-
-            {showTechnicalView ? (
+          </div>
+          {showTechnicalView ? (
               <>
                 <div className="canonical-card">
                   <div className="canonical-head">
@@ -1370,7 +1307,6 @@ export function App() {
                 </div>
               </>
             ) : null}
-          </div>
         </aside>
       </section>
 
@@ -1432,3 +1368,4 @@ export function App() {
     </main>
   );
 }
+

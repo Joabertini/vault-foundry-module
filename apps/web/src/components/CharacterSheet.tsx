@@ -21,7 +21,7 @@ export function CharacterSheet({ character }: { character: CharacterSheetData })
       <div className="sheet-header">
         <h1>{character.name || "Nombre del personaje"}</h1>
         <div className="sheet-sub">
-          {character.race || "Raza"} • {character.className || "Clase"} • Nivel{" "}
+          {character.race || "Raza"} / {character.className || "Clase"} / Nivel{" "}
           {character.level || 1}
         </div>
       </div>
@@ -91,3 +91,4 @@ export function CharacterSheet({ character }: { character: CharacterSheetData })
     </div>
   );
 }
+

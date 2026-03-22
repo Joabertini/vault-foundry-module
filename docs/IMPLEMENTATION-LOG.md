@@ -900,3 +900,20 @@ Impacto:
 - el criterio para evolucionar `apps/foundry-module` queda mucho mas claro;
 - futuras IAs ya no tienen que deducir desde cero que nos falta alrededor del exportador;
 - la migracion deja de ser solo una lista de archivos y pasa a ser tambien una lista de etapas operacionales.
+
+### CharacterSheet como preview principal real
+
+Se corrigio la integracion visual de la ficha inspirada en Foundry para que deje de convivir con la preview vieja como duplicado.
+
+Ahora incluye:
+
+- `apps/web/src/components/CharacterSheet.tsx` como superficie principal de preview;
+- reemplazo del bloque visual heredado por cards de soporte mas livianas;
+- hoja central con acciones de export visibles y resumen secundario fuera de la ficha;
+- validacion completa con `corepack pnpm web:verify`.
+
+Impacto:
+
+- la visual del builder ahora responde de verdad a la direccion de UI definida para la demo;
+- desaparece la sensacion de que la ficha nueva estaba "montada arriba" de la preview anterior;
+- futuras iteraciones visuales pueden trabajar sobre una sola hoja principal en vez de dos previews mezcladas.
