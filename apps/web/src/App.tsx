@@ -1,5 +1,4 @@
 import { buildFoundryActorPayload } from "@bertinis-vault/foundry-exporter";
-import { armorCatalog, weaponCatalog } from "@bertinis-vault/data-engine";
 import { useEffect, useState } from "react";
 import {
   type BuilderState,
@@ -9,44 +8,11 @@ import {
   coerceBuilderState,
   initialState,
 } from "./builder";
-
-const classOptions = [
-  { value: "barbarian", label: "Barbarian" },
-  { value: "bard", label: "Bard" },
-  { value: "cleric", label: "Cleric" },
-  { value: "druid", label: "Druid" },
-  { value: "fighter", label: "Fighter" },
-  { value: "monk", label: "Monk" },
-  { value: "paladin", label: "Paladin" },
-  { value: "ranger", label: "Ranger" },
-  { value: "rogue", label: "Rogue" },
-  { value: "sorcerer", label: "Sorcerer" },
-  { value: "warlock", label: "Warlock" },
-  { value: "wizard", label: "Wizard" },
-  { value: "artificer", label: "Artificer" },
-];
-
-const raceOptions = [
-  { value: "human", label: "Human" },
-  { value: "elf", label: "Elf" },
-  { value: "half-elf", label: "Half-Elf" },
-  { value: "dwarf", label: "Dwarf" },
-  { value: "halfling", label: "Halfling" },
-  { value: "half-orc", label: "Half-Orc" },
-  { value: "gnome", label: "Gnome" },
-  { value: "tiefling", label: "Tiefling" },
-  { value: "dragonborn", label: "Dragonborn" },
-  { value: "aasimar", label: "Aasimar" },
-];
-
-const backgroundOptions = [
-  { value: "acolyte", label: "Acolyte" },
-  { value: "criminal", label: "Criminal" },
-  { value: "folk-hero", label: "Folk Hero" },
-  { value: "sage", label: "Sage" },
-  { value: "soldier", label: "Soldier" },
-  { value: "wildspacer", label: "Wildspacer" },
-];
+import {
+  fallbackBuilderOptions,
+  loadBuilderOptions,
+  type BuilderOptionsPayload,
+} from "./builder-options";
 
 const featOptions = [
   { value: "alert", label: "Alert" },
@@ -55,16 +21,6 @@ const featOptions = [
   { value: "telekinetic", label: "Telekinetic" },
   { value: "war-caster", label: "War Caster" },
 ];
-
-const weaponOptions = weaponCatalog.map((entry) => ({
-  value: entry.id,
-  label: entry.label,
-}));
-
-const armorOptions = armorCatalog.map((entry) => ({
-  value: entry.id,
-  label: entry.label,
-}));
 
 const steps = [
   { id: "identity", label: "Identidad" },
@@ -77,6 +33,10 @@ const steps = [
 
 export function App() {
   const [stepIndex, setStepIndex] = useState(0);
+  const [builderOptions, setBuilderOptions] = useState<BuilderOptionsPayload>(
+    fallbackBuilderOptions,
+  );
+  const [datasetState, setDatasetState] = useState("Usando catalogo local");
   const [state, setState] = useState<BuilderState>(() => {
     if (typeof window === "undefined") {
       return initialState;
@@ -107,6 +67,26 @@ export function App() {
   const listedSpells = canonicalSnapshot.choices.spells;
   const listedFeatures = canonicalSnapshot.choices.features;
   const listedEquipment = canonicalSnapshot.choices.equipment;
+  const classOptions = builderOptions.classes.map((entry) => ({
+    value: entry.id,
+    label: entry.label,
+  }));
+  const raceOptions = builderOptions.races.map((entry) => ({
+    value: entry.id,
+    label: entry.label,
+  }));
+  const backgroundOptions = builderOptions.backgrounds.map((entry) => ({
+    value: entry.id,
+    label: entry.label,
+  }));
+  const weaponOptions = builderOptions.equipment.weapons.map((entry) => ({
+    value: entry.id,
+    label: entry.label,
+  }));
+  const armorOptions = builderOptions.equipment.armor.map((entry) => ({
+    value: entry.id,
+    label: entry.label,
+  }));
 
   function updateField<K extends keyof BuilderState>(key: K, value: BuilderState[K]) {
     setState((current) => ({ ...current, [key]: value }));
@@ -183,6 +163,32 @@ export function App() {
     setSaveState("Guardado local automatico");
   }, [state]);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    loadBuilderOptions()
+      .then((payload) => {
+        if (cancelled) {
+          return;
+        }
+
+        setBuilderOptions(payload);
+        setDatasetState(`API conectada: ${payload.source.mode}`);
+      })
+      .catch(() => {
+        if (cancelled) {
+          return;
+        }
+
+        setBuilderOptions(fallbackBuilderOptions);
+        setDatasetState("Fallback local activo");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <main className="app-shell">
       <section className="hero">
@@ -199,6 +205,7 @@ export function App() {
               La lógica ya está migrando a una arquitectura compartida. Esta UI es el primer
               punto de entrada real del builder fuera del módulo Foundry.
             </p>
+            <div className="inline-status">{datasetState}</div>
           </article>
           <article className="panel">
             <h2>Qué prueba esta pantalla</h2>

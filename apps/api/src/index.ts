@@ -8,6 +8,9 @@ const fiveToolsClient = createFiveToolsClient();
 function sendJson(response: import("node:http").ServerResponse, statusCode: number, payload: unknown) {
   response.writeHead(statusCode, {
     "content-type": "application/json; charset=utf-8",
+    "access-control-allow-origin": "*",
+    "access-control-allow-methods": "GET,OPTIONS",
+    "access-control-allow-headers": "content-type",
   });
   response.end(JSON.stringify(payload, null, 2));
 }
@@ -19,6 +22,16 @@ const server = createServer(async (request, response) => {
   }
 
   const url = new URL(request.url, `http://${request.headers.host ?? "127.0.0.1"}`);
+
+  if (request.method === "OPTIONS") {
+    response.writeHead(204, {
+      "access-control-allow-origin": "*",
+      "access-control-allow-methods": "GET,OPTIONS",
+      "access-control-allow-headers": "content-type",
+    });
+    response.end();
+    return;
+  }
 
   if (request.method === "GET" && url.pathname === "/health") {
     sendJson(response, 200, {

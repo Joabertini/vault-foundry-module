@@ -399,3 +399,20 @@ Impacto:
 - la estrategia de datos deja de ser solo conceptual;
 - empezamos a materializar el BFF que va a desacoplar web y fuentes externas;
 - prepara el camino para sincronizaciones y proxies mas selectivos contra 5etools.
+
+### Web conectada a datasets del BFF
+
+Se dio el primer paso para que la UI deje de depender solo de imports locales.
+
+Ahora incluye:
+
+- carga de opciones del builder desde `apps/api`;
+- fallback automatico a datasets locales si la API no esta disponible;
+- estado visible en la UI para saber de donde vienen los datos;
+- CORS basico habilitado para pruebas locales entre web y API.
+
+Impacto:
+
+- empezamos a usar el BFF como fuente de datos real del builder;
+- la integracion con tu stack de Render/5etools ya tiene una ruta concreta;
+- mantenemos estabilidad local aunque la API todavia no este arriba.

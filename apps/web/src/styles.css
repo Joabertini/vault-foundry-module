@@ -117,6 +117,17 @@ body {
   color: var(--muted);
 }
 
+.inline-status {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 14px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: rgba(103, 50, 26, 0.08);
+  color: var(--accent-deep);
+  font-size: 0.8rem;
+}
+
 .grid-section {
   margin-top: 26px;
 }
