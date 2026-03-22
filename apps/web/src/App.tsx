@@ -11,6 +11,7 @@ import {
   parseCantripLines,
   parseEquipmentLines,
   parseFeatureLines,
+  parseProficiencyLines,
   parseSpellLines,
   removeLine,
 } from "./builder";
@@ -103,6 +104,17 @@ export function App() {
   const selectedExtraEquipment = parseEquipmentLines(state.extraEquipmentText);
   const selectedFeatures = parseFeatureLines(state.featuresText);
   const selectedSpells = parseSpellLines(state.spellsText);
+  const selectedProficiencies = parseProficiencyLines(state.proficienciesText);
+  const selectedLanguages = parseProficiencyLines(state.languagesText);
+  const proficiencySuggestions = [
+    "Arcana",
+    "Investigation",
+    "Perception",
+    "Stealth",
+    "Thieves' Tools",
+    "Herbalism Kit",
+  ];
+  const languageSuggestions = ["Common", "Elvish", "Dwarvish", "Draconic", "Infernal", "Sylvan"];
 
   function updateField<K extends keyof BuilderState>(key: K, value: BuilderState[K]) {
     setState((current) => ({ ...current, [key]: value }));
@@ -138,6 +150,22 @@ export function App() {
 
   function removeFeature(value: string) {
     updateField("featuresText", removeLine(state.featuresText, value));
+  }
+
+  function addProficiency(value: string) {
+    updateField("proficienciesText", appendUniqueLine(state.proficienciesText, value));
+  }
+
+  function removeProficiency(value: string) {
+    updateField("proficienciesText", removeLine(state.proficienciesText, value));
+  }
+
+  function addLanguage(value: string) {
+    updateField("languagesText", appendUniqueLine(state.languagesText, value));
+  }
+
+  function removeLanguage(value: string) {
+    updateField("languagesText", removeLine(state.languagesText, value));
   }
 
   function resetDraft() {
@@ -354,6 +382,96 @@ export function App() {
                       className="sheet-tag"
                       key={entry}
                       onClick={() => addExtraEquipment(entry)}
+                      type="button"
+                    >
+                      {entry}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="field field-full">
+                <span>Competencias y tools</span>
+                <div className="selection-card">
+                  <div className="tag-list">
+                    {selectedProficiencies.length ? (
+                      selectedProficiencies.map((entry) => (
+                        <button
+                          className="sheet-tag removable-tag"
+                          key={entry}
+                          onClick={() => removeProficiency(entry)}
+                          type="button"
+                        >
+                          {entry}
+                          <strong>x</strong>
+                        </button>
+                      ))
+                    ) : (
+                      <span className="empty-note">Todavia no agregaste skills o tools.</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <label className="field field-full">
+                <span>Skills y tools</span>
+                <textarea
+                  rows={3}
+                  value={state.proficienciesText}
+                  onChange={(event) => updateField("proficienciesText", event.target.value)}
+                />
+              </label>
+              <div className="field field-full">
+                <span>Sugerencias de competencias</span>
+                <div className="tag-list">
+                  {proficiencySuggestions.map((entry) => (
+                    <button
+                      className="sheet-tag"
+                      key={entry}
+                      onClick={() => addProficiency(entry)}
+                      type="button"
+                    >
+                      {entry}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="field field-full">
+                <span>Lenguajes</span>
+                <div className="selection-card">
+                  <div className="tag-list">
+                    {selectedLanguages.length ? (
+                      selectedLanguages.map((entry) => (
+                        <button
+                          className="sheet-tag removable-tag"
+                          key={entry}
+                          onClick={() => removeLanguage(entry)}
+                          type="button"
+                        >
+                          {entry}
+                          <strong>x</strong>
+                        </button>
+                      ))
+                    ) : (
+                      <span className="empty-note">Todavia no agregaste lenguajes.</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <label className="field field-full">
+                <span>Lista de lenguajes</span>
+                <textarea
+                  rows={2}
+                  value={state.languagesText}
+                  onChange={(event) => updateField("languagesText", event.target.value)}
+                />
+              </label>
+              <div className="field field-full">
+                <span>Sugerencias de lenguajes</span>
+                <div className="tag-list">
+                  {languageSuggestions.map((entry) => (
+                    <button
+                      className="sheet-tag"
+                      key={entry}
+                      onClick={() => addLanguage(entry)}
                       type="button"
                     >
                       {entry}
@@ -787,6 +905,25 @@ export function App() {
                 {listedEquipment.map((item) => (
                   <span className="sheet-tag" key={item}>
                     {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="sheet-section">
+              <div className="sheet-section-head">
+                <span className="eyebrow">Training</span>
+                <strong>Skills, tools y lenguajes</strong>
+              </div>
+              <div className="tag-list">
+                {selectedProficiencies.map((entry) => (
+                  <span className="sheet-tag" key={entry}>
+                    {entry}
+                  </span>
+                ))}
+                {selectedLanguages.map((entry) => (
+                  <span className="sheet-tag" key={entry}>
+                    {entry}
                   </span>
                 ))}
               </div>

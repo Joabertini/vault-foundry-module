@@ -13,6 +13,8 @@ export type BuilderState = {
   weaponId: string;
   armorId: string;
   extraEquipmentText: string;
+  proficienciesText: string;
+  languagesText: string;
   cantripsText: string;
   spellsText: string;
   featuresText: string;
@@ -55,6 +57,8 @@ export const initialState: BuilderState = {
   weaponId: "quarterstaff",
   armorId: "mage-armor",
   extraEquipmentText: "spellbook\ncomponent-pouch",
+  proficienciesText: "Arcana\nInvestigation\nThieves' Tools",
+  languagesText: "Common\nElvish\nDraconic",
   cantripsText: "Mage Hand\nPrestidigitation",
   spellsText: "Nv1: Shield\nNv1: Magic Missile\nNv2: Misty Step",
   featuresText: "Arcane Recovery\nSculpt Spells",
@@ -95,6 +99,14 @@ export function coerceBuilderState(value: unknown): BuilderState {
       typeof candidate.extraEquipmentText === "string"
         ? candidate.extraEquipmentText
         : initialState.extraEquipmentText,
+    proficienciesText:
+      typeof candidate.proficienciesText === "string"
+        ? candidate.proficienciesText
+        : initialState.proficienciesText,
+    languagesText:
+      typeof candidate.languagesText === "string"
+        ? candidate.languagesText
+        : initialState.languagesText,
     cantripsText:
       typeof candidate.cantripsText === "string" ? candidate.cantripsText : initialState.cantripsText,
     spellsText: typeof candidate.spellsText === "string" ? candidate.spellsText : initialState.spellsText,
@@ -132,6 +144,10 @@ export function buildCanonicalSnapshot(state: BuilderState): CharacterBuild {
   const leveledSpells = parseLineList(state.spellsText);
   const features = parseLineList(state.featuresText);
   const extraEquipment = uniqueEntries(parseLineList(state.extraEquipmentText));
+  const proficiencies = uniqueEntries(parseLineList(state.proficienciesText));
+  const languages = uniqueEntries(parseLineList(state.languagesText)).map(
+    (entry) => `Language: ${entry}`,
+  );
 
   const buildInput: Omit<CharacterBuild, "derived"> = {
     meta: {
@@ -188,7 +204,7 @@ export function buildCanonicalSnapshot(state: BuilderState): CharacterBuild {
     },
     choices: {
       feats: [state.featId],
-      proficiencies: [],
+      proficiencies: [...proficiencies, ...languages],
       spells: [...cantrips, ...leveledSpells],
       equipment: [state.weaponId, state.armorId, ...extraEquipment],
       features,
@@ -211,6 +227,10 @@ export function parseEquipmentLines(value: string) {
 }
 
 export function parseFeatureLines(value: string) {
+  return uniqueEntries(parseLineList(value));
+}
+
+export function parseProficiencyLines(value: string) {
   return uniqueEntries(parseLineList(value));
 }
 

@@ -719,3 +719,21 @@ Impacto:
 - el flujo legacy empieza a beneficiarse de la nueva logica sin esperar una migracion total;
 - reducimos divergencias entre "lo que exporta la web" y "lo que crea el modulo";
 - damos otro paso hacia una unica fuente de verdad para el actor Foundry.
+
+### Lenguajes y tools dentro del flujo de exportacion
+
+Se extendio el builder web y el exportador para que competencias mas finas viajen hasta Foundry.
+
+Ahora incluye:
+
+- campos visibles para `skills/tools` y `lenguajes` en el builder web;
+- sugerencias rapidas para cargar esas elecciones sin depender solo de texto libre;
+- serializacion de lenguajes dentro de `choices.proficiencies`;
+- separacion en exportacion hacia `system.skills`, `system.tools` y `system.traits.languages`;
+- alineacion del bridge legacy para interpretar esos mismos datos.
+
+Impacto:
+
+- el personaje exportado se parece mas a un actor jugable y menos a un esqueleto;
+- cerramos mejor el bloque de "tools y demas" que faltaba en la ficha;
+- dejamos lista la base para futuras validaciones mas estrictas de background, clase y elecciones de proficiencia.

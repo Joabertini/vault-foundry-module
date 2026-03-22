@@ -113,6 +113,80 @@ const SKILL_ALIAS_TO_ID: Record<string, string> = {
   supervivencia: "sur",
 };
 
+const LANGUAGE_ALIAS_TO_ID: Record<string, string> = {
+  common: "common",
+  comun: "common",
+  "enano": "dwarvish",
+  dwarvish: "dwarvish",
+  dwarf: "dwarvish",
+  elvish: "elvish",
+  elfico: "elvish",
+  elficoo: "elvish",
+  gnomish: "gnomish",
+  gnomo: "gnomish",
+  halfling: "halfling",
+  mediano: "halfling",
+  giant: "giant",
+  gigante: "giant",
+  goblin: "goblin",
+  draconic: "draconic",
+  draconico: "draconic",
+  infernal: "infernal",
+  abyssal: "abyssal",
+  celestial: "celestial",
+  primordial: "primordial",
+  sylvan: "sylvan",
+  orc: "orc",
+  orcish: "orc",
+  undercommon: "undercommon",
+  "deep speech": "deep",
+};
+
+const TOOL_ALIAS_TO_ID: Record<string, { id: string; ability: string; label: string }> = {
+  "thieves tools": { id: "thief", ability: "dex", label: "Thieves' Tools" },
+  "herramientas de ladron": { id: "thief", ability: "dex", label: "Thieves' Tools" },
+  "herbalism kit": { id: "herb", ability: "wis", label: "Herbalism Kit" },
+  "kit de herboristeria": { id: "herb", ability: "wis", label: "Herbalism Kit" },
+  "disguise kit": { id: "disg", ability: "cha", label: "Disguise Kit" },
+  "kit de disfraz": { id: "disg", ability: "cha", label: "Disguise Kit" },
+  "forgery kit": { id: "forg", ability: "dex", label: "Forgery Kit" },
+  "kit de falsificacion": { id: "forg", ability: "dex", label: "Forgery Kit" },
+  "navigator's tools": { id: "navg", ability: "wis", label: "Navigator's Tools" },
+  "herramientas de navegacion": { id: "navg", ability: "wis", label: "Navigator's Tools" },
+  "gaming set": { id: "game", ability: "int", label: "Gaming Set" },
+  "vehicle land": { id: "land", ability: "dex", label: "Land Vehicles" },
+  "vehiculos terrestres": { id: "land", ability: "dex", label: "Land Vehicles" },
+  "vehicle water": { id: "water", ability: "dex", label: "Water Vehicles" },
+  "vehiculos acuaticos": { id: "water", ability: "dex", label: "Water Vehicles" },
+  "musical instrument": { id: "music", ability: "cha", label: "Musical Instrument" },
+  "instrumento musical": { id: "music", ability: "cha", label: "Musical Instrument" },
+  "artisan's tools": { id: "art", ability: "int", label: "Artisan's Tools" },
+  "artisan tools": { id: "art", ability: "int", label: "Artisan's Tools" },
+  "herramientas de artesano": { id: "art", ability: "int", label: "Artisan's Tools" },
+};
+
+const BACKGROUND_LANGUAGE_PROFS_BY_ID: Record<string, string[]> = {
+  acolyte: ["common"],
+  "guild-artisan": ["common"],
+  hermit: ["common"],
+  noble: ["common"],
+  outlander: ["common"],
+  sage: ["common"],
+};
+
+const BACKGROUND_TOOL_PROFS_BY_ID: Record<string, string[]> = {
+  charlatan: ["Disguise Kit", "Forgery Kit"],
+  criminal: ["Thieves' Tools", "Gaming Set"],
+  entertainer: ["Disguise Kit", "Musical Instrument"],
+  "guild-artisan": ["Artisan's Tools"],
+  hermit: ["Herbalism Kit"],
+  noble: ["Gaming Set"],
+  outlander: ["Musical Instrument"],
+  sailor: ["Navigator's Tools", "Vehicle Water"],
+  soldier: ["Gaming Set", "Vehicle Land"],
+  urchin: ["Disguise Kit", "Thieves' Tools"],
+};
+
 function makeId(): string {
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   return Array.from({ length: 16 }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join("");
@@ -212,6 +286,26 @@ function resolveSkillId(value: string) {
   return SKILL_ALIAS_TO_ID[normalizeSkillLabel(value)];
 }
 
+function normalizeProficiencyLabel(value: string) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z\s':-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function parseLanguageEntry(value: string) {
+  const normalized = normalizeProficiencyLabel(value).replace(/^language:\s*/, "");
+  return LANGUAGE_ALIAS_TO_ID[normalized];
+}
+
+function parseToolEntry(value: string) {
+  const normalized = normalizeProficiencyLabel(value).replace(/^tool:\s*/, "");
+  return TOOL_ALIAS_TO_ID[normalized];
+}
+
 function buildSkills(character: CharacterBuild) {
   const skills = makeSkills();
   const backgroundSkillIds = BACKGROUND_SKILL_PROFS_BY_ID[character.background.backgroundId] ?? [];
@@ -228,6 +322,48 @@ function buildSkills(character: CharacterBuild) {
   }
 
   return skills;
+}
+
+function makeTool(ability: string, customLabel?: string) {
+  return {
+    ability,
+    bonus: "",
+    value: 1,
+    prof: 1,
+    roll: { min: null, max: null, mode: 0 },
+    custom: customLabel ?? "",
+  };
+}
+
+function buildTools(character: CharacterBuild) {
+  const tools: Record<string, ReturnType<typeof makeTool>> = {};
+  const backgroundToolEntries = BACKGROUND_TOOL_PROFS_BY_ID[character.background.backgroundId] ?? [];
+  const toolEntries = [...backgroundToolEntries, ...character.choices.proficiencies];
+
+  for (const entry of toolEntries) {
+    const tool = parseToolEntry(entry);
+    if (!tool) {
+      continue;
+    }
+
+    tools[tool.id] = makeTool(tool.ability, tool.label);
+  }
+
+  return tools;
+}
+
+function buildLanguages(character: CharacterBuild) {
+  const backgroundLanguageIds = BACKGROUND_LANGUAGE_PROFS_BY_ID[character.background.backgroundId] ?? [];
+  const selectedLanguageIds = character.choices.proficiencies
+    .map((entry) => parseLanguageEntry(entry))
+    .filter((entry): entry is string => Boolean(entry));
+  const uniqueLanguageIds = Array.from(new Set([...backgroundLanguageIds, ...selectedLanguageIds]));
+
+  return {
+    value: uniqueLanguageIds,
+    custom: "",
+    communication: {},
+  };
 }
 
 function makeToken(name: string) {
@@ -643,7 +779,7 @@ function buildTraitData(character: CharacterBuild) {
     dv: { value: [], custom: "", bypasses: [] },
     dm: { amount: {}, bypasses: [] },
     ci: { value: [], custom: "" },
-    languages: { value: [], custom: "", communication: {} },
+    languages: buildLanguages(character),
     weaponProf: {
       value: [],
       custom: profs.weapons.join(", "),
@@ -695,7 +831,7 @@ export function buildFoundryActorPayload(character: CharacterBuild): FoundryActo
         spell: { dc: "" },
       },
       skills: buildSkills(character),
-      tools: {},
+      tools: buildTools(character),
       attributes: {
         ac: {
           flat: character.derived.ac,

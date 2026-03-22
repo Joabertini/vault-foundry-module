@@ -92,6 +92,78 @@ const SKILL_ALIAS_TO_ID = {
   supervivencia: 'sur',
 };
 
+const LANGUAGE_ALIAS_TO_ID = {
+  common: 'common',
+  comun: 'common',
+  dwarvish: 'dwarvish',
+  enano: 'dwarvish',
+  elvish: 'elvish',
+  elfico: 'elvish',
+  gnomish: 'gnomish',
+  gnomo: 'gnomish',
+  halfling: 'halfling',
+  mediano: 'halfling',
+  giant: 'giant',
+  gigante: 'giant',
+  goblin: 'goblin',
+  draconic: 'draconic',
+  draconico: 'draconic',
+  infernal: 'infernal',
+  abyssal: 'abyssal',
+  celestial: 'celestial',
+  primordial: 'primordial',
+  sylvan: 'sylvan',
+  orc: 'orc',
+  orcish: 'orc',
+  undercommon: 'undercommon',
+  'deep speech': 'deep',
+};
+
+const TOOL_ALIAS_TO_ID = {
+  'thieves tools': { id: 'thief', ability: 'dex', label: "Thieves' Tools" },
+  'herramientas de ladron': { id: 'thief', ability: 'dex', label: "Thieves' Tools" },
+  'herbalism kit': { id: 'herb', ability: 'wis', label: 'Herbalism Kit' },
+  'kit de herboristeria': { id: 'herb', ability: 'wis', label: 'Herbalism Kit' },
+  'disguise kit': { id: 'disg', ability: 'cha', label: 'Disguise Kit' },
+  'kit de disfraz': { id: 'disg', ability: 'cha', label: 'Disguise Kit' },
+  'forgery kit': { id: 'forg', ability: 'dex', label: 'Forgery Kit' },
+  'kit de falsificacion': { id: 'forg', ability: 'dex', label: 'Forgery Kit' },
+  "navigator's tools": { id: 'navg', ability: 'wis', label: "Navigator's Tools" },
+  'herramientas de navegacion': { id: 'navg', ability: 'wis', label: "Navigator's Tools" },
+  'gaming set': { id: 'game', ability: 'int', label: 'Gaming Set' },
+  'vehicle land': { id: 'land', ability: 'dex', label: 'Land Vehicles' },
+  'vehiculos terrestres': { id: 'land', ability: 'dex', label: 'Land Vehicles' },
+  'vehicle water': { id: 'water', ability: 'dex', label: 'Water Vehicles' },
+  'vehiculos acuaticos': { id: 'water', ability: 'dex', label: 'Water Vehicles' },
+  'musical instrument': { id: 'music', ability: 'cha', label: 'Musical Instrument' },
+  'instrumento musical': { id: 'music', ability: 'cha', label: 'Musical Instrument' },
+  "artisan's tools": { id: 'art', ability: 'int', label: "Artisan's Tools" },
+  'artisan tools': { id: 'art', ability: 'int', label: "Artisan's Tools" },
+  'herramientas de artesano': { id: 'art', ability: 'int', label: "Artisan's Tools" },
+};
+
+const BACKGROUND_LANGUAGE_PROFS_BY_ID = {
+  acolyte: ['common'],
+  'guild-artisan': ['common'],
+  hermit: ['common'],
+  noble: ['common'],
+  outlander: ['common'],
+  sage: ['common'],
+};
+
+const BACKGROUND_TOOL_PROFS_BY_ID = {
+  charlatan: ['Disguise Kit', 'Forgery Kit'],
+  criminal: ["Thieves' Tools", 'Gaming Set'],
+  entertainer: ['Disguise Kit', 'Musical Instrument'],
+  'guild-artisan': ["Artisan's Tools"],
+  hermit: ['Herbalism Kit'],
+  noble: ['Gaming Set'],
+  outlander: ['Musical Instrument'],
+  sailor: ["Navigator's Tools", 'Vehicle Water'],
+  soldier: ['Gaming Set', 'Vehicle Land'],
+  urchin: ['Disguise Kit', "Thieves' Tools"],
+};
+
 function makeId() {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   return Array.from({ length: 16 }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join('');
@@ -242,6 +314,26 @@ function resolveSkillId(value) {
   return SKILL_ALIAS_TO_ID[normalizeSkillLabel(value)];
 }
 
+function normalizeProficiencyLabel(value) {
+  return String(value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z\s':-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function parseLanguageEntry(value) {
+  const normalized = normalizeProficiencyLabel(value).replace(/^language:\s*/, '');
+  return LANGUAGE_ALIAS_TO_ID[normalized];
+}
+
+function parseToolEntry(value) {
+  const normalized = normalizeProficiencyLabel(value).replace(/^tool:\s*/, '');
+  return TOOL_ALIAS_TO_ID[normalized];
+}
+
 function buildSkills(canonicalBuild) {
   const skills = makeSkills();
   const backgroundId = canonicalBuild?.background?.backgroundId || '';
@@ -258,6 +350,46 @@ function buildSkills(canonicalBuild) {
   });
 
   return skills;
+}
+
+function makeTool(ability, customLabel) {
+  return {
+    ability,
+    bonus: '',
+    value: 1,
+    prof: 1,
+    roll: { min: null, max: null, mode: 0 },
+    custom: customLabel || '',
+  };
+}
+
+function buildTools(canonicalBuild) {
+  const tools = {};
+  const backgroundId = canonicalBuild?.background?.backgroundId || '';
+  const backgroundTools = BACKGROUND_TOOL_PROFS_BY_ID[backgroundId] || [];
+  const entries = [...backgroundTools, ...(canonicalBuild?.choices?.proficiencies || [])];
+
+  entries.forEach(entry => {
+    const tool = parseToolEntry(entry);
+    if (!tool) return;
+    tools[tool.id] = makeTool(tool.ability, tool.label);
+  });
+
+  return tools;
+}
+
+function buildLanguages(canonicalBuild) {
+  const backgroundId = canonicalBuild?.background?.backgroundId || '';
+  const backgroundLanguages = BACKGROUND_LANGUAGE_PROFS_BY_ID[backgroundId] || [];
+  const selectedLanguages = (canonicalBuild?.choices?.proficiencies || [])
+    .map(parseLanguageEntry)
+    .filter(Boolean);
+
+  return {
+    value: Array.from(new Set([...backgroundLanguages, ...selectedLanguages])),
+    custom: '',
+    communication: {},
+  };
 }
 
 function buildClassItems(canonicalBuild) {
@@ -495,7 +627,7 @@ function buildTraitData(canonicalBuild) {
     dv: { value: [], custom: '', bypasses: [] },
     dm: { amount: {}, bypasses: [] },
     ci: { value: [], custom: '' },
-    languages: { value: [], custom: '', communication: {} },
+    languages: buildLanguages(canonicalBuild),
     weaponProf: {
       value: [],
       custom: profs.weapons.join(', '),
@@ -552,7 +684,7 @@ export function buildFoundryActorPreview(canonicalBuild) {
       },
       abilities: buildAbilities(canonicalBuild),
       skills: buildSkills(canonicalBuild),
-      tools: {},
+      tools: buildTools(canonicalBuild),
       attributes: {
         ac: { flat: canonicalBuild?.derived?.ac || 10 },
         hp: {
