@@ -37,6 +37,82 @@ const CLASS_PROFS_BY_ID: Record<string, { armor: string[]; weapons: string[] }> 
   artificer: { armor: ["light", "medium", "shields"], weapons: ["simple"] },
 };
 
+const CLASS_SAVE_PROFS_BY_ID: Record<string, Array<keyof ReturnType<typeof buildFoundryAbilities>>> = {
+  barbarian: ["str", "con"],
+  bard: ["dex", "cha"],
+  cleric: ["wis", "cha"],
+  druid: ["int", "wis"],
+  fighter: ["str", "con"],
+  monk: ["str", "dex"],
+  paladin: ["wis", "cha"],
+  ranger: ["str", "dex"],
+  rogue: ["dex", "int"],
+  sorcerer: ["con", "cha"],
+  warlock: ["wis", "cha"],
+  wizard: ["int", "wis"],
+  artificer: ["con", "int"],
+};
+
+const BACKGROUND_SKILL_PROFS_BY_ID: Record<string, string[]> = {
+  acolyte: ["ins", "rel"],
+  charlatan: ["dec", "slt"],
+  criminal: ["dec", "ste"],
+  entertainer: ["acr", "prf"],
+  "folk-hero": ["ani", "sur"],
+  "guild-artisan": ["ins", "per"],
+  hermit: ["med", "rel"],
+  noble: ["his", "per"],
+  outlander: ["ath", "sur"],
+  sage: ["arc", "his"],
+  sailor: ["ath", "prc"],
+  soldier: ["ath", "itm"],
+  urchin: ["slt", "ste"],
+};
+
+const SKILL_ALIAS_TO_ID: Record<string, string> = {
+  acrobatics: "acr",
+  acrobacia: "acr",
+  "animal handling": "ani",
+  "manejo de animales": "ani",
+  arcana: "arc",
+  athletics: "ath",
+  atletismo: "ath",
+  deception: "dec",
+  engaño: "dec",
+  engano: "dec",
+  history: "his",
+  historia: "his",
+  insight: "ins",
+  intuicion: "ins",
+  intuición: "ins",
+  intimidation: "itm",
+  intimidacion: "itm",
+  intimidación: "itm",
+  investigation: "inv",
+  investigacion: "inv",
+  investigación: "inv",
+  medicine: "med",
+  medicina: "med",
+  nature: "nat",
+  naturaleza: "nat",
+  perception: "prc",
+  percepcion: "prc",
+  percepción: "prc",
+  performance: "prf",
+  interpretacion: "prf",
+  interpretación: "prf",
+  persuasion: "per",
+  persuasione: "per",
+  religion: "rel",
+  religione: "rel",
+  "sleight of hand": "slt",
+  "juego de manos": "slt",
+  stealth: "ste",
+  sigilo: "ste",
+  survival: "sur",
+  supervivencia: "sur",
+};
+
 function makeId(): string {
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   return Array.from({ length: 16 }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join("");
@@ -68,22 +144,24 @@ function makeStats() {
 
 function buildFoundryAbilities(character: CharacterBuild) {
   const modifiers = abilityModifierMap(character.abilities.final);
+  const primaryClassId = normalizeClassId(character.classing.classes[0]?.classId ?? "");
+  const saveProficiencies = new Set(CLASS_SAVE_PROFS_BY_ID[primaryClassId] ?? []);
 
   return {
-    str: makeAbility(character.abilities.final.str, modifiers.str),
-    dex: makeAbility(character.abilities.final.dex, modifiers.dex),
-    con: makeAbility(character.abilities.final.con, modifiers.con),
-    int: makeAbility(character.abilities.final.int, modifiers.int),
-    wis: makeAbility(character.abilities.final.wis, modifiers.wis),
-    cha: makeAbility(character.abilities.final.cha, modifiers.cha),
+    str: makeAbility(character.abilities.final.str, modifiers.str, saveProficiencies.has("str")),
+    dex: makeAbility(character.abilities.final.dex, modifiers.dex, saveProficiencies.has("dex")),
+    con: makeAbility(character.abilities.final.con, modifiers.con, saveProficiencies.has("con")),
+    int: makeAbility(character.abilities.final.int, modifiers.int, saveProficiencies.has("int")),
+    wis: makeAbility(character.abilities.final.wis, modifiers.wis, saveProficiencies.has("wis")),
+    cha: makeAbility(character.abilities.final.cha, modifiers.cha, saveProficiencies.has("cha")),
   };
 }
 
-function makeAbility(value: number, modifier: number) {
+function makeAbility(value: number, modifier: number, saveProficient: boolean) {
   return {
     value,
     mod: modifier,
-    proficient: 0,
+    proficient: saveProficient ? 1 : 0,
     bonuses: { check: "", save: "" },
   };
 }
@@ -118,6 +196,38 @@ function makeSkills() {
     ste: makeSkill("dex"),
     sur: makeSkill("wis"),
   };
+}
+
+function normalizeSkillLabel(value: string) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function resolveSkillId(value: string) {
+  return SKILL_ALIAS_TO_ID[normalizeSkillLabel(value)];
+}
+
+function buildSkills(character: CharacterBuild) {
+  const skills = makeSkills();
+  const backgroundSkillIds = BACKGROUND_SKILL_PROFS_BY_ID[character.background.backgroundId] ?? [];
+  const selectedSkillIds = character.choices.proficiencies
+    .map((entry) => resolveSkillId(entry))
+    .filter((entry): entry is string => Boolean(entry));
+
+  const proficientSkills = new Set([...backgroundSkillIds, ...selectedSkillIds]);
+
+  for (const skillId of proficientSkills) {
+    if (skillId in skills) {
+      skills[skillId as keyof typeof skills].value = 1;
+    }
+  }
+
+  return skills;
 }
 
 function makeToken(name: string) {
@@ -584,7 +694,7 @@ export function buildFoundryActorPayload(character: CharacterBuild): FoundryActo
         abilities: { check: "", save: "", skill: "" },
         spell: { dc: "" },
       },
-      skills: makeSkills(),
+      skills: buildSkills(character),
       tools: {},
       attributes: {
         ac: {

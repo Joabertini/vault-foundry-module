@@ -686,3 +686,20 @@ Impacto:
 - la exportacion web deja de parecer un preview minimo y se acerca mas a un actor listo;
 - reducimos la brecha entre el builder nuevo y el flujo legacy del modulo;
 - mejora la base para una importacion mas confiable dentro de Foundry.
+
+### Exportacion Foundry con salvaciones y pericias base
+
+Se mejoro el exportador compartido para que el actor resultante respete mejor competencias basicas del personaje.
+
+Ahora incluye:
+
+- proficiencias de salvacion derivadas por clase principal;
+- pericias base derivadas por background clasico;
+- lectura de `choices.proficiencies` para futuras selecciones mas estructuradas;
+- `system.skills` menos vacio y mas cercano a un actor util en Foundry.
+
+Impacto:
+
+- el actor exportado refleja mejor lo que el personaje sabe hacer;
+- reducimos una diferencia importante entre "personaje armado" y "actor realmente jugable";
+- dejamos preparada la base para exponer estas elecciones con mas detalle en la UI mas adelante.
