@@ -669,3 +669,20 @@ Impacto:
 - el builder gana otra capa de estructura por encima del texto libre;
 - los rasgos del personaje quedan mas claros y mas faciles de revisar;
 - seguimos acercando la experiencia al comportamiento de un builder real.
+
+### Actor Foundry con estructura mas completa
+
+Se reforzo el exportador compartido para que el actor exportado se acerque mas al formato completo de Foundry dnd5e.
+
+Ahora incluye:
+
+- `prototypeToken`;
+- `_stats`, `ownership` y `folder`;
+- `currency`, `bonuses`, `skills`, `tools`, `resources` y `favorites`;
+- atributos adicionales de actor que antes no estaban presentes en la salida compartida.
+
+Impacto:
+
+- la exportacion web deja de parecer un preview minimo y se acerca mas a un actor listo;
+- reducimos la brecha entre el builder nuevo y el flujo legacy del modulo;
+- mejora la base para una importacion mas confiable dentro de Foundry.

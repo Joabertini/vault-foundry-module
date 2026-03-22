@@ -8,6 +8,10 @@ export const foundryActorPayloadSchema = z.object({
   items: z.array(z.record(z.string(), z.unknown())).default([]),
   effects: z.array(z.record(z.string(), z.unknown())).default([]),
   flags: z.record(z.string(), z.unknown()).default({}),
+  prototypeToken: z.record(z.string(), z.unknown()).optional(),
+  folder: z.unknown().optional(),
+  ownership: z.record(z.string(), z.unknown()).optional(),
+  _stats: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type FoundryActorPayload = z.infer<typeof foundryActorPayloadSchema>;

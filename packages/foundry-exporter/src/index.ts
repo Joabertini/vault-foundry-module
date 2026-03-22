@@ -88,6 +88,105 @@ function makeAbility(value: number, modifier: number) {
   };
 }
 
+function makeSkill(ability: string) {
+  return {
+    ability,
+    roll: { min: null, max: null, mode: 0 },
+    value: 0,
+    bonuses: { check: "", passive: "" },
+  };
+}
+
+function makeSkills() {
+  return {
+    acr: makeSkill("dex"),
+    ani: makeSkill("wis"),
+    arc: makeSkill("int"),
+    ath: makeSkill("str"),
+    dec: makeSkill("cha"),
+    his: makeSkill("int"),
+    ins: makeSkill("wis"),
+    itm: makeSkill("cha"),
+    inv: makeSkill("int"),
+    med: makeSkill("wis"),
+    nat: makeSkill("int"),
+    prc: makeSkill("wis"),
+    prf: makeSkill("cha"),
+    per: makeSkill("cha"),
+    rel: makeSkill("int"),
+    slt: makeSkill("dex"),
+    ste: makeSkill("dex"),
+    sur: makeSkill("wis"),
+  };
+}
+
+function makeToken(name: string) {
+  return {
+    name,
+    displayName: 0,
+    actorLink: true,
+    width: 1,
+    height: 1,
+    texture: {
+      src: "systems/dnd5e/icons/svg/actors/character.svg",
+      anchorX: 0.5,
+      anchorY: 0.5,
+      offsetX: 0,
+      offsetY: 0,
+      fit: "contain",
+      scaleX: 1,
+      scaleY: 1,
+      rotation: 0,
+      tint: "#ffffff",
+      alphaThreshold: 0.75,
+    },
+    lockRotation: false,
+    rotation: 0,
+    alpha: 1,
+    disposition: 1,
+    displayBars: 0,
+    bar1: { attribute: "attributes.hp" },
+    bar2: { attribute: null },
+    light: {
+      negative: false,
+      priority: 0,
+      alpha: 0.5,
+      angle: 360,
+      bright: 0,
+      color: null,
+      coloration: 1,
+      dim: 0,
+      attenuation: 0.5,
+      luminosity: 0.5,
+      saturation: 0,
+      contrast: 0,
+      shadows: 0,
+      animation: { type: null, speed: 5, intensity: 5, reverse: false },
+      darkness: { min: 0, max: 1 },
+    },
+    sight: {
+      enabled: true,
+      range: 0,
+      angle: 360,
+      visionMode: "basic",
+      color: null,
+      attenuation: 0.1,
+      brightness: 0,
+      saturation: 0,
+      contrast: 0,
+    },
+    detectionModes: [],
+    occludable: { radius: 0 },
+    ring: { enabled: false, colors: { ring: null, background: null }, effects: 1, subject: { scale: 1, texture: null } },
+    turnMarker: { mode: 1, animation: null, src: null, disposition: false },
+    movementAction: null,
+    flags: {},
+    randomImg: false,
+    appendNumber: false,
+    prependAdjective: false,
+  };
+}
+
 function buildClassItems(character: CharacterBuild): FoundryItem[] {
   return character.classing.classes.map((entry) => {
     const classId = normalizeClassId(entry.classId);
@@ -475,7 +574,18 @@ export function buildFoundryActorPayload(character: CharacterBuild): FoundryActo
     type: "character",
     img: "systems/dnd5e/icons/svg/actors/character.svg",
     system: {
+      currency: { pp: 0, gp: 0, ep: 0, sp: 0, cp: 0 },
       abilities: buildFoundryAbilities(character),
+      bonuses: {
+        mwak: { attack: "", damage: "" },
+        rwak: { attack: "", damage: "" },
+        msak: { attack: "", damage: "" },
+        rsak: { attack: "", damage: "" },
+        abilities: { check: "", save: "", skill: "" },
+        spell: { dc: "" },
+      },
+      skills: makeSkills(),
+      tools: {},
       attributes: {
         ac: {
           flat: character.derived.ac,
@@ -485,7 +595,34 @@ export function buildFoundryActorPayload(character: CharacterBuild): FoundryActo
           max: character.derived.hp,
         },
         spellcasting: character.derived.spellcasting?.ability ?? "",
+        init: { ability: "", roll: { min: null, max: null, mode: 0 }, bonus: "" },
+        movement: { units: null, hover: false, ignoredDifficultTerrain: [] },
+        attunement: { max: 3 },
+        senses: {
+          darkvision: null,
+          blindsight: null,
+          tremorsense: null,
+          truesight: null,
+          units: null,
+          special: "",
+        },
+        exhaustion: 0,
+        concentration: {
+          ability: "",
+          roll: { min: null, max: null, mode: 0 },
+          bonuses: { save: "" },
+          limit: 1,
+        },
+        loyalty: {},
+        death: {
+          roll: { min: null, max: null, mode: 0 },
+          success: 0,
+          failure: 0,
+          bonuses: { save: "" },
+        },
+        inspiration: false,
       },
+      bastion: { name: "", description: "" },
       details: {
         alignment: character.identity.alignment ?? "",
         biography: { value: buildBiography(character), public: "" },
@@ -500,6 +637,12 @@ export function buildFoundryActorPayload(character: CharacterBuild): FoundryActo
       },
       spells: character.derived.spellcasting?.slots ?? {},
       traits: buildTraitData(character),
+      resources: {
+        primary: { value: 0, max: 0, sr: false, lr: false, label: "" },
+        secondary: { value: 0, max: 0, sr: false, lr: false, label: "" },
+        tertiary: { value: 0, max: 0, sr: false, lr: false, label: "" },
+      },
+      favorites: [],
     },
     items: buildItems(character),
     effects: [],
@@ -509,6 +652,10 @@ export function buildFoundryActorPayload(character: CharacterBuild): FoundryActo
         rulesVersion: character.meta.rulesVersion,
       },
     },
+    prototypeToken: makeToken(character.identity.characterName),
+    folder: null,
+    ownership: { default: 0 },
+    _stats: makeStats(),
   };
 
   return foundryActorPayloadSchema.parse(payload);
