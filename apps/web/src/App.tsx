@@ -7,7 +7,6 @@ import {
   buildCanonicalSnapshot,
   coerceBuilderState,
   initialState,
-  proficiencyBonus,
 } from "./builder";
 
 const classOptions = [
@@ -104,14 +103,12 @@ export function App() {
   const [exportState, setExportState] = useState("Listo para exportar");
   const [foundryExportState, setFoundryExportState] = useState("Preview Foundry lista");
 
-  const pb = proficiencyBonus(state.level);
-  const intMod = abilityModifier(state.int);
-  const dexMod = abilityModifier(state.dex);
-  const conMod = abilityModifier(state.con);
-  const ac = 10 + dexMod;
-  const hp = 6 + conMod + Math.max(state.level - 1, 0) * (4 + conMod);
   const canonicalSnapshot = buildCanonicalSnapshot(state);
   const foundryPreview = buildFoundryActorPayload(canonicalSnapshot);
+  const pb = canonicalSnapshot.derived.proficiencyBonus;
+  const ac = canonicalSnapshot.derived.ac;
+  const hp = canonicalSnapshot.derived.hp;
+  const spellDc = canonicalSnapshot.derived.spellcasting?.saveDC ?? 0;
   const listedSpells = canonicalSnapshot.choices.spells;
   const listedFeatures = canonicalSnapshot.choices.features;
   const listedEquipment = canonicalSnapshot.choices.equipment;
@@ -502,7 +499,7 @@ export function App() {
               </div>
               <div>
                 <span>Spell DC</span>
-                <strong>{8 + pb + intMod}</strong>
+                <strong>{spellDc || "-"}</strong>
               </div>
             </div>
 

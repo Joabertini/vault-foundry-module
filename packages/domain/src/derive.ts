@@ -1,4 +1,5 @@
 import { type CharacterBuild, characterBuildSchema } from "@bertinis-vault/contracts";
+import { getArmorCatalogEntry } from "@bertinis-vault/data-engine";
 import { abilityModifierMap } from "./abilities";
 import { calculateArmorClass, calculateEstimatedHitPoints } from "./combat";
 import {
@@ -26,10 +27,17 @@ export function deriveCharacterBuild(
     constitutionModifier: modifiers.con,
   });
 
+  const armorEntry = input.choices.equipment
+    .map((entry) => getArmorCatalogEntry(entry))
+    .find((entry) => Boolean(entry));
+  const hasShield = input.choices.equipment
+    .map((entry) => getArmorCatalogEntry(entry))
+    .some((entry) => entry?.grantsShieldBonus);
+
   const ac = calculateArmorClass({
-    armorFormula: "10+DEX",
+    armorFormula: armorEntry?.armorFormula ?? "10+DEX",
     dexModifier: modifiers.dex,
-    hasShield: false,
+    hasShield,
   });
 
   const spellcasting = spellAbility

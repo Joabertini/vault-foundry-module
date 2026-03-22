@@ -350,3 +350,19 @@ Impacto:
 - la web puede levantar en modo dev sin exigir builds previos de cada paquete;
 - reduce friccion para revisar la UI localmente;
 - mejora el flujo diario de trabajo del proyecto.
+
+### Calculo de AC mas realista en la capa compartida
+
+Se mejoro la derivacion del personaje para que tenga en cuenta mejor la proteccion elegida.
+
+Ahora incluye:
+
+- catalogo inicial de armaduras compartido en `data-engine`;
+- deteccion de armadura y escudo desde `choices.equipment`;
+- uso de `derived.ac` dentro de la sheet web.
+
+Impacto:
+
+- la web y Foundry quedan mas alineados en defensa real del personaje;
+- el dominio deja de asumir siempre `10 + DEX`;
+- seguimos moviendo reglas concretas al motor compartido del proyecto.
