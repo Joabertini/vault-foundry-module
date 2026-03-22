@@ -135,3 +135,20 @@ test("buildFoundryExportResult omits payload when preflight has blockers", () =>
   assert.equal(result.preflight.summary.blockers, 1);
   assert.equal(result.payload, undefined);
 });
+
+test("buildFoundryExportResult propagates richer warnings from preflight", () => {
+  const build = makeCharacterBuild();
+  build.choices.normalized.spells = [{ spellId: "fireball", label: "Shield", level: 1 }];
+  build.choices.normalized.equipment = [
+    { itemId: "shield", label: "Shield", quantity: 1, category: "armor" },
+  ];
+
+  const result = buildFoundryExportResult(build);
+
+  assert.equal(result.preflight.ok, true);
+  assert.equal(result.preflight.summary.warnings, 3);
+  assert.deepEqual(
+    result.preflight.issues.map((issue) => issue.code),
+    ["SPELL_ID_LABEL_MISMATCH", "SPELL_LEVEL_MISMATCH", "EQUIPMENT_CATEGORY_MISMATCH"],
+  );
+});

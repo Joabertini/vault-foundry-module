@@ -102,3 +102,48 @@ test("buildPreflightResult returns warnings for unresolved normalized choices", 
     ["UNKNOWN_CHOSEN_FEAT_ID", "UNRESOLVED_SPELL", "UNRESOLVED_EQUIPMENT"],
   );
 });
+
+test("buildPreflightResult blocks builds whose total class levels exceed 20", () => {
+  const result = buildPreflightResult(makeInput({
+    classing: {
+      classes: [
+        { classId: "wizard", level: 12 },
+        { classId: "fighter", level: 9 },
+      ],
+    },
+  }), {
+    generatedAt: "2026-03-22T00:00:00.000Z",
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.summary.blockers, 1);
+  assert.equal(result.issues[0].code, "TOTAL_LEVEL_EXCEEDS_20");
+});
+
+test("buildPreflightResult warns on spell id mismatches and equipment category mismatches", () => {
+  const result = buildPreflightResult(makeInput({
+    choices: {
+      feats: [],
+      proficiencies: [],
+      spells: [],
+      equipment: [],
+      features: [],
+      normalized: {
+        feats: [],
+        proficiencies: [],
+        spells: [{ spellId: "fireball", label: "Shield", level: 1 }],
+        equipment: [{ itemId: "shield", label: "Shield", category: "armor", quantity: 1 }],
+        features: [],
+      },
+    },
+  }), {
+    generatedAt: "2026-03-22T00:00:00.000Z",
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.summary.warnings, 3);
+  assert.deepEqual(
+    result.issues.map((issue) => issue.code),
+    ["SPELL_ID_LABEL_MISMATCH", "SPELL_LEVEL_MISMATCH", "EQUIPMENT_CATEGORY_MISMATCH"],
+  );
+});

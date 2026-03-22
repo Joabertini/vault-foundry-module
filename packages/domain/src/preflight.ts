@@ -55,6 +55,21 @@ function makeIssue(issue: PreflightIssue): PreflightIssue {
 
 function validateCanonicalCatalogs(character: CharacterBuild) {
   const issues: PreflightIssue[] = [];
+  const totalLevels = character.classing.classes.reduce((sum, entry) => sum + entry.level, 0);
+
+  if (totalLevels > 20) {
+    issues.push(makeIssue({
+      code: "TOTAL_LEVEL_EXCEEDS_20",
+      message: `Total class levels add up to ${totalLevels}, which exceeds the 5e maximum of 20.`,
+      severity: "blocker",
+      scope: "canonical-build",
+      path: "classing.classes",
+      source: "domain",
+      details: {
+        totalLevels,
+      },
+    }));
+  }
 
   for (const [index, entry] of character.classing.classes.entries()) {
     if (!getClassCatalogEntry(entry.classId)) {
@@ -134,9 +149,9 @@ function validateNormalizedChoices(character: CharacterBuild) {
   }
 
   for (const [index, spell] of normalizedChoices.spells.entries()) {
-    const catalogEntry = spell.spellId
-      ? getSpellCatalogEntry(spell.spellId)
-      : getSpellCatalogEntry(spell.label);
+    const catalogById = spell.spellId ? getSpellCatalogEntry(spell.spellId) : undefined;
+    const catalogByLabel = getSpellCatalogEntry(spell.label);
+    const catalogEntry = catalogById ?? catalogByLabel;
 
     if (!catalogEntry) {
       issues.push(makeIssue({
@@ -149,6 +164,22 @@ function validateNormalizedChoices(character: CharacterBuild) {
         canonicalId: spell.spellId,
       }));
       continue;
+    }
+
+    if (catalogById && catalogByLabel && catalogById.id !== catalogByLabel.id) {
+      issues.push(makeIssue({
+        code: "SPELL_ID_LABEL_MISMATCH",
+        message: `Spell entry "${spell.label}" resolves to "${catalogByLabel.id}", but provided spellId was "${spell.spellId}".`,
+        severity: "warning",
+        scope: "canonical-build",
+        path: `choices.normalized.spells[${index}]`,
+        source: "domain",
+        canonicalId: spell.spellId,
+        details: {
+          resolvedFromLabel: catalogByLabel.id,
+          resolvedFromId: catalogById.id,
+        },
+      }));
     }
 
     if (catalogEntry.level !== spell.level) {
@@ -170,10 +201,10 @@ function validateNormalizedChoices(character: CharacterBuild) {
 
   for (const [index, item] of normalizedChoices.equipment.entries()) {
     const lookupValue = item.itemId ?? item.label;
-    const catalogEntry =
-      getArmorCatalogEntry(lookupValue)
-      ?? getWeaponCatalogEntry(lookupValue)
-      ?? getGearCatalogEntry(lookupValue);
+    const armorEntry = getArmorCatalogEntry(lookupValue);
+    const weaponEntry = getWeaponCatalogEntry(lookupValue);
+    const gearEntry = getGearCatalogEntry(lookupValue);
+    const catalogEntry = armorEntry ?? weaponEntry ?? gearEntry;
 
     if (!catalogEntry) {
       issues.push(makeIssue({
@@ -184,6 +215,31 @@ function validateNormalizedChoices(character: CharacterBuild) {
         path: `choices.normalized.equipment[${index}]`,
         source: "domain",
         canonicalId: item.itemId,
+      }));
+      continue;
+    }
+
+    const expectedCategory = armorEntry
+      ? (armorEntry.grantsShieldBonus ? "shield" : "armor")
+      : weaponEntry
+        ? "weapon"
+        : gearEntry
+          ? "gear"
+          : "other";
+
+    if (item.category !== expectedCategory && !(item.category === "other" && expectedCategory === "gear")) {
+      issues.push(makeIssue({
+        code: "EQUIPMENT_CATEGORY_MISMATCH",
+        message: `Equipment "${item.label}" is categorized as "${item.category}", but the shared catalog expects "${expectedCategory}".`,
+        severity: "warning",
+        scope: "canonical-build",
+        path: `choices.normalized.equipment[${index}].category`,
+        source: "domain",
+        canonicalId: item.itemId ?? ("id" in catalogEntry ? catalogEntry.id : undefined),
+        details: {
+          expectedCategory,
+          providedCategory: item.category,
+        },
       }));
     }
   }

@@ -171,6 +171,32 @@ Impacto:
 - el camino operativo de import/export queda mucho mas cerca del benchmark procesal definido para el proyecto;
 - el siguiente paso natural es reemplazar este bridge temporal por consumo mas directo del carril compartido cuando el modulo legacy deje de ser el centro del runtime.
 
+### Matriz inicial de edge cases para preflight
+
+Se reforzo el preflight compartido con checks mas cercanos a fallas reales de build y de normalizacion.
+
+Ahora incluye:
+
+- blocker nuevo `TOTAL_LEVEL_EXCEEDS_20` cuando la suma de multiclass supera el maximo de nivel 20;
+- warning nuevo `SPELL_ID_LABEL_MISMATCH` cuando `spellId` y `label` resuelven a spells distintos;
+- warning nuevo `SPELL_LEVEL_MISMATCH` cuando el nivel informado no coincide con el catalogo compartido;
+- warning nuevo `EQUIPMENT_CATEGORY_MISMATCH` cuando la categoria normalizada no coincide con el catalogo compartido;
+- tests ampliados en `packages/domain/test/preflight.test.mjs`;
+- tests ampliados en `packages/foundry-exporter/test/index.test.mjs` para verificar propagacion de warnings mas ricos.
+
+Validacion ejecutada:
+
+- build de `packages/domain` correcto;
+- build de `packages/foundry-exporter` correcto;
+- `node --test packages/domain/test/preflight.test.mjs` pasando;
+- `node --test packages/foundry-exporter/test/index.test.mjs` pasando.
+
+Impacto:
+
+- el preflight deja de cubrir solo "ids faltantes" y empieza a detectar inconsistencias internas del build canonico;
+- exporter y runtime heredan mejores diagnosticos sin agregar logica paralela;
+- el siguiente paso natural es ampliar fixtures reales de spellcasting, proficiencies y multiclass antes de converger mas codigo legacy.
+
 ### Base architecture bootstrap
 
 Se agrego la base inicial del monorepo sin romper el prototipo actual de Foundry.
