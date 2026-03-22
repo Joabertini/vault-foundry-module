@@ -13,6 +13,33 @@ import {
 
 type FoundryItem = Record<string, unknown>;
 
+const CLASS_PROFS_BY_ID: Record<string, { armor: string[]; weapons: string[] }> = {
+  barbarian: { armor: ["light", "medium", "shields"], weapons: ["simple", "martial"] },
+  bard: { armor: ["light"], weapons: ["simple", "hand crossbow", "longsword", "rapier", "shortsword"] },
+  cleric: { armor: ["light", "medium", "shields"], weapons: ["simple"] },
+  druid: {
+    armor: ["light", "medium", "shields"],
+    weapons: ["clubs", "daggers", "darts", "javelins", "maces", "quarterstaffs", "scimitars", "sickles", "slings", "spears"],
+  },
+  fighter: { armor: ["light", "medium", "heavy", "shields"], weapons: ["simple", "martial"] },
+  monk: { armor: [], weapons: ["simple", "shortswords"] },
+  paladin: { armor: ["light", "medium", "heavy", "shields"], weapons: ["simple", "martial"] },
+  ranger: { armor: ["light", "medium", "shields"], weapons: ["simple", "martial"] },
+  rogue: { armor: ["light"], weapons: ["simple", "hand crossbow", "longsword", "rapier", "shortsword"] },
+  sorcerer: { armor: [], weapons: ["daggers", "darts", "slings", "quarterstaffs", "light crossbows"] },
+  warlock: { armor: ["light"], weapons: ["simple"] },
+  wizard: { armor: [], weapons: ["daggers", "darts", "slings", "quarterstaffs", "light crossbows"] },
+  artificer: { armor: ["light", "medium", "shields"], weapons: ["simple"] },
+};
+
+const WEAPON_CATALOG = [
+  { name: "dagger", itemType: "simpleM", damage: "1d4", damageType: "piercing", attackType: "melee" },
+  { name: "mace", itemType: "simpleM", damage: "1d6", damageType: "bludgeoning", attackType: "melee" },
+  { name: "quarterstaff", itemType: "simpleM", damage: "1d6", damageType: "bludgeoning", attackType: "melee" },
+  { name: "longsword", itemType: "martialM", damage: "1d8", damageType: "slashing", attackType: "melee" },
+  { name: "shortbow", itemType: "simpleR", damage: "1d6", damageType: "piercing", attackType: "ranged" },
+];
+
 function makeId(): string {
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   return Array.from({ length: 16 }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join("");
@@ -214,11 +241,152 @@ function buildFeatItems(character: CharacterBuild): FoundryItem[] {
   return [...backgroundFeats, ...chosenFeats, ...featureItems];
 }
 
+function parseDamageFormula(formula: string) {
+  const match = formula.match(/(\d+)d(\d+)/i);
+
+  return {
+    number: match ? Number.parseInt(match[1], 10) : 1,
+    denomination: match ? Number.parseInt(match[2], 10) : 6,
+  };
+}
+
+function findWeaponData(name: string) {
+  const normalizedName = name.trim().toLowerCase();
+  return WEAPON_CATALOG.find((weapon) => normalizedName.includes(weapon.name));
+}
+
+function buildWeaponItem(name: string): FoundryItem {
+  const weaponData = findWeaponData(name);
+  const activityId = "dnd5eactivity000";
+  const damage = parseDamageFormula(weaponData?.damage ?? "1d6");
+
+  return {
+    _id: makeId(),
+    name,
+    type: "weapon",
+    img: "icons/svg/sword.svg",
+    system: {
+      source: { custom: "", book: "", page: "", license: "", rules: "2014", revision: 1 },
+      description: { value: "", chat: "" },
+      quantity: 1,
+      weight: { value: 0, units: "lb" },
+      price: { value: 0, denomination: "gp" },
+      attunement: { required: false },
+      equipped: true,
+      identified: true,
+      rarity: "common",
+      uses: { max: "", recovery: [], spent: 0 },
+      activation: { type: "action", value: 1, condition: "" },
+      duration: { value: "", units: "inst" },
+      target: { template: { contiguous: false, units: "ft" }, affects: { count: "1", type: "creature", choice: false } },
+      range: { value: null, units: "ft" },
+      damage: {
+        base: {
+          number: damage.number,
+          denomination: damage.denomination,
+          bonus: "",
+          types: [weaponData?.damageType ?? "slashing"],
+          custom: { enabled: false },
+          scaling: { mode: "whole", number: 1, formula: "" },
+        },
+      },
+      type: { value: weaponData?.itemType ?? "simpleM", baseItem: "" },
+      properties: [],
+      proficient: null,
+      activities: {
+        [activityId]: {
+          _id: activityId,
+          type: "attack",
+          activation: { type: "action", value: null, override: false },
+          consumption: { targets: [], scaling: { allowed: false, max: "" }, spellSlot: false },
+          description: { chatFlavor: "" },
+          duration: { units: "inst", concentration: false, override: false },
+          effects: [],
+          range: { override: false, units: "ft" },
+          target: { prompt: true, template: { contiguous: false, units: "ft" }, affects: { choice: false }, override: false },
+          attack: {
+            ability: "",
+            bonus: "",
+            critical: { threshold: null },
+            flat: false,
+            type: { value: weaponData?.attackType ?? "melee", classification: "weapon" },
+          },
+          damage: {
+            critical: { bonus: "" },
+            includeBase: true,
+            parts: [
+              {
+                number: damage.number,
+                denomination: damage.denomination,
+                bonus: "",
+                types: [weaponData?.damageType ?? "slashing"],
+                custom: { enabled: false, formula: "" },
+                scaling: { mode: "whole", number: 1, formula: "" },
+              },
+            ],
+          },
+          uses: { spent: 0, recovery: [] },
+          sort: 0,
+          flags: {},
+        },
+      },
+      identifier: slugify(name),
+    },
+    flags: {},
+    effects: [],
+    _stats: makeStats(),
+    folder: null,
+    sort: 0,
+    ownership: { default: 0 },
+  };
+}
+
+function buildBiography(character: CharacterBuild) {
+  const biography = character.identity.biography ?? {};
+  const lines: string[] = [];
+
+  if (biography.trait) lines.push(`<p><em>Trait:</em> ${biography.trait}</p>`);
+  if (biography.ideal) lines.push(`<p><em>Ideal:</em> ${biography.ideal}</p>`);
+  if (biography.bond) lines.push(`<p><em>Bond:</em> ${biography.bond}</p>`);
+  if (biography.flaw) lines.push(`<p><em>Flaw:</em> ${biography.flaw}</p>`);
+  if (biography.notes) lines.push(`<p><em>Notes:</em> ${biography.notes}</p>`);
+
+  return lines.join("");
+}
+
+function buildTraitData(character: CharacterBuild) {
+  const primaryClassId = normalizeClassId(character.classing.classes[0]?.classId ?? "");
+  const profs = CLASS_PROFS_BY_ID[primaryClassId] ?? { armor: [], weapons: [] };
+
+  return {
+    size: "med",
+    di: { value: [], custom: "", bypasses: [] },
+    dr: { value: [], custom: "", bypasses: [] },
+    dv: { value: [], custom: "", bypasses: [] },
+    dm: { amount: {}, bypasses: [] },
+    ci: { value: [], custom: "" },
+    languages: { value: [], custom: "", communication: {} },
+    weaponProf: {
+      value: [],
+      custom: profs.weapons.join(", "),
+      mastery: { value: [], bonus: [] },
+    },
+    armorProf: {
+      value: profs.armor.filter((type) => ["light", "medium", "heavy"].includes(type)),
+      custom: profs.armor.includes("shields") ? "shields" : "",
+    },
+  };
+}
+
 function buildItems(character: CharacterBuild): FoundryItem[] {
+  const primaryWeapon = character.choices.equipment.find((item) => Boolean(findWeaponData(item)));
+  const weaponItems = primaryWeapon ? [buildWeaponItem(primaryWeapon)] : [];
+
   return [
     ...buildClassItems(character),
     ...buildFeatItems(character),
     ...buildSpellItems(character),
+    ...weaponItems,
   ];
 }
 
@@ -241,8 +409,18 @@ export function buildFoundryActorPayload(character: CharacterBuild): FoundryActo
       },
       details: {
         alignment: character.identity.alignment ?? "",
+        biography: { value: buildBiography(character), public: "" },
+        race: character.ancestry.raceId,
+        background: character.background.backgroundId,
+        originalClass: character.classing.classes[0]?.classId ?? "",
+        trait: character.identity.biography?.trait ?? "",
+        appearance: "",
+        ideal: character.identity.biography?.ideal ?? "",
+        bond: character.identity.biography?.bond ?? "",
+        flaw: character.identity.biography?.flaw ?? "",
       },
       spells: character.derived.spellcasting?.slots ?? {},
+      traits: buildTraitData(character),
     },
     items: buildItems(character),
     effects: [],

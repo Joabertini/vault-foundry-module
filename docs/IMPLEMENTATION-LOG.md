@@ -284,3 +284,19 @@ Impacto:
 - la web ya no exporta solo el formato interno;
 - acerca mucho mas el builder al flujo final de Foundry;
 - reduce la distancia entre la experiencia web y el modulo actual.
+
+### Payload Foundry mas rico en la capa compartida
+
+Se reforzo el exportador Foundry compartido para producir un actor mas completo.
+
+Ahora incluye:
+
+- biografia y detalles descriptivos dentro de `system.details`;
+- proficiencias de armas y armaduras dentro de `system.traits`;
+- arma principal reconocida como item de tipo `weapon`.
+
+Impacto:
+
+- la preview Foundry web se parece mas al actor real esperado;
+- el exportador compartido absorbe logica que antes vivia solo en el puente legacy;
+- prepara mejor el terreno para reemplazar piezas del modulo actual con la capa nueva.
