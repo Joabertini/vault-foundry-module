@@ -653,3 +653,19 @@ Impacto:
 - la exportacion empieza a parecerse mas a un actor utilizable en Foundry;
 - el trabajo reciente sobre `choices.equipment` ya se refleja en el destino final;
 - reducimos la distancia entre builder web y export real del personaje.
+
+### Features estructuradas en web
+
+Se aplico el mismo enfoque de seleccion visible y sugerida a los rasgos del personaje.
+
+Ahora incluye:
+
+- chips de features seleccionadas;
+- sugerencias segun clase, background y feat;
+- agregar/quitar sin romper la compatibilidad con `featuresText`.
+
+Impacto:
+
+- el builder gana otra capa de estructura por encima del texto libre;
+- los rasgos del personaje quedan mas claros y mas faciles de revisar;
+- seguimos acercando la experiencia al comportamiento de un builder real.

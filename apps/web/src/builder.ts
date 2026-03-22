@@ -210,6 +210,10 @@ export function parseEquipmentLines(value: string) {
   return uniqueEntries(parseLineList(value));
 }
 
+export function parseFeatureLines(value: string) {
+  return uniqueEntries(parseLineList(value));
+}
+
 export function appendUniqueLine(currentValue: string, nextValue: string) {
   const entries = uniqueEntries([...parseLineList(currentValue), nextValue.trim()]);
   return entries.join("\n");

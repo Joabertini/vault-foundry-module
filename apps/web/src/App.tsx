@@ -10,6 +10,7 @@ import {
   initialState,
   parseCantripLines,
   parseEquipmentLines,
+  parseFeatureLines,
   parseSpellLines,
   removeLine,
 } from "./builder";
@@ -18,6 +19,7 @@ import {
   loadBuilderOptions,
   type BuilderOptionsPayload,
 } from "./builder-options";
+import { getFeatureSuggestions } from "./feature-suggestions";
 
 const steps = [
   { id: "identity", label: "Identidad" },
@@ -96,8 +98,10 @@ export function App() {
   const cantripSuggestions = builderOptions.spells.cantrips
     .slice(0, 10)
     .map((entry) => entry.label);
+  const featureSuggestions = getFeatureSuggestions(state).slice(0, 8);
   const selectedCantrips = parseCantripLines(state.cantripsText);
   const selectedExtraEquipment = parseEquipmentLines(state.extraEquipmentText);
+  const selectedFeatures = parseFeatureLines(state.featuresText);
   const selectedSpells = parseSpellLines(state.spellsText);
 
   function updateField<K extends keyof BuilderState>(key: K, value: BuilderState[K]) {
@@ -126,6 +130,14 @@ export function App() {
 
   function removeExtraEquipment(value: string) {
     updateField("extraEquipmentText", removeLine(state.extraEquipmentText, value));
+  }
+
+  function addFeature(value: string) {
+    updateField("featuresText", appendUniqueLine(state.featuresText, value));
+  }
+
+  function removeFeature(value: string) {
+    updateField("featuresText", removeLine(state.featuresText, value));
   }
 
   function resetDraft() {
@@ -614,6 +626,43 @@ export function App() {
                   onChange={(event) => updateField("featuresText", event.target.value)}
                 />
               </label>
+              <div className="field field-full">
+                <span>Features seleccionadas</span>
+                <div className="selection-card">
+                  <div className="tag-list">
+                    {selectedFeatures.length ? (
+                      selectedFeatures.map((entry) => (
+                        <button
+                          className="sheet-tag removable-tag"
+                          key={entry}
+                          onClick={() => removeFeature(entry)}
+                          type="button"
+                        >
+                          {entry}
+                          <strong>x</strong>
+                        </button>
+                      ))
+                    ) : (
+                      <span className="empty-note">Todavia no agregaste features.</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="field field-full">
+                <span>Sugerencias de features</span>
+                <div className="tag-list">
+                  {featureSuggestions.map((entry) => (
+                    <button
+                      className="sheet-tag"
+                      key={entry}
+                      onClick={() => addFeature(entry)}
+                      type="button"
+                    >
+                      {entry}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           ) : null}
 
