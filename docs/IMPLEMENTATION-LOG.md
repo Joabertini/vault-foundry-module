@@ -412,6 +412,30 @@ Impacto:
 - baja el riesgo de que una mejora del bridge se pierda antes de llegar al actor final;
 - el siguiente paso natural es seguir reduciendo codigo legacy redundante dentro de `character-builder.js`, especialmente helpers y defaults que ya quedaron cubiertos por la preview.
 
+### Bridge legacy consumiendo mas elecciones normalizadas
+
+Se reforzo `scripts/foundry-export-bridge.js` para que la preview canonica aproveche mejor el contrato estructurado cuando ya existe.
+
+Ahora incluye:
+
+- uso de `choices.normalized.proficiencies` para:
+  - skills
+  - languages
+  - tools
+- uso de `choices.normalized.features` para derivar feats/features del actor preview;
+- fallback legacy mantenido cuando la build todavia no trae elecciones normalizadas.
+
+Validacion ejecutada:
+
+- `node --check scripts/foundry-export-bridge.js`;
+- `node --check scripts/character-builder.js`.
+
+Impacto:
+
+- el bridge legacy deja de depender tanto de parsing tardio de strings cuando la build canonica ya viene mejor estructurada;
+- se reduce otra diferencia importante entre runtime activo y carril compartido del monorepo;
+- el siguiente paso natural es seguir eliminando codigo legacy ahora realmente redundante dentro de `character-builder.js` y `foundry-export-bridge.js`.
+
 ### Base architecture bootstrap
 
 Se agrego la base inicial del monorepo sin romper el prototipo actual de Foundry.

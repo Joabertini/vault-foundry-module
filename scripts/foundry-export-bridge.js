@@ -334,11 +334,56 @@ function parseToolEntry(value) {
   return TOOL_ALIAS_TO_ID[normalized];
 }
 
+function getNormalizedProficiencyLabels(canonicalBuild, kind) {
+  const entries = canonicalBuild?.choices?.normalized?.proficiencies || [];
+  return entries
+    .filter(entry => entry.kind === kind)
+    .map(entry => entry.label);
+}
+
+function getProficiencyLabels(canonicalBuild, kind) {
+  const normalizedLabels = getNormalizedProficiencyLabels(canonicalBuild, kind);
+  if (normalizedLabels.length) return normalizedLabels;
+
+  const legacyEntries = canonicalBuild?.choices?.proficiencies || [];
+
+  if (kind === 'language') {
+    return legacyEntries
+      .filter(entry => /^language:/i.test(entry))
+      .map(entry => entry.replace(/^language:\s*/i, '').trim());
+  }
+
+  if (kind === 'tool') {
+    return legacyEntries
+      .filter(entry => /^tool:/i.test(entry))
+      .map(entry => entry.replace(/^tool:\s*/i, '').trim());
+  }
+
+  return legacyEntries.filter(
+    entry => !/^language:/i.test(entry) && !/^tool:/i.test(entry),
+  );
+}
+
+function getFeatureEntries(canonicalBuild) {
+  const normalizedFeatures = canonicalBuild?.choices?.normalized?.features || [];
+  if (normalizedFeatures.length) {
+    return normalizedFeatures.map(entry => ({
+      name: entry.label,
+      source: entry.source || 'class',
+    }));
+  }
+
+  return (canonicalBuild?.choices?.features || []).map(feature => ({
+    name: feature,
+    source: 'class',
+  }));
+}
+
 function buildSkills(canonicalBuild) {
   const skills = makeSkills();
   const backgroundId = canonicalBuild?.background?.backgroundId || '';
   const backgroundSkillIds = BACKGROUND_SKILL_PROFS_BY_ID[backgroundId] || [];
-  const selectedSkillIds = (canonicalBuild?.choices?.proficiencies || [])
+  const selectedSkillIds = getProficiencyLabels(canonicalBuild, 'skill')
     .map(resolveSkillId)
     .filter(Boolean);
   const proficientSkills = new Set([...backgroundSkillIds, ...selectedSkillIds]);
@@ -367,7 +412,7 @@ function buildTools(canonicalBuild) {
   const tools = {};
   const backgroundId = canonicalBuild?.background?.backgroundId || '';
   const backgroundTools = BACKGROUND_TOOL_PROFS_BY_ID[backgroundId] || [];
-  const entries = [...backgroundTools, ...(canonicalBuild?.choices?.proficiencies || [])];
+  const entries = [...backgroundTools, ...getProficiencyLabels(canonicalBuild, 'tool')];
 
   entries.forEach(entry => {
     const tool = parseToolEntry(entry);
@@ -381,7 +426,7 @@ function buildTools(canonicalBuild) {
 function buildLanguages(canonicalBuild) {
   const backgroundId = canonicalBuild?.background?.backgroundId || '';
   const backgroundLanguages = BACKGROUND_LANGUAGE_PROFS_BY_ID[backgroundId] || [];
-  const selectedLanguages = (canonicalBuild?.choices?.proficiencies || [])
+  const selectedLanguages = getProficiencyLabels(canonicalBuild, 'language')
     .map(parseLanguageEntry)
     .filter(Boolean);
 
@@ -737,8 +782,8 @@ function buildItems(canonicalBuild) {
   const chosenFeats = (canonicalBuild?.choices?.feats || []).map(featId =>
     buildFeatItem(featId, 'feat')
   );
-  const classFeatures = (canonicalBuild?.choices?.features || []).map(feature =>
-    buildFeatItem(feature, 'class')
+  const classFeatures = getFeatureEntries(canonicalBuild).map(feature =>
+    buildFeatItem(feature.name, feature.source)
   );
   const primaryClassId = canonicalBuild?.classing?.classes?.[0]?.classId || '';
   const spellSources = canonicalBuild?.choices?.normalized?.spells?.length
