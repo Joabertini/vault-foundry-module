@@ -1481,3 +1481,19 @@ Impacto:
 - `packages/domain` pasa a ser realmente la capa de reglas y seleccion compartida, en vez de delegar esa responsabilidad al exporter;
 - se reduce duplicacion entre capas y baja el riesgo de divergencia entre web, exporter y futuros procesos de import/sync;
 - la siguiente etapa puede enfocarse en ids canonicos y reglas de progresion sin arrastrar parsing repetido en consumidores.
+
+### Reutilizacion de metadata top-level del preview compartido
+
+Se hizo otra pasada de convergencia sobre el runtime legacy de Foundry, esta vez en la envoltura del actor y no solo en `system` o `items`.
+
+Ahora incluye:
+
+- `scripts/character-builder.js` actualizado para preferir metadata top-level de `canonicalFoundryPreview`;
+- reutilizacion de `name`, `type`, `img`, `prototypeToken`, `effects`, `folder`, `_stats` y `ownership` cuando la preview compartida ya los trae;
+- merge de flags existentes del preview antes de agregar `bertinis-vault`, evitando reconstruir toda la envoltura del actor con defaults legacy.
+
+Impacto:
+
+- el actor creado por el runtime activo queda mas alineado con la salida del exporter compartido;
+- baja otra fuente de divergencia silenciosa entre preview/export y actor real;
+- deja mejor preparado el terreno para eliminar defaults legacy top-level en iteraciones futuras.

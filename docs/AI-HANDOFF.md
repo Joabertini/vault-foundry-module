@@ -94,3 +94,10 @@ For frontend-only demo work, use:
 - add more fixtures for classes/backgrounds/spellcasting edge cases;
 - move more final actor sections from `scripts/character-builder.js` to shared exporter output;
 - replace more free-text proficiency/equipment handling with structured picks in the web builder.
+
+## Latest Convergence Note
+
+- `scripts/character-builder.js` now reuses more top-level actor metadata from `canonicalFoundryPreview`, not just `system` and `items`.
+- The legacy runtime currently prefers preview-backed `name`, `type`, `img`, `prototypeToken`, `effects`, `folder`, `_stats`, and `ownership`.
+- Preview flags are now merged into the final actor envelope before attaching `bertinis-vault` metadata.
+- A dead-code cleanup pass was attempted on old item/spell helper functions, but the file's encoding made block deletion brittle with `apply_patch`; prefer structural convergence or a future whole-file normalization pass before aggressive removal.

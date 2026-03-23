@@ -216,6 +216,7 @@ export function buildActor(formData) {
   });
   const canonicalFoundryPreview = buildFoundryActorPreview(canonicalBuild);
   const canonicalPreflight = buildFoundryPreflightPreview(canonicalBuild);
+  const previewActor = canonicalFoundryPreview || {};
   const previewSystem = canonicalFoundryPreview?.system || {};
   const previewAttributes = previewSystem.attributes || {};
   const previewDetails = previewSystem.details || {};
@@ -319,16 +320,18 @@ export function buildActor(formData) {
   };
 
   return {
-    name: charName || 'New Character',
-    type: 'character',
-    img: 'systems/dnd5e/icons/svg/actors/character.svg',
+    name: previewActor.name || charName || 'New Character',
+    type: previewActor.type || 'character',
+    img: previewActor.img || 'systems/dnd5e/icons/svg/actors/character.svg',
     system,
-    prototypeToken: buildToken(charName),
+    prototypeToken: previewActor.prototypeToken || buildToken(charName),
     items,
-    effects: [],
-    folder: null,
+    effects: Array.isArray(previewActor.effects) ? previewActor.effects : [],
+    folder: previewActor.folder ?? null,
     flags: {
+      ...(previewActor.flags || {}),
       'bertinis-vault': {
+        ...(previewActor.flags?.['bertinis-vault'] || {}),
         createdBy: playerName,
         version: '0.1.0',
         canonicalBuild,
@@ -336,8 +339,8 @@ export function buildActor(formData) {
         canonicalPreflight,
       },
     },
-    _stats: makeStats(),
-    ownership: { default: 0 },
+    _stats: previewActor._stats || makeStats(),
+    ownership: previewActor.ownership || { default: 0 },
   };
 }
 
