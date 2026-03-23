@@ -262,6 +262,45 @@ function BetaScopeSection() {
   );
 }
 
+function BetaPackageSection() {
+  const packageItems = [
+    {
+      title: "Release Notes",
+      detail: "Resumen claro de alcance beta, cambios recientes y feedback esperado.",
+    },
+    {
+      title: "Validation Guide",
+      detail: "Pasada manual en Foundry con escenarios concretos y criterio de salida.",
+    },
+    {
+      title: "Capture Guide",
+      detail: "Set mínimo de screenshots y reglas visuales para compartir la demo.",
+    },
+    {
+      title: "Tester Feedback",
+      detail: "Template estructurado para recibir hallazgos de testers sin ruido.",
+    },
+  ];
+
+  return (
+    <section className="beta-package">
+      <div className="section-head">
+        <span className="eyebrow">Beta Package</span>
+        <h2>Materiales listos para compartir y ejecutar</h2>
+      </div>
+
+      <div className="beta-package-grid">
+        {packageItems.map((entry) => (
+          <article className="beta-package-card" key={entry.title}>
+            <span>{entry.title}</span>
+            <p>{entry.detail}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function PreflightCard({
   blockers,
   warnings,
@@ -659,6 +698,8 @@ export function App() {
       <BetaReadinessSection />
 
       <BetaScopeSection />
+
+      <BetaPackageSection />
 
 
       <section className="builder-layout" id="builder">

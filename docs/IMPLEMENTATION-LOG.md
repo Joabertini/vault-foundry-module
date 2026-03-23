@@ -1691,3 +1691,53 @@ Impacto:
 - Stage C queda completo desde el lado de preparacion del repo;
 - lo que falta ya es ejecucion de los pasos finales, no ausencia de materiales;
 - el proyecto tiene continuidad clara hacia una etapa post-beta enfocada en findings, deuda legacy y regresiones.
+
+### Limpieza fuerte del wrapper legacy
+
+Se hizo una pasada de limpieza fuerte sobre `scripts/character-builder.js`, que venia arrastrando una gran cantidad de ensamblado inalcanzable desde que el runtime activo dejo de depender de esa ruta.
+
+Ahora incluye:
+
+- `scripts/character-builder.js` reescrito como wrapper minimo;
+- eliminacion del bloque legacy muerto de armado de actor, items, system y token que ya no participaba del camino activo;
+- mantenimiento de compatibilidad a traves de:
+  - `abilityMod(...)`
+  - `calculateAC(...)`
+  - `buildActor(...)` como wrapper canonico enriquecido
+
+Validacion ejecutada:
+
+- `node --check scripts/character-builder.js`
+- `node --check scripts/vault-app.js`
+
+Impacto:
+
+- baja de forma material la deuda legacy mas ruidosa del repo;
+- reduce confusion futura al dejar mas claro que `character-builder.js` ya no es una segunda implementacion completa;
+- prepara mejor el terreno para pasar del cleanup interno al trabajo de superficie web/producto.
+
+### Superficie web muestra el paquete beta completo
+
+Despues de la limpieza de bridges y codigo muerto, se avanzo sobre el area web para mejorar la presentacion del proyecto como paquete compartible.
+
+Ahora incluye:
+
+- nueva `BetaPackageSection` en `apps/web/src/App.tsx`;
+- estilos asociados en `apps/web/src/styles.css`;
+- esa seccion resume de forma visible:
+  - release notes
+  - validation guide
+  - capture guide
+  - tester feedback
+
+Validacion ejecutada:
+
+- `corepack pnpm web:typecheck`
+- `corepack pnpm --filter @bertinis-vault/web build`
+- `node --check scripts/character-builder.js`
+
+Impacto:
+
+- la demo ya comunica no solo el producto, sino tambien el material de release disponible;
+- mejora el valor de sharing para colaboradores, testers y stakeholders;
+- conecta mejor la limpieza tecnica previa con una superficie mas lista para uso real.

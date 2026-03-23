@@ -31,11 +31,12 @@ The architecture is no longer just aspirational:
 - Foundry runtime with progress feedback, settings, and preflight gating;
 - active runtime now creating actors directly from `canonicalFoundryPreview`;
 - `buildActor(...)` reduced to a compatibility wrapper around the canonical preview path.
+- web demo now also exposes the beta package itself as part of the shareable product surface.
 
 ## Main Risks Still Open
 
-- the legacy module still contains cleanup debt and compatibility scaffolding, even though the active runtime is now shared-first;
-- `scripts/character-builder.js` still contains redundant legacy logic and dead-weight helpers;
+- the legacy module still contains some cleanup debt and compatibility scaffolding, even though the active runtime is now shared-first;
+- `scripts/character-builder.js` has been reduced heavily, but temporary bridges still deserve another cleanup pass;
 - some files still contain encoding/mojibake issues that make cleanup slower and more brittle;
 - full manual validation inside a live Foundry VTT environment is still needed for the most confidence-sensitive flows.
 - Stage C is now at the point where the remaining work is operational execution rather than missing repo-side preparation.

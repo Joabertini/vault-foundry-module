@@ -184,3 +184,15 @@ For frontend-only demo work, use:
   - `Stage B`: `90%`
   - `Stage C`: `90%`
 - After final beta execution, continue using `docs/POST-BETA-HARDENING.md` as the next-stage anchor.
+
+## Latest Legacy Cleanup
+
+- `scripts/character-builder.js` was rewritten as a minimal compatibility wrapper.
+- The large unreachable legacy actor-assembly block inside that file has been removed.
+- Active cleanup focus can now shift more comfortably toward temporary bridges and web/product surface work.
+
+## Latest Web Packaging Pass
+
+- `apps/web/src/App.tsx` now includes a `BetaPackageSection`.
+- `apps/web/src/styles.css` includes the presentation layer for that section.
+- The demo now exposes the beta package itself as part of the visible product surface, not just the builder and sheet preview.
