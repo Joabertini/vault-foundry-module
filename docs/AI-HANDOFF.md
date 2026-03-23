@@ -119,3 +119,9 @@ For frontend-only demo work, use:
 - Runtime-enriched flags from `buildActor(...)` are merged back onto the shared preview before `Actor.create(...)`, so operational metadata is preserved.
 - Full fallback to the legacy-built actor payload remains in place if the canonical preview is unavailable.
 - This is one of the highest-leverage convergence steps so far because the active Foundry creation path now prefers the shared preview, not just the legacy builder output.
+
+## Latest Stage B Move
+
+- `scripts/character-builder.js` now treats `previewActor.system` as the preferred system payload and keeps its local system assembly as fallback.
+- This reduces the practical responsibility of the legacy wrapper even when `buildActor(...)` is still used as a metadata carrier.
+- A stable summary file now exists at `docs/PROJECT-STATUS.md` for project state, percentages, and recommended next steps if the thread ends abruptly.

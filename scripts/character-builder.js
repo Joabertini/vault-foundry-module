@@ -243,7 +243,7 @@ export function buildActor(formData) {
       })();
 
   // ── System data ──
-  const system = {
+  const fallbackSystem = {
     currency: previewSystem.currency || { pp: 0, gp: 0, ep: 0, sp: 0, cp: 0 },
     abilities: canonicalFoundryPreview?.system?.abilities || abilities,
     bonuses: previewSystem?.bonuses || {
@@ -318,6 +318,7 @@ export function buildActor(formData) {
     },
     favorites: previewFavorites,
   };
+  const system = previewActor.system || fallbackSystem;
 
   return {
     name: previewActor.name || charName || 'New Character',

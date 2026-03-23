@@ -1546,3 +1546,23 @@ Impacto:
 - el runtime activo queda mas cerca del exporter compartido, no solo la previsualizacion;
 - baja otro tramo de divergencia entre lo que se valida/exporta y lo que finalmente se crea en Foundry;
 - este cambio empuja de verdad la transicion desde Stage A hacia Stage B, porque reduce el peso del ensamblado legacy en el camino critico real.
+
+### Wrapper legacy usa la preview como sistema principal
+
+Se dio otro paso de Stage B para que `scripts/character-builder.js` deje de comportarse como una segunda implementacion completa del actor.
+
+Ahora incluye:
+
+- `scripts/character-builder.js` actualizado para usar `previewActor.system` como fuente principal cuando la preview canonica ya existe;
+- el objeto local extendido queda como `fallbackSystem`, no como camino preferido;
+- nuevo documento estable `docs/PROJECT-STATUS.md` para dejar una foto resumida del proyecto, porcentajes y proximos pasos en caso de corte del hilo.
+
+Validacion ejecutada:
+
+- `node --check scripts/character-builder.js`
+
+Impacto:
+
+- baja todavia mas el peso real del ensamblado legacy dentro del wrapper;
+- formaliza mejor la transicion hacia un `character-builder` de compatibilidad y metadata, no de ensamblado principal;
+- deja una referencia de estado pensada para continuidad entre sesiones o ultimos mensajes.
