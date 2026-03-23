@@ -125,3 +125,12 @@ For frontend-only demo work, use:
 - `scripts/character-builder.js` now treats `previewActor.system` as the preferred system payload and keeps its local system assembly as fallback.
 - This reduces the practical responsibility of the legacy wrapper even when `buildActor(...)` is still used as a metadata carrier.
 - A stable summary file now exists at `docs/PROJECT-STATUS.md` for project state, percentages, and recommended next steps if the thread ends abruptly.
+
+## Latest Runtime Ownership Shift
+
+- `scripts/vault-app.js` no longer depends on `buildActor(...)` to create the active Foundry actor.
+- The active runtime now builds from `canonicalBuild` and `buildFoundryActorPreview(...)`, then enriches flags directly before `Actor.create(...)`.
+- `scripts/character-builder.js` is now best understood as compatibility scaffolding; its operational importance is much lower than before.
+- Current estimate after this slice:
+  - `Stage A`: `90%`
+  - `Stage B`: `90%`

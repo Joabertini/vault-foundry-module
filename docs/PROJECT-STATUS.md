@@ -2,7 +2,7 @@
 
 ## General State
 
-Current assessment: the project is in a strong alpha transition, with `Stage A` effectively at about `90%` and `Stage B` underway.
+Current assessment: the project is in a strong alpha transition, with `Stage A` effectively at about `90%` and `Stage B` now approaching completion from an architectural ownership standpoint.
 
 The architecture is no longer just aspirational:
 
@@ -14,7 +14,7 @@ The architecture is no longer just aspirational:
 ## Progress Snapshot
 
 - `Stage A - import/export stabilization`: `90%`
-- `Stage B - migration away from legacy runtime ownership`: `50%`
+- `Stage B - migration away from legacy runtime ownership`: `90%`
 - `Stage C - beta/demo/release hardening`: `18%`
 
 ## What Is Stable Right Now
@@ -24,21 +24,22 @@ The architecture is no longer just aspirational:
 - exporter path that carries preflight summary into Foundry payload flags;
 - web demo showing preflight blockers and warnings before export;
 - Foundry runtime with progress feedback, settings, and preflight gating;
-- active runtime now preferring `canonicalFoundryPreview` when creating actors.
+- active runtime now creating actors directly from `canonicalFoundryPreview`;
+- `buildActor(...)` reduced to a compatibility wrapper around the canonical preview path.
 
 ## Main Risks Still Open
 
-- the legacy module is still present in the critical path as fallback and compatibility layer;
+- the legacy module still contains cleanup debt and compatibility scaffolding, even though the active runtime is now shared-first;
 - `scripts/character-builder.js` still contains redundant legacy logic and dead-weight helpers;
 - some files still contain encoding/mojibake issues that make cleanup slower and more brittle;
 - full manual validation inside a live Foundry VTT environment is still needed for the most confidence-sensitive flows.
 
 ## Recommended Next Steps
 
-1. Continue Stage B by reducing `scripts/character-builder.js` into a thin compatibility wrapper.
-2. Keep moving final actor assembly responsibility into the shared preview/export path.
+1. Remove dead legacy helpers and unreachable assembly code from `scripts/character-builder.js`.
+2. Replace temporary JS bridges where possible with shared package usage or thinner adapters.
 3. Add more runtime-oriented validation and regression coverage for Foundry creation flows.
-4. Once the legacy builder becomes lightweight enough, start removing redundant helpers and temporary bridges.
+4. Run deeper manual validation inside live Foundry VTT to confirm import behavior under real operator usage.
 5. After that, shift attention toward beta hardening and presentation work in Stage C.
 
 ## Operational Rule

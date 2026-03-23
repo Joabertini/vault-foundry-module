@@ -217,6 +217,22 @@ export function buildActor(formData) {
   const canonicalFoundryPreview = buildFoundryActorPreview(canonicalBuild);
   const canonicalPreflight = buildFoundryPreflightPreview(canonicalBuild);
   const previewActor = canonicalFoundryPreview || {};
+
+  return {
+    ...previewActor,
+    flags: {
+      ...(previewActor.flags || {}),
+      'bertinis-vault': {
+        ...(previewActor.flags?.['bertinis-vault'] || {}),
+        createdBy: playerName,
+        version: '0.1.0',
+        canonicalBuild,
+        canonicalFoundryPreview,
+        canonicalPreflight,
+      },
+    },
+  };
+
   const previewSystem = canonicalFoundryPreview?.system || {};
   const previewAttributes = previewSystem.attributes || {};
   const previewDetails = previewSystem.details || {};

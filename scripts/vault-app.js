@@ -10,8 +10,8 @@ import {
   FEATS_NO_PREREQ, ALL_FEATS, PB_COST, PB_MAX_POINTS,
   PB_MIN, PB_MAX
 } from './data.js';
-import { buildActor } from './character-builder.js';
 import { createCanonicalCharacterBuild } from './model-bridge.js';
+import { buildFoundryActorPreview } from './foundry-export-bridge.js';
 import {
   buildFoundryPreflightPreview,
   formatPreflightIssues,
@@ -549,23 +549,23 @@ export class VaultCreatorApp extends Application {
       this._setCreationStatus(html, actorFolder
         ? `Creando actor en Foundry dentro de "${actorFolder.name}"...`
         : 'Creando actor en Foundry...');
-      const actorData = buildActor(this._formData);
-      const canonicalPreview = actorData?.flags?.['bertinis-vault']?.canonicalFoundryPreview;
-      const actorCreateData = canonicalPreview
-        ? {
-            ...canonicalPreview,
-            system: canonicalPreview.system || actorData.system,
-            items: Array.isArray(canonicalPreview.items) && canonicalPreview.items.length
-              ? canonicalPreview.items
-              : actorData.items,
-            flags: foundry.utils.mergeObject(
-              canonicalPreview.flags || {},
-              actorData.flags || {},
-              { inplace: false, recursive: true },
-            ),
-            folder: actorData.folder ?? canonicalPreview.folder ?? null,
-          }
-        : actorData;
+      const canonicalPreview = buildFoundryActorPreview(canonicalBuild);
+      const actorCreateData = {
+        ...canonicalPreview,
+        flags: foundry.utils.mergeObject(
+          canonicalPreview.flags || {},
+          {
+            'bertinis-vault': {
+              createdBy: this._formData.playerName,
+              version: '0.1.0',
+              canonicalBuild,
+              canonicalFoundryPreview: canonicalPreview,
+              canonicalPreflight: preflight,
+            },
+          },
+          { inplace: false, recursive: true },
+        ),
+      };
 
       if (actorFolder) {
         actorCreateData.folder = actorFolder.id;

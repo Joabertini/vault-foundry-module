@@ -1566,3 +1566,30 @@ Impacto:
 - baja todavia mas el peso real del ensamblado legacy dentro del wrapper;
 - formaliza mejor la transicion hacia un `character-builder` de compatibilidad y metadata, no de ensamblado principal;
 - deja una referencia de estado pensada para continuidad entre sesiones o ultimos mensajes.
+
+### Runtime activo desacoplado de buildActor
+
+Se completo otro salto importante de migracion: el runtime activo ya no necesita llamar a `buildActor(...)` para crear actores en Foundry.
+
+Ahora incluye:
+
+- `scripts/vault-app.js` actualizado para construir el actor real desde `canonicalBuild` + `buildFoundryActorPreview(...)`;
+- enriquecimiento de flags directamente en el runtime con:
+  - `canonicalBuild`
+  - `canonicalFoundryPreview`
+  - `canonicalPreflight`
+  - `createdBy`
+  - `version`
+- `scripts/character-builder.js` convertido efectivamente en wrapper de compatibilidad que devuelve la preview canonica enriquecida;
+- `docs/PROJECT-STATUS.md` actualizado para reflejar `Stage B` en `90%`.
+
+Validacion ejecutada:
+
+- `node --check scripts/vault-app.js`
+- `node --check scripts/character-builder.js`
+
+Impacto:
+
+- el camino activo de creacion de actor ya es shared-first, no legacy-first;
+- `buildActor(...)` deja de ser pieza critica del runtime y pasa a ser soporte de compatibilidad;
+- Stage B sube de forma material porque la propiedad real del ensamblado ya esta en el carril canonico compartido.
