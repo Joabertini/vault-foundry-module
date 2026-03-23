@@ -119,10 +119,6 @@ function makeSkill(ability, profValue = 0) {
   };
 }
 
-function previewItemsByType(preview, type) {
-  return (preview?.items || []).filter(item => item?.type === type);
-}
-
 /**
  * Generates a random 16-char Foundry-style ID
  */
@@ -227,25 +223,21 @@ export function buildActor(formData) {
   const previewSkills = previewSystem.skills || {};
 
   // ── Items ──
-  const items = [];
+  const previewItems = Array.isArray(canonicalFoundryPreview?.items)
+    ? canonicalFoundryPreview.items
+    : [];
+  const items = previewItems.length
+    ? previewItems
+    : (() => {
+        const fallbackItems = [];
+        const weaponName = weaponCustom || weapon;
 
-  // Class item
-  items.push(...previewItemsByType(canonicalFoundryPreview, 'class'));
+        if (weaponName) {
+          fallbackItems.push(buildWeaponItem(weaponName, cls, mods, pb, spellStat));
+        }
 
-  // Weapons
-  const previewWeaponItems = previewItemsByType(canonicalFoundryPreview, 'weapon');
-  if (previewWeaponItems.length) {
-    items.push(...previewWeaponItems);
-  } else {
-    const weaponName = weaponCustom || weapon;
-    if (weaponName) {
-      items.push(buildWeaponItem(weaponName, cls, mods, pb, spellStat));
-    }
-  }
-
-  // Features from class/subclass text
-  items.push(...previewItemsByType(canonicalFoundryPreview, 'feat'));
-  items.push(...previewItemsByType(canonicalFoundryPreview, 'spell'));
+        return fallbackItems;
+      })();
 
   // ── System data ──
   const system = {

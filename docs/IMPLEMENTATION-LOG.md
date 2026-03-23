@@ -324,6 +324,30 @@ Impacto:
 - la configuracion del modulo empieza a tener consecuencias concretas dentro del flujo de creacion;
 - el siguiente paso natural es seguir convergiendo `vault-app` / `character-builder` con el exporter compartido para que el runtime legacy deje de reconstruir partes del actor por su cuenta.
 
+### Runtime legacy reutilizando el inventario completo del exporter compartido
+
+Se aplico un slice pequeno pero importante de convergencia entre `scripts/character-builder.js` y el exporter compartido.
+
+Ahora incluye:
+
+- `scripts/character-builder.js` reutilizando `canonicalFoundryPreview.items` completo cuando la preview compartida esta disponible;
+- eliminacion del armado parcial que antes solo copiaba:
+  - class items
+  - feat items
+  - spell items
+  - un arma fallback
+- fallback legacy mantenido solo cuando no hay `canonicalFoundryPreview.items`.
+
+Validacion ejecutada:
+
+- `node --check scripts/character-builder.js`.
+
+Impacto:
+
+- el runtime legacy deja de perder equipment/loot que la capa compartida ya sabe exportar;
+- baja la divergencia entre "actor creado en Foundry" y "payload producido por el exporter compartido";
+- el siguiente paso natural es empujar la misma convergencia sobre mas secciones de `system`, no solo sobre `items`.
+
 ### Base architecture bootstrap
 
 Se agrego la base inicial del monorepo sin romper el prototipo actual de Foundry.
