@@ -1593,3 +1593,28 @@ Impacto:
 - el camino activo de creacion de actor ya es shared-first, no legacy-first;
 - `buildActor(...)` deja de ser pieza critica del runtime y pasa a ser soporte de compatibilidad;
 - Stage B sube de forma material porque la propiedad real del ensamblado ya esta en el carril canonico compartido.
+
+### Stage C arranca con beta framing y checklist de release
+
+Se empezo Stage C con entregables visibles y reutilizables, no solo con notas de backlog.
+
+Ahora incluye:
+
+- nueva seccion `BetaReadinessSection` en `apps/web/src/App.tsx` con:
+  - porcentajes por stage
+  - framing ejecutivo del estado del proyecto
+  - checklist visible de base para beta
+- estilos nuevos en `apps/web/src/styles.css` para esa superficie;
+- nuevo documento `docs/BETA-RELEASE-CHECKLIST.md` con criterio de salida y validaciones recomendadas;
+- `docs/PROJECT-STATUS.md` actualizado para reflejar `Stage C` en `55%`.
+
+Validacion ejecutada:
+
+- `corepack pnpm web:typecheck`
+- `corepack pnpm --filter @bertinis-vault/web build`
+
+Impacto:
+
+- la demo web ya comunica mejor el estado real del producto, no solo la build puntual;
+- el proyecto gana una base concreta para beta sharing y handoff con terceros;
+- Stage C deja de ser solamente polish futuro y pasa a tener artefactos reales de release.

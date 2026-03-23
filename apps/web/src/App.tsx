@@ -152,6 +152,67 @@ function StoryBlock() {
   );
 }
 
+function BetaReadinessSection() {
+  const readiness = [
+    {
+      label: "Stage A",
+      progress: "90%",
+      detail: "Pipeline compartido con preflight, exporter y runtime Foundry ya operativos.",
+    },
+    {
+      label: "Stage B",
+      progress: "90%",
+      detail: "Runtime activo migrado al carril canónico; legacy pasa a compatibilidad y limpieza.",
+    },
+    {
+      label: "Stage C",
+      progress: "45%",
+      detail: "Demo, narrativa de producto y checklist de beta ya visibles, pero todavía falta hardening de release.",
+    },
+  ];
+
+  const checklist = [
+    "Demo web con presets, preflight y export visible para sharing.",
+    "Checklist de beta y estado del proyecto documentados en docs.",
+    "Runtime Foundry alineado con la preview canónica.",
+    "Pendiente: validación manual profunda dentro de Foundry VTT real.",
+  ];
+
+  return (
+    <section className="beta-readiness">
+      <div className="section-head">
+        <span className="eyebrow">Beta Readiness</span>
+        <h2>Estado ejecutivo del proyecto</h2>
+      </div>
+
+      <div className="readiness-grid">
+        {readiness.map((entry) => (
+          <article className="readiness-card" key={entry.label}>
+            <span>{entry.label}</span>
+            <strong>{entry.progress}</strong>
+            <p>{entry.detail}</p>
+          </article>
+        ))}
+      </div>
+
+      <div className="beta-checklist">
+        <div>
+          <span className="eyebrow">Lo que ya esta</span>
+          <h3>Base para una beta compartible</h3>
+        </div>
+        <div className="beta-checklist-list">
+          {checklist.map((entry) => (
+            <div className="beta-check-item" key={entry}>
+              <strong>Listo</strong>
+              <p>{entry}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function PreflightCard({
   blockers,
   warnings,
@@ -545,6 +606,8 @@ export function App() {
       <ActivePresetSummary presetId={activePresetId} />
 
       <StoryBlock />
+
+      <BetaReadinessSection />
 
 
       <section className="builder-layout" id="builder">

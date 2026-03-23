@@ -15,7 +15,7 @@ The architecture is no longer just aspirational:
 
 - `Stage A - import/export stabilization`: `90%`
 - `Stage B - migration away from legacy runtime ownership`: `90%`
-- `Stage C - beta/demo/release hardening`: `18%`
+- `Stage C - beta/demo/release hardening`: `55%`
 
 ## What Is Stable Right Now
 
@@ -23,6 +23,7 @@ The architecture is no longer just aspirational:
 - shared preflight with structural and operational warnings;
 - exporter path that carries preflight summary into Foundry payload flags;
 - web demo showing preflight blockers and warnings before export;
+- beta-readiness section visible inside the web demo with stage percentages and release framing;
 - Foundry runtime with progress feedback, settings, and preflight gating;
 - active runtime now creating actors directly from `canonicalFoundryPreview`;
 - `buildActor(...)` reduced to a compatibility wrapper around the canonical preview path.
@@ -33,6 +34,7 @@ The architecture is no longer just aspirational:
 - `scripts/character-builder.js` still contains redundant legacy logic and dead-weight helpers;
 - some files still contain encoding/mojibake issues that make cleanup slower and more brittle;
 - full manual validation inside a live Foundry VTT environment is still needed for the most confidence-sensitive flows.
+- beta polish is now underway, but screenshots, release notes, and live operator validation still need one more pass.
 
 ## Recommended Next Steps
 
@@ -40,7 +42,7 @@ The architecture is no longer just aspirational:
 2. Replace temporary JS bridges where possible with shared package usage or thinner adapters.
 3. Add more runtime-oriented validation and regression coverage for Foundry creation flows.
 4. Run deeper manual validation inside live Foundry VTT to confirm import behavior under real operator usage.
-5. After that, shift attention toward beta hardening and presentation work in Stage C.
+5. Push Stage C from demo-ready to beta-ready with screenshots, release notes, and manual Foundry validation.
 
 ## Operational Rule
 

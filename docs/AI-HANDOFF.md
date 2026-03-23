@@ -134,3 +134,13 @@ For frontend-only demo work, use:
 - Current estimate after this slice:
   - `Stage A`: `90%`
   - `Stage B`: `90%`
+
+## Latest Stage C Start
+
+- `apps/web/src/App.tsx` now includes a visible beta-readiness section with stage percentages and release framing.
+- `apps/web/src/styles.css` includes the supporting presentation layer for that section.
+- `docs/BETA-RELEASE-CHECKLIST.md` now exists as the release-oriented checklist for moving from demo to beta.
+- Current estimate after this slice:
+  - `Stage A`: `90%`
+  - `Stage B`: `90%`
+  - `Stage C`: `55%`
