@@ -381,6 +381,37 @@ Impacto:
 - se reduce otra fuente importante de divergencia entre carril canonico y runtime activo;
 - el siguiente paso natural es converger mas `system` del bridge/builder con la salida compartida, no solo `items`.
 
+### Convergencia inicial de `system` entre preview legacy y builder activo
+
+Se dio el siguiente paso despues de `items`: acercar tambien la forma base de `system` entre la preview legacy y el actor que finalmente crea Foundry.
+
+Ahora incluye:
+
+- `scripts/foundry-export-bridge.js` enriquecido con mas estructura de `system`, incluyendo:
+  - `currency`
+  - `bastion`
+  - `attributes` mas completos
+  - `details` con mas campos base
+- `scripts/character-builder.js` reutilizando mas datos de `previewSystem` en lugar de regenerar tantos defaults locales para:
+  - `currency`
+  - `attributes`
+  - `bastion`
+  - `details`
+  - `traits`
+  - `resources`
+  - `favorites`
+
+Validacion ejecutada:
+
+- `node --check scripts/foundry-export-bridge.js`;
+- `node --check scripts/character-builder.js`.
+
+Impacto:
+
+- el runtime legacy empieza a depender mas de una estructura compartida y menos de merges manuales dispersos;
+- baja el riesgo de que una mejora del bridge se pierda antes de llegar al actor final;
+- el siguiente paso natural es seguir reduciendo codigo legacy redundante dentro de `character-builder.js`, especialmente helpers y defaults que ya quedaron cubiertos por la preview.
+
 ### Base architecture bootstrap
 
 Se agrego la base inicial del monorepo sin romper el prototipo actual de Foundry.

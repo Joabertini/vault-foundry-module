@@ -221,6 +221,8 @@ export function buildActor(formData) {
   const previewDetails = previewSystem.details || {};
   const previewTraits = previewSystem.traits || {};
   const previewSkills = previewSystem.skills || {};
+  const previewResources = previewSystem.resources || {};
+  const previewFavorites = previewSystem.favorites || [];
 
   // ── Items ──
   const previewItems = Array.isArray(canonicalFoundryPreview?.items)
@@ -241,7 +243,7 @@ export function buildActor(formData) {
 
   // ── System data ──
   const system = {
-    currency: { pp: 0, gp: 0, ep: 0, sp: 0, cp: 0 },
+    currency: previewSystem.currency || { pp: 0, gp: 0, ep: 0, sp: 0, cp: 0 },
     abilities: canonicalFoundryPreview?.system?.abilities || abilities,
     bonuses: previewSystem?.bonuses || {
       mwak: { attack: '', damage: '' }, rwak: { attack: '', damage: '' },
@@ -253,33 +255,36 @@ export function buildActor(formData) {
     tools: previewSystem?.tools || {},
     spells: canonicalFoundryPreview?.system?.spells || spellSlots,
     attributes: {
+      ...previewAttributes,
       ac: {
         calc: 'flat',
         flat: previewAttributes?.ac?.flat ?? ac,
       },
-      init: { ability: '', roll: { min: null, max: null, mode: 0 }, bonus: '' },
-      movement: { units: null, hover: false, ignoredDifficultTerrain: [] },
-      attunement: { max: 3 },
-      senses: { darkvision: null, blindsight: null, tremorsense: null, truesight: null, units: null, special: '' },
+      init: previewAttributes?.init || { ability: '', roll: { min: null, max: null, mode: 0 }, bonus: '' },
+      movement: previewAttributes?.movement || { units: null, hover: false, ignoredDifficultTerrain: [] },
+      attunement: previewAttributes?.attunement || { max: 3 },
+      senses: previewAttributes?.senses || { darkvision: null, blindsight: null, tremorsense: null, truesight: null, units: null, special: '' },
       spellcasting: previewAttributes?.spellcasting ?? spellStat ?? '',
-      exhaustion: 0,
-      concentration: {
+      exhaustion: previewAttributes?.exhaustion ?? 0,
+      concentration: previewAttributes?.concentration || {
         ability: '', roll: { min: null, max: null, mode: 0 },
         bonuses: { save: '' }, limit: 1,
       },
-      loyalty: {},
+      loyalty: previewAttributes?.loyalty || {},
       hp: {
+        ...(previewAttributes?.hp || {}),
         max: previewAttributes?.hp?.max ?? null,
         temp: null,
         tempmax: 0,
         value: previewAttributes?.hp?.value ?? hpMax,
         bonuses: {},
       },
-      death: { roll: { min: null, max: null, mode: 0 }, success: 0, failure: 0, bonuses: { save: '' } },
-      inspiration: false,
+      death: previewAttributes?.death || { roll: { min: null, max: null, mode: 0 }, success: 0, failure: 0, bonuses: { save: '' } },
+      inspiration: previewAttributes?.inspiration ?? false,
     },
-    bastion: { name: '', description: '' },
+    bastion: previewSystem.bastion || { name: '', description: '' },
     details: {
+      ...previewDetails,
       biography: previewDetails?.biography || { value: buildBiography(formData, { pb, ac, hpMax, spellDC, spellAtk }), public: '' },
       alignment: previewDetails?.alignment ?? alignment || '',
       trait: previewDetails?.trait ?? trait || '',
@@ -294,6 +299,7 @@ export function buildActor(formData) {
       eyes: '', height: '', faith: '', hair: '', weight: '', gender: '', skin: '', age: '',
     },
     traits: {
+      ...previewTraits,
       size: previewTraits?.size ?? 'med',
       di: previewTraits?.di ?? { value: [], custom: '', bypasses: [] },
       dr: previewTraits?.dr ?? { value: [], custom: '', bypasses: [] },
@@ -304,12 +310,12 @@ export function buildActor(formData) {
       weaponProf: previewTraits?.weaponProf ?? { value: [], custom: '', mastery: { value: [], bonus: [] } },
       armorProf:  previewTraits?.armorProf ?? { value: [], custom: '' },
     },
-    resources: previewSystem?.resources || {
+    resources: Object.keys(previewResources).length ? previewResources : {
       primary:   { value: 0, max: 0, sr: false, lr: false, label: '' },
       secondary: { value: 0, max: 0, sr: false, lr: false, label: '' },
       tertiary:  { value: 0, max: 0, sr: false, lr: false, label: '' },
     },
-    favorites: previewSystem?.favorites || [],
+    favorites: previewFavorites,
   };
 
   return {
