@@ -15,7 +15,7 @@ The architecture is no longer just aspirational:
 
 - `Stage A - import/export stabilization`: `90%`
 - `Stage B - migration away from legacy runtime ownership`: `90%`
-- `Stage C - beta/demo/release hardening`: `85%`
+- `Stage C - beta/demo/release hardening`: `90%`
 
 ## What Is Stable Right Now
 
@@ -27,6 +27,7 @@ The architecture is no longer just aspirational:
 - beta scope, release notes, and checklist artifacts now exist for actual sharing and tester onboarding;
 - manual Foundry validation guide and beta announcement template now exist for the final release pass;
 - capture guide and tester feedback template now exist for the last mile of beta execution;
+- beta signoff and post-beta hardening documents now exist to close this stage cleanly and move into the next one;
 - Foundry runtime with progress feedback, settings, and preflight gating;
 - active runtime now creating actors directly from `canonicalFoundryPreview`;
 - `buildActor(...)` reduced to a compatibility wrapper around the canonical preview path.
@@ -37,7 +38,7 @@ The architecture is no longer just aspirational:
 - `scripts/character-builder.js` still contains redundant legacy logic and dead-weight helpers;
 - some files still contain encoding/mojibake issues that make cleanup slower and more brittle;
 - full manual validation inside a live Foundry VTT environment is still needed for the most confidence-sensitive flows.
-- beta polish is now underway, and the remaining work is mostly execution inside Foundry plus the final capture/release pass.
+- Stage C is now at the point where the remaining work is operational execution rather than missing repo-side preparation.
 
 ## Recommended Next Steps
 
@@ -45,7 +46,7 @@ The architecture is no longer just aspirational:
 2. Replace temporary JS bridges where possible with shared package usage or thinner adapters.
 3. Add more runtime-oriented validation and regression coverage for Foundry creation flows.
 4. Run deeper manual validation inside live Foundry VTT to confirm import behavior under real operator usage.
-5. Execute the final Stage C pass in Foundry, capture the demo, and publish the beta package using the prepared release materials.
+5. Move into post-beta hardening using `docs/POST-BETA-HARDENING.md` after running the final beta execution pass.
 
 ## Operational Rule
 

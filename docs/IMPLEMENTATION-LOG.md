@@ -1675,3 +1675,19 @@ Impacto:
 - el ultimo tramo de beta queda menos dependiente de coordinacion oral;
 - mejora la capacidad de compartir el proyecto y recoger feedback util de forma consistente;
 - el gap restante hasta `90%` ya depende casi por completo de ejecutar la validacion manual y la pasada final de release.
+
+### Stage C queda formalmente preparado para cierre y siguiente etapa
+
+Se completo la preparacion repo-side de Stage C y se definio la etapa siguiente para evitar un vacio de roadmap despues del beta.
+
+Ahora incluye:
+
+- nuevo `docs/BETA-SIGNOFF.md` para cerrar la etapa con un registro claro;
+- nuevo `docs/POST-BETA-HARDENING.md` como siguiente etapa logica;
+- `docs/PROJECT-STATUS.md` actualizado para reflejar `Stage C` en `90%`.
+
+Impacto:
+
+- Stage C queda completo desde el lado de preparacion del repo;
+- lo que falta ya es ejecucion de los pasos finales, no ausencia de materiales;
+- el proyecto tiene continuidad clara hacia una etapa post-beta enfocada en findings, deuda legacy y regresiones.

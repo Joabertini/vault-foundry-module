@@ -174,3 +174,13 @@ For frontend-only demo work, use:
   - execute the Foundry validation pass
   - capture the final demo assets
   - run the final release/announcement pass
+
+## Stage C At 90 And Next Stage
+
+- `docs/BETA-SIGNOFF.md` now exists for the final beta signoff record.
+- `docs/POST-BETA-HARDENING.md` now defines the next stage after this roadmap's Stage C.
+- `docs/PROJECT-STATUS.md` now reflects:
+  - `Stage A`: `90%`
+  - `Stage B`: `90%`
+  - `Stage C`: `90%`
+- After final beta execution, continue using `docs/POST-BETA-HARDENING.md` as the next-stage anchor.
