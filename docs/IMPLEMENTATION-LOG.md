@@ -1524,3 +1524,25 @@ Impacto:
 - el preflight detecta mejor duplicaciones que antes podian pasar como builds tecnicamente validas pero operativamente inconsistentes;
 - sube la confiabilidad del pipeline compartido sin depender del runtime legacy para descubrir estos casos;
 - Stage A queda mas cerca de una linea defensible para import/export repetible.
+
+### Runtime Foundry prioriza preview canonica al crear actores
+
+Se hizo un cambio importante en el flujo activo de importacion: el runtime Foundry ya no depende solamente del ensamblado final de `buildActor(...)` para crear el actor real.
+
+Ahora incluye:
+
+- `scripts/vault-app.js` actualizado para detectar `flags['bertinis-vault'].canonicalFoundryPreview` en la salida de `buildActor(...)`;
+- cuando esa preview existe, `Actor.create(...)` usa la preview canonica como base real del actor;
+- los flags enriquecidos del runtime legacy se mergean sobre la preview compartida para no perder metadata operacional ni trazabilidad;
+- se mantiene fallback completo a `buildActor(...)` si la preview canonica no estuviera disponible.
+
+Validacion ejecutada:
+
+- `node --check scripts/vault-app.js`
+- `node --check scripts/character-builder.js`
+
+Impacto:
+
+- el runtime activo queda mas cerca del exporter compartido, no solo la previsualizacion;
+- baja otro tramo de divergencia entre lo que se valida/exporta y lo que finalmente se crea en Foundry;
+- este cambio empuja de verdad la transicion desde Stage A hacia Stage B, porque reduce el peso del ensamblado legacy en el camino critico real.

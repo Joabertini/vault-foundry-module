@@ -550,10 +550,28 @@ export class VaultCreatorApp extends Application {
         ? `Creando actor en Foundry dentro de "${actorFolder.name}"...`
         : 'Creando actor en Foundry...');
       const actorData = buildActor(this._formData);
+      const canonicalPreview = actorData?.flags?.['bertinis-vault']?.canonicalFoundryPreview;
+      const actorCreateData = canonicalPreview
+        ? {
+            ...canonicalPreview,
+            system: canonicalPreview.system || actorData.system,
+            items: Array.isArray(canonicalPreview.items) && canonicalPreview.items.length
+              ? canonicalPreview.items
+              : actorData.items,
+            flags: foundry.utils.mergeObject(
+              canonicalPreview.flags || {},
+              actorData.flags || {},
+              { inplace: false, recursive: true },
+            ),
+            folder: actorData.folder ?? canonicalPreview.folder ?? null,
+          }
+        : actorData;
+
       if (actorFolder) {
-        actorData.folder = actorFolder.id;
+        actorCreateData.folder = actorFolder.id;
       }
-      this._createdActor = await Actor.create(actorData);
+
+      this._createdActor = await Actor.create(actorCreateData);
 
       // Show success
       html.find('#vault-creating').hide();

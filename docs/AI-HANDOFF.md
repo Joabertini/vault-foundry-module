@@ -112,3 +112,10 @@ For frontend-only demo work, use:
 - Those warnings are covered in `packages/domain/test/preflight.test.mjs` and confirmed to propagate through `packages/foundry-exporter/test/index.test.mjs`.
 - This was intended as a Stage A reliability push: catch operationally inconsistent but structurally valid builds before they drift into export/import workflows.
 - Current Stage A estimate after this slice: about `90%`, with the main remaining gap being deeper manual validation inside Foundry VTT plus continued legacy retirement rather than missing shared preflight/export primitives.
+
+## Latest Runtime Convergence
+
+- `scripts/vault-app.js` now creates actors from `canonicalFoundryPreview` when that preview is present in `buildActor(...)` flags.
+- Runtime-enriched flags from `buildActor(...)` are merged back onto the shared preview before `Actor.create(...)`, so operational metadata is preserved.
+- Full fallback to the legacy-built actor payload remains in place if the canonical preview is unavailable.
+- This is one of the highest-leverage convergence steps so far because the active Foundry creation path now prefers the shared preview, not just the legacy builder output.
