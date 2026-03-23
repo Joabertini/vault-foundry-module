@@ -164,3 +164,13 @@ For frontend-only demo work, use:
   - run the manual validation pass
   - capture the final demo/screenshots
   - publish or dry-run the beta announcement/release package
+
+## Latest Stage C Sharing Prep
+
+- `docs/DEMO-CAPTURE-GUIDE.md` now exists for the final screenshot/demo pass.
+- `docs/TESTER-FEEDBACK-TEMPLATE.md` now exists for structured tester reports.
+- `docs/PROJECT-STATUS.md` now reflects `Stage C` at `85%`.
+- The remaining gap to `90%` is now almost entirely:
+  - execute the Foundry validation pass
+  - capture the final demo assets
+  - run the final release/announcement pass

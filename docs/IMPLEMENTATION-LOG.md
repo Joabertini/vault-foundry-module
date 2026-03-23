@@ -1659,3 +1659,19 @@ Impacto:
 - el tramo restante de Stage C queda mucho mas operacionalizado;
 - ya no faltan tanto artefactos, sino ejecucion final de validacion y anuncio;
 - el proyecto queda mejor preparado para continuidad si el cierre beta lo hace otra sesion o colaborador.
+
+### Stage C suma captura y feedback para testers
+
+Se preparo otra parte del cierre beta enfocada en sharing y recepcion de feedback.
+
+Ahora incluye:
+
+- nuevo `docs/DEMO-CAPTURE-GUIDE.md` con la lista minima de capturas y reglas visuales;
+- nuevo `docs/TESTER-FEEDBACK-TEMPLATE.md` para ordenar hallazgos de testers;
+- `docs/PROJECT-STATUS.md` actualizado para reflejar `Stage C` en `85%`.
+
+Impacto:
+
+- el ultimo tramo de beta queda menos dependiente de coordinacion oral;
+- mejora la capacidad de compartir el proyecto y recoger feedback util de forma consistente;
+- el gap restante hasta `90%` ya depende casi por completo de ejecutar la validacion manual y la pasada final de release.

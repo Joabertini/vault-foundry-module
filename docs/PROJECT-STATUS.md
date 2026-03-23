@@ -15,7 +15,7 @@ The architecture is no longer just aspirational:
 
 - `Stage A - import/export stabilization`: `90%`
 - `Stage B - migration away from legacy runtime ownership`: `90%`
-- `Stage C - beta/demo/release hardening`: `80%`
+- `Stage C - beta/demo/release hardening`: `85%`
 
 ## What Is Stable Right Now
 
@@ -26,6 +26,7 @@ The architecture is no longer just aspirational:
 - beta-readiness section visible inside the web demo with stage percentages and release framing;
 - beta scope, release notes, and checklist artifacts now exist for actual sharing and tester onboarding;
 - manual Foundry validation guide and beta announcement template now exist for the final release pass;
+- capture guide and tester feedback template now exist for the last mile of beta execution;
 - Foundry runtime with progress feedback, settings, and preflight gating;
 - active runtime now creating actors directly from `canonicalFoundryPreview`;
 - `buildActor(...)` reduced to a compatibility wrapper around the canonical preview path.
@@ -36,7 +37,7 @@ The architecture is no longer just aspirational:
 - `scripts/character-builder.js` still contains redundant legacy logic and dead-weight helpers;
 - some files still contain encoding/mojibake issues that make cleanup slower and more brittle;
 - full manual validation inside a live Foundry VTT environment is still needed for the most confidence-sensitive flows.
-- beta polish is now underway, but live operator validation and the final release pass still need execution, not more framework.
+- beta polish is now underway, and the remaining work is mostly execution inside Foundry plus the final capture/release pass.
 
 ## Recommended Next Steps
 
@@ -44,7 +45,7 @@ The architecture is no longer just aspirational:
 2. Replace temporary JS bridges where possible with shared package usage or thinner adapters.
 3. Add more runtime-oriented validation and regression coverage for Foundry creation flows.
 4. Run deeper manual validation inside live Foundry VTT to confirm import behavior under real operator usage.
-5. Execute the final Stage C pass in Foundry and publish the beta package using the prepared checklist, validation guide, and announcement template.
+5. Execute the final Stage C pass in Foundry, capture the demo, and publish the beta package using the prepared release materials.
 
 ## Operational Rule
 
