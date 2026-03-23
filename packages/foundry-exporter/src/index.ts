@@ -616,7 +616,7 @@ function findGearData(name: string) {
   return getGearCatalogEntry(name);
 }
 
-function buildWeaponItem(name: string): FoundryItem {
+function buildWeaponItem(name: string, quantity = 1): FoundryItem {
   const weaponData = findWeaponData(name);
   const activityId = "dnd5eactivity000";
   const damage = parseDamageFormula(weaponData?.damage ?? "1d6");
@@ -629,7 +629,7 @@ function buildWeaponItem(name: string): FoundryItem {
     system: {
       source: { custom: "", book: "", page: "", license: "", rules: "2014", revision: 1 },
       description: { value: "", chat: "" },
-      quantity: 1,
+      quantity,
       weight: { value: 0, units: "lb" },
       price: { value: 0, denomination: "gp" },
       attunement: { required: false },
@@ -702,7 +702,7 @@ function buildWeaponItem(name: string): FoundryItem {
   };
 }
 
-function buildArmorItem(name: string, equipped: boolean): FoundryItem {
+function buildArmorItem(name: string, quantity = 1, equipped: boolean): FoundryItem {
   const armorData = findArmorData(name);
 
   return {
@@ -713,7 +713,7 @@ function buildArmorItem(name: string, equipped: boolean): FoundryItem {
     system: {
       source: { custom: "", book: "", page: "", license: "", rules: "2014", revision: 1 },
       description: { value: "", chat: "" },
-      quantity: 1,
+      quantity,
       weight: { value: 0, units: "lb" },
       price: { value: 0, denomination: "gp" },
       attunement: { required: false },
@@ -739,7 +739,7 @@ function buildArmorItem(name: string, equipped: boolean): FoundryItem {
   };
 }
 
-function buildGearItem(name: string): FoundryItem {
+function buildGearItem(name: string, quantity = 1): FoundryItem {
   const gearData = findGearData(name);
 
   return {
@@ -750,7 +750,7 @@ function buildGearItem(name: string): FoundryItem {
     system: {
       source: { custom: "", book: "", page: "", license: "", rules: "2014", revision: 1 },
       description: { value: "", chat: "" },
-      quantity: 1,
+      quantity,
       weight: { value: 0, units: "lb" },
       price: { value: 0, denomination: "gp" },
       rarity: "common",
@@ -806,23 +806,38 @@ function buildTraitData(character: CharacterBuild) {
 
 function buildItems(character: CharacterBuild): FoundryItem[] {
   const equipment = getEquipmentEntries(character);
-  const primaryWeapon = equipment.find((item) => Boolean(findWeaponData(item.lookupName)));
-  const primaryArmor = equipment.find((item) => Boolean(findArmorData(item.lookupName)));
-  const extraGear = equipment.filter(
-    (item) => !findWeaponData(item.lookupName) && !findArmorData(item.lookupName),
-  );
+  let equippedArmorAssigned = false;
+  let equippedShieldAssigned = false;
 
-  const weaponItems = primaryWeapon ? [buildWeaponItem(primaryWeapon.lookupName)] : [];
-  const armorItems = primaryArmor ? [buildArmorItem(primaryArmor.lookupName, true)] : [];
-  const gearItems = extraGear.map((item) => buildGearItem(item.lookupName));
+  const equipmentItems = equipment.flatMap((item) => {
+    if (findWeaponData(item.lookupName)) {
+      return [buildWeaponItem(item.lookupName, item.quantity)];
+    }
+
+    const armorData = findArmorData(item.lookupName);
+    if (armorData) {
+      const isShield = Boolean(armorData.grantsShieldBonus);
+      const shouldEquip = isShield
+        ? !equippedShieldAssigned
+        : !equippedArmorAssigned;
+
+      if (isShield) {
+        equippedShieldAssigned = true;
+      } else {
+        equippedArmorAssigned = true;
+      }
+
+      return [buildArmorItem(item.lookupName, item.quantity, shouldEquip)];
+    }
+
+    return [buildGearItem(item.lookupName, item.quantity)];
+  });
 
   return [
     ...buildClassItems(character),
     ...buildFeatItems(character),
     ...buildSpellItems(character),
-    ...armorItems,
-    ...weaponItems,
-    ...gearItems,
+    ...equipmentItems,
   ];
 }
 

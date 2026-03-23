@@ -117,6 +117,33 @@ test("buildFoundryActorPayload prefers normalized choices when present", () => {
   assert.equal(payload.items.some((item) => item.name === "wrong-item"), false);
 });
 
+test("buildFoundryActorPayload preserves mixed equipment entries and quantities", () => {
+  const build = makeCharacterBuild();
+  build.choices.normalized.equipment = [
+    { itemId: "quarterstaff", label: "Quarterstaff", quantity: 2, category: "weapon" },
+    { itemId: "dagger", label: "Dagger", quantity: 1, category: "weapon" },
+    { itemId: "mage-armor", label: "Mage Armor", quantity: 1, category: "armor" },
+    { itemId: "shield", label: "Shield", quantity: 1, category: "shield" },
+    { itemId: "chain-mail", label: "Chain Mail", quantity: 1, category: "armor" },
+    { itemId: "rope-hempen", label: "Hempen Rope", quantity: 2, category: "gear" },
+  ];
+
+  const payload = buildFoundryActorPayload(build);
+  const equipmentItems = payload.items.filter((item) =>
+    ["weapon", "equipment", "loot"].includes(item.type),
+  );
+  const equippedItems = equipmentItems.filter((item) => item.system?.equipped === true);
+
+  assert.equal(equipmentItems.filter((item) => item.type === "weapon").length, 2);
+  assert.equal(equipmentItems.filter((item) => item.type === "equipment").length, 3);
+  assert.equal(equipmentItems.filter((item) => item.type === "loot").length, 1);
+  assert.equal(equipmentItems.find((item) => item.name === "quarterstaff")?.system?.quantity, 2);
+  assert.equal(equipmentItems.find((item) => item.name === "Hempen Rope")?.system?.quantity, 2);
+  assert.equal(equippedItems.filter((item) => item.name === "Mage Armor").length, 1);
+  assert.equal(equippedItems.filter((item) => item.name === "Shield").length, 1);
+  assert.equal(equippedItems.filter((item) => item.name === "Chain Mail").length, 0);
+});
+
 test("buildFoundryExportResult returns preflight summary alongside payload", () => {
   const result = buildFoundryExportResult(makeCharacterBuild());
 

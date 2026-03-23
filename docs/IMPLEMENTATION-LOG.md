@@ -258,6 +258,37 @@ Impacto:
 - exporter y preflight comparten una misma logica de resolucion, lo que baja riesgo de divergencia;
 - el siguiente paso natural es ampliar fixtures mixtos de equipment y continuar la convergencia del runtime Foundry con esta capa compartida.
 
+### Exportacion de equipment mixto sin truncar inventario
+
+Se corrigio una limitacion concreta del exporter compartido: antes conservaba solo una arma y una pieza defensiva principal.
+
+Ahora incluye:
+
+- `packages/foundry-exporter/src/index.ts` exportando todas las entradas de `choices.equipment` / `choices.normalized.equipment`;
+- preservacion de `quantity` en:
+  - armas
+  - equipment defensivo
+  - gear/loot
+- logica de `equipped` mas razonable:
+  - primera armor no-shield equipada
+  - primer shield equipado
+  - piezas defensivas adicionales exportadas pero no equipadas
+- test nuevo en `packages/foundry-exporter/test/index.test.mjs` para cubrir:
+  - multiples armas
+  - armor + shield + armor extra
+  - gear con cantidad mayor a 1
+
+Validacion ejecutada:
+
+- build de `packages/foundry-exporter` correcto;
+- `node --test packages/foundry-exporter/test/index.test.mjs` pasando.
+
+Impacto:
+
+- el exporter deja de perder inventario valido en personajes con equipo mas realista;
+- la salida Foundry se acerca mas a un actor utilizable sin post-edicion manual;
+- el siguiente paso natural es llevar esta misma claridad operativa al flujo de operador Foundry, especialmente settings y feedback de importacion.
+
 ### Base architecture bootstrap
 
 Se agrego la base inicial del monorepo sin romper el prototipo actual de Foundry.
