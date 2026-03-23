@@ -28,6 +28,33 @@ Hooks.once('init', () => {
     type: String,
     default: '',
   });
+
+  game.settings.register('bertinis-vault', 'createFolderIfMissing', {
+    name: 'Vault | Crear carpeta por defecto si no existe',
+    hint: 'Si la carpeta configurada no existe, Vault creara una carpeta de actores con ese nombre.',
+    scope: 'world',
+    config: true,
+    type: Boolean,
+    default: true,
+  });
+
+  game.settings.register('bertinis-vault', 'notifyPreflightWarnings', {
+    name: 'Vault | Mostrar advertencias de preflight',
+    hint: 'Si esta activo, Vault mostrara una notificacion cuando la build tenga warnings no bloqueantes.',
+    scope: 'client',
+    config: true,
+    type: Boolean,
+    default: true,
+  });
+
+  game.settings.register('bertinis-vault', 'openSheetOnCreate', {
+    name: 'Vault | Abrir hoja al crear',
+    hint: 'Si esta activo, la hoja del actor se abre automaticamente despues de la creacion exitosa.',
+    scope: 'client',
+    config: true,
+    type: Boolean,
+    default: false,
+  });
 });
 
 Hooks.once('ready', () => {

@@ -289,6 +289,41 @@ Impacto:
 - la salida Foundry se acerca mas a un actor utilizable sin post-edicion manual;
 - el siguiente paso natural es llevar esta misma claridad operativa al flujo de operador Foundry, especialmente settings y feedback de importacion.
 
+### Settings operativos y feedback de importacion en Foundry
+
+Se dio un paso mas orientado al operador dentro del runtime legacy de Foundry, sin esperar todavia a reemplazar toda la UI.
+
+Ahora incluye:
+
+- nuevos settings en `scripts/vault.js`:
+  - `createFolderIfMissing`
+  - `notifyPreflightWarnings`
+  - `openSheetOnCreate`
+- uso real de `defaultFolder` durante la creacion del actor desde `scripts/vault-app.js`;
+- creacion opcional de carpeta de actores cuando la configuracion lo pide y la carpeta no existe;
+- mensajes de progreso mas explicitos durante:
+  - validacion canonica
+  - preparacion de export
+  - creacion del actor
+- resumen de preflight visible en la pantalla de exito;
+- apertura automatica de la hoja del actor cuando el setting cliente lo habilita;
+- notificacion explicita de error de importacion via `ui.notifications.error(...)`.
+
+Validacion ejecutada:
+
+- `node --check scripts/vault.js`;
+- `node --check scripts/vault-app.js`.
+
+Limite actual:
+
+- sigue pendiente la validacion manual dentro de Foundry VTT para confirmar render final, creacion real de carpeta y comportamiento visual del spinner/resultado.
+
+Impacto:
+
+- Stage A ya no mejora solo el modelo y el exporter: tambien mejora el proceso real de importacion para la persona que opera el modulo;
+- la configuracion del modulo empieza a tener consecuencias concretas dentro del flujo de creacion;
+- el siguiente paso natural es seguir convergiendo `vault-app` / `character-builder` con el exporter compartido para que el runtime legacy deje de reconstruir partes del actor por su cuenta.
+
 ### Base architecture bootstrap
 
 Se agrego la base inicial del monorepo sin romper el prototipo actual de Foundry.

@@ -47,6 +47,29 @@ export class VaultCreatorApp extends Application {
     this._createdActor = null;
   }
 
+  _setCreationStatus(html, message) {
+    html.find('#vault-creating-status').text(message || 'Creando personaje en Foundry...');
+  }
+
+  async _resolveActorFolder() {
+    const folderName = (game.settings.get('bertinis-vault', 'defaultFolder') || '').trim();
+    if (!folderName) return null;
+
+    const existingFolder = game.folders?.find((folder) =>
+      folder.type === 'Actor' && folder.name === folderName,
+    );
+    if (existingFolder) return existingFolder;
+
+    const shouldCreate = game.settings.get('bertinis-vault', 'createFolderIfMissing');
+    if (!shouldCreate) return null;
+
+    return Folder.create({
+      name: folderName,
+      type: 'Actor',
+      color: '#7a5f28',
+    });
+  }
+
   getData() {
     return {
       step: this._step,
@@ -487,6 +510,7 @@ export class VaultCreatorApp extends Application {
 
   async _createCharacter(html) {
     this._saveStepData(html);
+    this._setCreationStatus(html, 'Validando build canonica...');
 
     const canonicalBuild = createCanonicalCharacterBuild(this._formData, {});
     const preflight = buildFoundryPreflightPreview(canonicalBuild);
@@ -504,34 +528,57 @@ export class VaultCreatorApp extends Application {
 
     if (preflight.summary.warnings > 0) {
       const warningSummary = formatPreflightIssues(preflight);
-      ui.notifications.warn(
-        warningSummary
-          ? `Vault preflight: ${warningSummary}`
-          : 'Vault preflight detecto advertencias en esta build.',
-      );
+      if (game.settings.get('bertinis-vault', 'notifyPreflightWarnings')) {
+        ui.notifications.warn(
+          warningSummary
+            ? `Vault preflight: ${warningSummary}`
+            : 'Vault preflight detecto advertencias en esta build.',
+        );
+      }
     }
 
     // Show loading state
     html.find('#vault-step-9').hide();
     html.find('.vault-footer').hide();
     html.find('#vault-creating').show();
+    html.find('#vault-creating .vault-spinner-text').not('#vault-creating-status').hide();
+    this._setCreationStatus(html, 'Preparando exportacion a Foundry...');
 
     try {
+      const actorFolder = await this._resolveActorFolder();
+      this._setCreationStatus(html, actorFolder
+        ? `Creando actor en Foundry dentro de "${actorFolder.name}"...`
+        : 'Creando actor en Foundry...');
       const actorData = buildActor(this._formData);
+      if (actorFolder) {
+        actorData.folder = actorFolder.id;
+      }
       this._createdActor = await Actor.create(actorData);
 
       // Show success
       html.find('#vault-creating').hide();
       html.find('#vault-success').show();
       html.find('#vault-created-name').text(this._createdActor.name);
+      const successSummary = `Preflight: ${preflight.summary.blockers} blockers, ${preflight.summary.warnings} warnings, ${preflight.summary.info} info.`;
+      let summaryNode = html.find('#vault-created-summary');
+      if (!summaryNode.length) {
+        summaryNode = $('<div id="vault-created-summary" class="vault-result-sub" style="margin-top:8px"></div>');
+        html.find('#vault-success .vault-result-sub').last().after(summaryNode);
+      }
+      summaryNode.text(successSummary);
 
       ui.notifications.info(
-        `✦ ${game.i18n.localize('VAULT.Success')}: ${this._createdActor.name}`
+        `${game.i18n.localize('VAULT.Success')}: ${this._createdActor.name}`
       );
+
+      if (game.settings.get('bertinis-vault', 'openSheetOnCreate')) {
+        this._createdActor.sheet.render(true);
+      }
     } catch (err) {
       console.error('Vault | Error creating character:', err);
       html.find('#vault-creating').hide();
       html.find('#vault-error').show().find('#vault-error-msg').text(err.message);
+      ui.notifications.error(`Vault import fallo: ${err.message}`);
     }
   }
 
