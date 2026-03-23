@@ -31,9 +31,10 @@ This document is the fast-start guide for the next AI working on the repo.
 - shared exporter now preserves mixed equipment and quantities instead of truncating to a single weapon/armor pair;
 - legacy Foundry runtime now uses module settings for folder creation, warning notifications, and optional auto-open on success;
 - legacy `character-builder` now reuses the full shared preview item list instead of rebuilding only a subset of items;
+- legacy `foundry-export-bridge` now mirrors mixed equipment and quantity handling more closely, so runtime preview items are less divergent;
 - `apps/web` now surfaces exporter preflight to the operator before download;
 - the legacy Foundry runtime now uses a temporary `scripts/preflight-bridge.js` to surface blockers and warnings before actor creation;
-- next work should focus on converging more of legacy `system` assembly onto the shared exporter path, because item-level reuse is already in place;
+- next work should focus on converging more of legacy `system` assembly onto the shared exporter path, because both item-level reuse and preview equipment handling are already in better shape;
 - after that, reduce bridge duplication and converge Foundry runtime on the shared preflight path instead of adding new validation layers elsewhere;
 - keep `apps/web` dual-purpose: financier-facing demo first, builder internals second;
 - keep extracting logic out of legacy Foundry JS and into shared packages;

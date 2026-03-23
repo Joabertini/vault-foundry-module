@@ -348,6 +348,39 @@ Impacto:
 - baja la divergencia entre "actor creado en Foundry" y "payload producido por el exporter compartido";
 - el siguiente paso natural es empujar la misma convergencia sobre mas secciones de `system`, no solo sobre `items`.
 
+### Preview legacy mas alineada con equipment y cantidades del exporter compartido
+
+Se reforzo `scripts/foundry-export-bridge.js` para que la preview canonica que consume el runtime legacy deje de quedarse en un inventario minimo.
+
+Ahora incluye:
+
+- soporte para `choices.normalized.equipment` y `choices.normalized.spells` cuando existen;
+- exportacion de:
+  - multiples armas
+  - armor + shield + armor extra
+  - gear/loot
+- preservacion de `quantity` en armas, equipo defensivo y loot;
+- criterio simple de `equipped` en la preview:
+  - primera armor no-shield equipada
+  - primer shield equipado
+  - defensas adicionales no equipadas
+- `scripts/character-builder.js` manteniendo consumo directo de `canonicalFoundryPreview.items`, por lo que esta mejora ya impacta el actor legacy final.
+
+Validacion ejecutada:
+
+- `node --check scripts/foundry-export-bridge.js`;
+- `node --check scripts/character-builder.js`.
+
+Limite actual:
+
+- sigue faltando una prueba manual dentro de Foundry para confirmar que la UX final y la hoja del actor resultante se comportan como esperamos con inventarios mas ricos.
+
+Impacto:
+
+- el puente legacy deja de ser una preview demasiado recortada respecto del exporter compartido;
+- se reduce otra fuente importante de divergencia entre carril canonico y runtime activo;
+- el siguiente paso natural es converger mas `system` del bridge/builder con la salida compartida, no solo `items`.
+
 ### Base architecture bootstrap
 
 Se agrego la base inicial del monorepo sin romper el prototipo actual de Foundry.

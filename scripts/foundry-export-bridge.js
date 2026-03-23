@@ -4,7 +4,7 @@
 // the canonical CharacterBuild model inside the legacy module.
 // ============================================================
 
-import { WEAPON_OPTIONS } from './data.js';
+import { ARMOR_OPTIONS, WEAPON_OPTIONS } from './data.js';
 
 const CLASS_PROFS_BY_ID = {
   barbarian: { armor: ['light', 'medium', 'shields'], weapons: ['simple', 'martial'] },
@@ -464,6 +464,25 @@ function parseSpellEntry(raw) {
   };
 }
 
+function getEquipmentEntries(canonicalBuild) {
+  const normalizedEquipment = canonicalBuild?.choices?.normalized?.equipment || [];
+  if (normalizedEquipment.length) {
+    return normalizedEquipment.map(entry => ({
+      lookupName: entry.itemId || entry.label,
+      label: entry.label,
+      category: entry.category || 'other',
+      quantity: entry.quantity || 1,
+    }));
+  }
+
+  return (canonicalBuild?.choices?.equipment || []).map(entry => ({
+    lookupName: entry,
+    label: entry,
+    category: 'other',
+    quantity: 1,
+  }));
+}
+
 function buildSpellItem(name, level, classId) {
   const activityId = 'dnd5eactivity000';
 
@@ -520,7 +539,12 @@ function findWeaponData(name) {
   return WEAPON_OPTIONS.find(weapon => normalizedName.includes(weapon.name.toLowerCase()));
 }
 
-function buildWeaponItem(name) {
+function findArmorData(name) {
+  const normalizedName = String(name || '').toLowerCase();
+  return ARMOR_OPTIONS.find(armor => normalizedName.includes(String(armor.name || '').toLowerCase()));
+}
+
+function buildWeaponItem(name, quantity = 1) {
   const weaponData = findWeaponData(name);
   const activityId = 'dnd5eactivity000';
 
@@ -532,7 +556,7 @@ function buildWeaponItem(name) {
     system: {
       source: { custom: '', book: '', page: '', license: '', rules: '2014', revision: 1 },
       description: { value: '', chat: '' },
-      quantity: 1,
+      quantity,
       weight: { value: 0, units: 'lb' },
       price: { value: 0, denomination: 'gp' },
       attunement: { required: false },
@@ -603,6 +627,72 @@ function buildWeaponItem(name) {
   };
 }
 
+function buildArmorItem(name, quantity = 1, equipped = false) {
+  const armorData = findArmorData(name);
+  const armorType = String(armorData?.name || '').toLowerCase().includes('shield')
+    ? 'shield'
+    : 'light';
+
+  return {
+    _id: makeId(),
+    name: armorData?.name || name,
+    type: 'equipment',
+    img: 'icons/svg/shield.svg',
+    system: {
+      source: { custom: '', book: '', page: '', license: '', rules: '2014', revision: 1 },
+      description: { value: '', chat: '' },
+      quantity,
+      weight: { value: 0, units: 'lb' },
+      price: { value: 0, denomination: 'gp' },
+      attunement: { required: false },
+      equipped,
+      identified: true,
+      rarity: 'common',
+      uses: { max: '', recovery: [], spent: 0 },
+      armor: {
+        type: armorType,
+        value: armorData?.formula || '',
+      },
+      strength: 0,
+      stealth: false,
+      proficient: null,
+      identifier: slugify(name),
+    },
+    flags: {},
+    effects: [],
+    _stats: makeStats(),
+    folder: null,
+    sort: 0,
+    ownership: { default: 0 },
+  };
+}
+
+function buildGearItem(name, quantity = 1) {
+  return {
+    _id: makeId(),
+    name,
+    type: 'loot',
+    img: 'icons/svg/item-bag.svg',
+    system: {
+      source: { custom: '', book: '', page: '', license: '', rules: '2014', revision: 1 },
+      description: { value: '', chat: '' },
+      quantity,
+      weight: { value: 0, units: 'lb' },
+      price: { value: 0, denomination: 'gp' },
+      rarity: 'common',
+      identified: true,
+      container: null,
+      identifier: slugify(name),
+    },
+    flags: {},
+    effects: [],
+    _stats: makeStats(),
+    folder: null,
+    sort: 0,
+    ownership: { default: 0 },
+  };
+}
+
 function buildBiography(canonicalBuild) {
   const bio = canonicalBuild?.identity?.biography || {};
   const lines = [];
@@ -651,12 +741,35 @@ function buildItems(canonicalBuild) {
     buildFeatItem(feature, 'class')
   );
   const primaryClassId = canonicalBuild?.classing?.classes?.[0]?.classId || '';
-  const spellItems = (canonicalBuild?.choices?.spells || []).map(rawSpell => {
-    const parsed = parseSpellEntry(rawSpell);
-    return buildSpellItem(parsed.name, parsed.level, primaryClassId);
+  const spellSources = canonicalBuild?.choices?.normalized?.spells?.length
+    ? canonicalBuild.choices.normalized.spells.map(entry => ({ name: entry.label, level: entry.level }))
+    : (canonicalBuild?.choices?.spells || []).map(rawSpell => parseSpellEntry(rawSpell));
+  const spellItems = spellSources.map(parsed => {
+    const spellName = parsed.name || parsed.label;
+    const spellLevel = parsed.level ?? 1;
+    return buildSpellItem(spellName, spellLevel, primaryClassId);
   });
-  const weaponName = (canonicalBuild?.choices?.equipment || []).find(item => findWeaponData(item));
-  const weaponItems = weaponName ? [buildWeaponItem(weaponName)] : [];
+  const equipmentEntries = getEquipmentEntries(canonicalBuild);
+  let equippedArmorAssigned = false;
+  let equippedShieldAssigned = false;
+  const equipmentItems = equipmentEntries.map(item => {
+    if (findWeaponData(item.lookupName)) {
+      return buildWeaponItem(item.lookupName, item.quantity);
+    }
+
+    const armorData = findArmorData(item.lookupName);
+    if (armorData) {
+      const isShield = String(armorData.name || '').toLowerCase().includes('shield');
+      const shouldEquip = isShield ? !equippedShieldAssigned : !equippedArmorAssigned;
+
+      if (isShield) equippedShieldAssigned = true;
+      else equippedArmorAssigned = true;
+
+      return buildArmorItem(item.lookupName, item.quantity, shouldEquip);
+    }
+
+    return buildGearItem(item.label || item.lookupName, item.quantity);
+  });
 
   return [
     ...buildClassItems(canonicalBuild),
@@ -664,7 +777,7 @@ function buildItems(canonicalBuild) {
     ...chosenFeats,
     ...classFeatures,
     ...spellItems,
-    ...weaponItems,
+    ...equipmentItems,
   ];
 }
 
