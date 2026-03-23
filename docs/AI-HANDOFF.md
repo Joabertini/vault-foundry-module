@@ -144,3 +144,13 @@ For frontend-only demo work, use:
   - `Stage A`: `90%`
   - `Stage B`: `90%`
   - `Stage C`: `55%`
+
+## Latest Stage C Packaging
+
+- `apps/web/src/App.tsx` now also includes a beta scope section covering supported flows and honest risks.
+- `docs/BETA-RELEASE-NOTES.md` now exists as the release-facing summary for testers or collaborators.
+- `docs/PROJECT-STATUS.md` now reflects `Stage C` at `70%`.
+- Remaining work to reach `90%` is mostly outside pure code:
+  - screenshot/capture pass
+  - manual validation in live Foundry
+  - final beta announcement/release pass

@@ -15,7 +15,7 @@ The architecture is no longer just aspirational:
 
 - `Stage A - import/export stabilization`: `90%`
 - `Stage B - migration away from legacy runtime ownership`: `90%`
-- `Stage C - beta/demo/release hardening`: `55%`
+- `Stage C - beta/demo/release hardening`: `70%`
 
 ## What Is Stable Right Now
 
@@ -24,6 +24,7 @@ The architecture is no longer just aspirational:
 - exporter path that carries preflight summary into Foundry payload flags;
 - web demo showing preflight blockers and warnings before export;
 - beta-readiness section visible inside the web demo with stage percentages and release framing;
+- beta scope, release notes, and checklist artifacts now exist for actual sharing and tester onboarding;
 - Foundry runtime with progress feedback, settings, and preflight gating;
 - active runtime now creating actors directly from `canonicalFoundryPreview`;
 - `buildActor(...)` reduced to a compatibility wrapper around the canonical preview path.
@@ -34,7 +35,7 @@ The architecture is no longer just aspirational:
 - `scripts/character-builder.js` still contains redundant legacy logic and dead-weight helpers;
 - some files still contain encoding/mojibake issues that make cleanup slower and more brittle;
 - full manual validation inside a live Foundry VTT environment is still needed for the most confidence-sensitive flows.
-- beta polish is now underway, but screenshots, release notes, and live operator validation still need one more pass.
+- beta polish is now underway, but live operator validation and a final release pass still need one more round.
 
 ## Recommended Next Steps
 
@@ -42,7 +43,7 @@ The architecture is no longer just aspirational:
 2. Replace temporary JS bridges where possible with shared package usage or thinner adapters.
 3. Add more runtime-oriented validation and regression coverage for Foundry creation flows.
 4. Run deeper manual validation inside live Foundry VTT to confirm import behavior under real operator usage.
-5. Push Stage C from demo-ready to beta-ready with screenshots, release notes, and manual Foundry validation.
+5. Push Stage C from `70%` to `90%` with screenshots, manual Foundry validation, and a final beta announcement/release pass.
 
 ## Operational Rule
 

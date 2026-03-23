@@ -213,6 +213,55 @@ function BetaReadinessSection() {
   );
 }
 
+function BetaScopeSection() {
+  const supported = [
+    "Builder demo con presets, sheet preview y export JSON para Foundry.",
+    "Preflight con blockers, warnings e info antes de exportar.",
+    "Creación de actor Foundry desde la preview canónica compartida.",
+  ];
+
+  const knownWeakSpots = [
+    "Validación manual en Foundry real todavía pendiente como última pasada fuerte.",
+    "Persisten restos legacy y algunos archivos con mojibake/encoding incómodo.",
+    "La beta sigue enfocada en 5e 2014 y en los flujos ya cubiertos por el pipeline compartido.",
+  ];
+
+  return (
+    <section className="beta-scope">
+      <div className="section-head">
+        <span className="eyebrow">Beta Scope</span>
+        <h2>Qué ya puede mostrarse y qué sigue siendo sensible</h2>
+      </div>
+
+      <div className="beta-scope-grid">
+        <article className="scope-card">
+          <span className="eyebrow">Soportado</span>
+          <div className="scope-list">
+            {supported.map((entry) => (
+              <div className="scope-item" key={entry}>
+                <strong>Listo</strong>
+                <p>{entry}</p>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article className="scope-card scope-card-risk">
+          <span className="eyebrow">Riesgos honestos</span>
+          <div className="scope-list">
+            {knownWeakSpots.map((entry) => (
+              <div className="scope-item" key={entry}>
+                <strong>Atención</strong>
+                <p>{entry}</p>
+              </div>
+            ))}
+          </div>
+        </article>
+      </div>
+    </section>
+  );
+}
+
 function PreflightCard({
   blockers,
   warnings,
@@ -608,6 +657,8 @@ export function App() {
       <StoryBlock />
 
       <BetaReadinessSection />
+
+      <BetaScopeSection />
 
 
       <section className="builder-layout" id="builder">

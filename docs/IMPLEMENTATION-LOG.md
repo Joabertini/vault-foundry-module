@@ -1618,3 +1618,28 @@ Impacto:
 - la demo web ya comunica mejor el estado real del producto, no solo la build puntual;
 - el proyecto gana una base concreta para beta sharing y handoff con terceros;
 - Stage C deja de ser solamente polish futuro y pasa a tener artefactos reales de release.
+
+### Stage C suma alcance soportado y release notes
+
+Se agrego otra capa de presentacion util para beta, enfocada en compartir el proyecto sin depender de explicacion oral constante.
+
+Ahora incluye:
+
+- nueva `BetaScopeSection` en `apps/web/src/App.tsx` con:
+  - alcance soportado
+  - riesgos honestos
+  - framing mas claro para viewers y testers
+- estilos asociados en `apps/web/src/styles.css`;
+- nuevo documento `docs/BETA-RELEASE-NOTES.md`;
+- `docs/PROJECT-STATUS.md` actualizado para reflejar `Stage C` en `70%`.
+
+Validacion ejecutada:
+
+- `corepack pnpm web:typecheck`
+- `corepack pnpm --filter @bertinis-vault/web build`
+
+Impacto:
+
+- la demo ya sirve mejor como superficie de sharing con terceros;
+- el proyecto gana material concreto para tester onboarding y release communication;
+- Stage C sube con entregables reales, aunque todavia depende de validacion manual Foundry y una pasada final de anuncio/release.
