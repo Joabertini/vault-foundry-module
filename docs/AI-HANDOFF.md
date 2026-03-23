@@ -154,3 +154,13 @@ For frontend-only demo work, use:
   - screenshot/capture pass
   - manual validation in live Foundry
   - final beta announcement/release pass
+
+## Latest Stage C Closing Prep
+
+- `docs/FOUNDRY-MANUAL-VALIDATION.md` now exists for the final live Foundry validation pass.
+- `docs/BETA-ANNOUNCEMENT-TEMPLATE.md` now exists for the final beta communication step.
+- `docs/PROJECT-STATUS.md` now reflects `Stage C` at `80%`.
+- What remains before calling Stage C `90%` is execution, not framework:
+  - run the manual validation pass
+  - capture the final demo/screenshots
+  - publish or dry-run the beta announcement/release package

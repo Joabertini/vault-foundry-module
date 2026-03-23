@@ -1643,3 +1643,19 @@ Impacto:
 - la demo ya sirve mejor como superficie de sharing con terceros;
 - el proyecto gana material concreto para tester onboarding y release communication;
 - Stage C sube con entregables reales, aunque todavia depende de validacion manual Foundry y una pasada final de anuncio/release.
+
+### Stage C suma artefactos para cierre operativo
+
+Se preparo el ultimo tramo de Stage C con documentos ejecutables para que la salida beta no dependa de recordatorio manual.
+
+Ahora incluye:
+
+- nuevo `docs/FOUNDRY-MANUAL-VALIDATION.md` con escenarios y criterio de salida para la pasada manual en Foundry;
+- nuevo `docs/BETA-ANNOUNCEMENT-TEMPLATE.md` con version corta y larga del anuncio beta;
+- `docs/PROJECT-STATUS.md` actualizado para reflejar `Stage C` en `80%`.
+
+Impacto:
+
+- el tramo restante de Stage C queda mucho mas operacionalizado;
+- ya no faltan tanto artefactos, sino ejecucion final de validacion y anuncio;
+- el proyecto queda mejor preparado para continuidad si el cierre beta lo hace otra sesion o colaborador.
