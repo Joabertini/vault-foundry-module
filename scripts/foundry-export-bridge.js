@@ -197,6 +197,73 @@ function makeStats() {
   };
 }
 
+function makeToken(name) {
+  return {
+    name: name || 'New Character',
+    displayName: 0,
+    actorLink: true,
+    width: 1,
+    height: 1,
+    texture: {
+      src: 'systems/dnd5e/icons/svg/actors/character.svg',
+      anchorX: 0.5,
+      anchorY: 0.5,
+      offsetX: 0,
+      offsetY: 0,
+      fit: 'contain',
+      scaleX: 1,
+      scaleY: 1,
+      rotation: 0,
+      tint: '#ffffff',
+      alphaThreshold: 0.75,
+    },
+    lockRotation: false,
+    rotation: 0,
+    alpha: 1,
+    disposition: 1,
+    displayBars: 0,
+    bar1: { attribute: 'attributes.hp' },
+    bar2: { attribute: null },
+    light: {
+      negative: false,
+      priority: 0,
+      alpha: 0.5,
+      angle: 360,
+      bright: 0,
+      color: null,
+      coloration: 1,
+      dim: 0,
+      attenuation: 0.5,
+      luminosity: 0.5,
+      saturation: 0,
+      contrast: 0,
+      shadows: 0,
+      animation: { type: null, speed: 5, intensity: 5, reverse: false },
+      darkness: { min: 0, max: 1 },
+    },
+    sight: {
+      enabled: true,
+      range: 0,
+      angle: 360,
+      visionMode: 'basic',
+      color: null,
+      attenuation: 0.1,
+      brightness: 0,
+      saturation: 0,
+      contrast: 0,
+    },
+    detectionModes: [],
+    occludable: { radius: 0 },
+    ring: { enabled: false, colors: { ring: null, background: null }, effects: 1, subject: { scale: 1, texture: null } },
+    turnMarker: { mode: 1, animation: null, src: null, disposition: false },
+    movementAction: null,
+    flags: {},
+    randomImg: false,
+    appendNumber: false,
+    prependAdjective: false,
+  };
+}
+
 function getSpellAbility(classId) {
   const map = {
     artificer: 'int',
@@ -914,6 +981,10 @@ export function buildFoundryActorPreview(canonicalBuild) {
     },
     items: buildItems(canonicalBuild),
     effects: [],
+    prototypeToken: makeToken(canonicalBuild?.identity?.characterName || 'New Character'),
+    folder: null,
+    ownership: { default: 0 },
+    _stats: makeStats(),
     flags: {
       'bertinis-vault': {
         sourceProfile: canonicalBuild?.meta?.sourceProfile || 'vault-v1',

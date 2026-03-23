@@ -34,6 +34,7 @@ This document is the fast-start guide for the next AI working on the repo.
 - legacy `foundry-export-bridge` now mirrors mixed equipment and quantity handling more closely, so runtime preview items are less divergent;
 - legacy preview now carries more of the final `system` shape, and `character-builder` reuses more of that structure directly;
 - legacy preview now also consumes more `choices.normalized` data for proficiencies and features when available;
+- legacy preview now includes more top-level actor shape as well (`prototypeToken`, `_stats`, `ownership`, `folder`);
 - `apps/web` now surfaces exporter preflight to the operator before download;
 - the legacy Foundry runtime now uses a temporary `scripts/preflight-bridge.js` to surface blockers and warnings before actor creation;
 - next work should focus on deleting or collapsing legacy-only builder/bridge logic that is now shadowed by `canonicalFoundryPreview`, because both `system` shape and normalized choices are carrying more of the runtime already;

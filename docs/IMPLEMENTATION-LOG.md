@@ -436,6 +436,26 @@ Impacto:
 - se reduce otra diferencia importante entre runtime activo y carril compartido del monorepo;
 - el siguiente paso natural es seguir eliminando codigo legacy ahora realmente redundante dentro de `character-builder.js` y `foundry-export-bridge.js`.
 
+### Preview legacy mas cercana a un actor completo en top-level
+
+Se agrego otra capa de convergencia en `scripts/foundry-export-bridge.js`: ya no solo se acerca en `system` e `items`, sino tambien en la forma general del actor.
+
+Ahora incluye:
+
+- `prototypeToken` dentro de la preview legacy;
+- `_stats`, `ownership` y `folder` en la salida preview;
+- helper local `makeToken(...)` para que la preview ya tenga forma mucho mas parecida a un actor Foundry completo.
+
+Validacion ejecutada:
+
+- `node --check scripts/foundry-export-bridge.js`.
+
+Impacto:
+
+- se reduce la distancia entre "preview canonica" y "actor completo" incluso fuera de `system`;
+- prepara mejor el terreno para que futuras limpiezas del builder legacy puedan confiar mas en la preview completa;
+- el siguiente paso natural es una pasada mas agresiva de eliminacion de codigo redundante dentro de `character-builder.js`.
+
 ### Base architecture bootstrap
 
 Se agrego la base inicial del monorepo sin romper el prototipo actual de Foundry.
