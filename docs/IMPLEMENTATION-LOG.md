@@ -1497,3 +1497,30 @@ Impacto:
 - el actor creado por el runtime activo queda mas alineado con la salida del exporter compartido;
 - baja otra fuente de divergencia silenciosa entre preview/export y actor real;
 - deja mejor preparado el terreno para eliminar defaults legacy top-level en iteraciones futuras.
+
+### Preflight reforzado contra duplicados canonicos
+
+Se reforzo otra capa del pipeline de Stage A, esta vez sobre inconsistencias que no rompen el contrato estructural pero si degradan import/export y sincronizacion operativa.
+
+Ahora incluye:
+
+- `packages/domain/src/preflight.ts` actualizado para advertir:
+  - feats otorgados duplicados en `background.grantedFeatIds`
+  - feats elegidos duplicados en `choices.feats`
+  - spells duplicados en `choices.normalized.spells`
+  - equipment duplicado en `choices.normalized.equipment`
+- nuevos tests en `packages/domain/test/preflight.test.mjs`;
+- propagacion validada en `packages/foundry-exporter/test/index.test.mjs`.
+
+Validacion ejecutada:
+
+- `corepack pnpm --filter @bertinis-vault/domain build`
+- `corepack pnpm --filter @bertinis-vault/foundry-exporter build`
+- `node --test packages/domain/test/preflight.test.mjs`
+- `node --test packages/foundry-exporter/test/index.test.mjs`
+
+Impacto:
+
+- el preflight detecta mejor duplicaciones que antes podian pasar como builds tecnicamente validas pero operativamente inconsistentes;
+- sube la confiabilidad del pipeline compartido sin depender del runtime legacy para descubrir estos casos;
+- Stage A queda mas cerca de una linea defensible para import/export repetible.

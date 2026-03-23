@@ -293,3 +293,46 @@ test("buildPreflightResult warns on unresolved and duplicate legacy proficiencie
     ["DUPLICATE_PROFICIENCY_ENTRY", "UNRESOLVED_PROFICIENCY"],
   );
 });
+
+test("buildPreflightResult warns on duplicate feats, duplicate spells, and duplicate equipment entries", () => {
+  const result = buildPreflightResult(makeInput({
+    background: {
+      backgroundId: "sage",
+      grantedFeatIds: ["alert", "alert"],
+    },
+    choices: {
+      feats: ["alert", "alert"],
+      proficiencies: [],
+      spells: [],
+      equipment: [],
+      features: [],
+      normalized: {
+        feats: ["alert", "alert"],
+        proficiencies: [],
+        spells: [
+          { label: "Shield", level: 1 },
+          { label: "Shield", level: 1 },
+        ],
+        equipment: [
+          { itemId: "shield", label: "Shield", category: "shield", quantity: 1 },
+          { itemId: "shield", label: "Shield", category: "shield", quantity: 1 },
+        ],
+        features: [],
+      },
+    },
+  }), {
+    generatedAt: "2026-03-22T00:00:00.000Z",
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.summary.warnings, 4);
+  assert.deepEqual(
+    result.issues.map((issue) => issue.code),
+    [
+      "DUPLICATE_GRANTED_FEAT_ID",
+      "DUPLICATE_CHOSEN_FEAT_ID",
+      "DUPLICATE_SPELL_ENTRY",
+      "DUPLICATE_EQUIPMENT_ENTRY",
+    ],
+  );
+});

@@ -241,3 +241,31 @@ test("buildFoundryExportResult propagates proficiency warnings from preflight", 
     ],
   );
 });
+
+test("buildFoundryExportResult propagates duplicate warnings from preflight", () => {
+  const build = makeCharacterBuild();
+  build.background.grantedFeatIds = ["alert", "alert"];
+  build.choices.feats = ["alert", "alert"];
+  build.choices.normalized.spells = [
+    { label: "Shield", level: 1 },
+    { label: "Shield", level: 1 },
+  ];
+  build.choices.normalized.equipment = [
+    { itemId: "shield", label: "Shield", quantity: 1, category: "shield" },
+    { itemId: "shield", label: "Shield", quantity: 1, category: "shield" },
+  ];
+
+  const result = buildFoundryExportResult(build);
+
+  assert.equal(result.preflight.ok, true);
+  assert.deepEqual(
+    result.preflight.issues.map((issue) => issue.code),
+    [
+      "DUPLICATE_GRANTED_FEAT_ID",
+      "DUPLICATE_CHOSEN_FEAT_ID",
+      "DUPLICATE_SPELL_ENTRY",
+      "DUPLICATE_EQUIPMENT_ENTRY",
+    ],
+  );
+  assert.equal(result.payload?.flags["bertinis-vault"].preflight.warnings, 4);
+});

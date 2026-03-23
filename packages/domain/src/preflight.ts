@@ -67,6 +67,8 @@ function validateCanonicalCatalogs(character: CharacterBuild) {
   const issues: PreflightIssue[] = [];
   const totalLevels = character.classing.classes.reduce((sum, entry) => sum + entry.level, 0);
   const seenClassIds = new Set<string>();
+  const seenGrantedFeatIds = new Set<string>();
+  const seenChosenFeatIds = new Set<string>();
 
   if (totalLevels > 20) {
     issues.push(makeIssue({
@@ -135,6 +137,20 @@ function validateCanonicalCatalogs(character: CharacterBuild) {
   }
 
   for (const [index, featId] of character.background.grantedFeatIds.entries()) {
+    if (seenGrantedFeatIds.has(featId)) {
+      issues.push(makeIssue({
+        code: "DUPLICATE_GRANTED_FEAT_ID",
+        message: `Granted feat id "${featId}" appears more than once in background.grantedFeatIds.`,
+        severity: "warning",
+        scope: "canonical-build",
+        path: `background.grantedFeatIds[${index}]`,
+        source: "domain",
+        canonicalId: featId,
+      }));
+    } else {
+      seenGrantedFeatIds.add(featId);
+    }
+
     if (!getFeatCatalogEntry(featId)) {
       issues.push(makeIssue({
         code: "UNKNOWN_GRANTED_FEAT_ID",
@@ -149,6 +165,20 @@ function validateCanonicalCatalogs(character: CharacterBuild) {
   }
 
   for (const [index, featId] of character.choices.feats.entries()) {
+    if (seenChosenFeatIds.has(featId)) {
+      issues.push(makeIssue({
+        code: "DUPLICATE_CHOSEN_FEAT_ID",
+        message: `Chosen feat id "${featId}" appears more than once in choices.feats.`,
+        severity: "warning",
+        scope: "canonical-build",
+        path: `choices.feats[${index}]`,
+        source: "domain",
+        canonicalId: featId,
+      }));
+    } else {
+      seenChosenFeatIds.add(featId);
+    }
+
     if (!getFeatCatalogEntry(featId)) {
       issues.push(makeIssue({
         code: "UNKNOWN_CHOSEN_FEAT_ID",
@@ -168,6 +198,8 @@ function validateCanonicalCatalogs(character: CharacterBuild) {
 function validateNormalizedChoices(character: CharacterBuild) {
   const issues: PreflightIssue[] = [];
   const normalizedChoices = character.choices.normalized;
+  const seenSpellEntries = new Set<string>();
+  const seenEquipmentEntries = new Set<string>();
 
   if (!normalizedChoices) {
     return issues;
@@ -177,6 +209,21 @@ function validateNormalizedChoices(character: CharacterBuild) {
     const catalogById = spell.spellId ? getSpellCatalogEntry(spell.spellId) : undefined;
     const catalogByLabel = getSpellCatalogEntry(spell.label);
     const catalogEntry = catalogById ?? catalogByLabel;
+    const duplicateSpellKey = `${spell.spellId ?? catalogEntry?.id ?? spell.label.toLowerCase()}:${spell.level}`;
+
+    if (seenSpellEntries.has(duplicateSpellKey)) {
+      issues.push(makeIssue({
+        code: "DUPLICATE_SPELL_ENTRY",
+        message: `Spell "${spell.label}" appears more than once in choices.normalized.spells.`,
+        severity: "warning",
+        scope: "canonical-build",
+        path: `choices.normalized.spells[${index}]`,
+        source: "domain",
+        canonicalId: spell.spellId ?? catalogEntry?.id,
+      }));
+    } else {
+      seenSpellEntries.add(duplicateSpellKey);
+    }
 
     if (!catalogEntry) {
       issues.push(makeIssue({
@@ -230,6 +277,21 @@ function validateNormalizedChoices(character: CharacterBuild) {
     const weaponEntry = getWeaponCatalogEntry(lookupValue);
     const gearEntry = getGearCatalogEntry(lookupValue);
     const catalogEntry = armorEntry ?? weaponEntry ?? gearEntry;
+    const duplicateEquipmentKey = `${item.category}:${item.itemId ?? lookupValue.toLowerCase()}`;
+
+    if (seenEquipmentEntries.has(duplicateEquipmentKey)) {
+      issues.push(makeIssue({
+        code: "DUPLICATE_EQUIPMENT_ENTRY",
+        message: `Equipment "${item.label}" appears more than once in choices.normalized.equipment.`,
+        severity: "warning",
+        scope: "canonical-build",
+        path: `choices.normalized.equipment[${index}]`,
+        source: "domain",
+        canonicalId: item.itemId,
+      }));
+    } else {
+      seenEquipmentEntries.add(duplicateEquipmentKey);
+    }
 
     if (!catalogEntry) {
       issues.push(makeIssue({

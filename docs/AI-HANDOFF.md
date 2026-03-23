@@ -101,3 +101,14 @@ For frontend-only demo work, use:
 - The legacy runtime currently prefers preview-backed `name`, `type`, `img`, `prototypeToken`, `effects`, `folder`, `_stats`, and `ownership`.
 - Preview flags are now merged into the final actor envelope before attaching `bertinis-vault` metadata.
 - A dead-code cleanup pass was attempted on old item/spell helper functions, but the file's encoding made block deletion brittle with `apply_patch`; prefer structural convergence or a future whole-file normalization pass before aggressive removal.
+
+## Latest Preflight Hardening
+
+- `packages/domain/src/preflight.ts` now warns on duplicate canonical entries across:
+  - `background.grantedFeatIds`
+  - `choices.feats`
+  - `choices.normalized.spells`
+  - `choices.normalized.equipment`
+- Those warnings are covered in `packages/domain/test/preflight.test.mjs` and confirmed to propagate through `packages/foundry-exporter/test/index.test.mjs`.
+- This was intended as a Stage A reliability push: catch operationally inconsistent but structurally valid builds before they drift into export/import workflows.
+- Current Stage A estimate after this slice: about `90%`, with the main remaining gap being deeper manual validation inside Foundry VTT plus continued legacy retirement rather than missing shared preflight/export primitives.
