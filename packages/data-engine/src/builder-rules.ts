@@ -44,6 +44,36 @@ export const classSkillPickCountByClassId: Record<string, number> = {
   wizard: 2,
 };
 
+export const classWeaponOptionIdsByClassId: Record<string, string[]> = {
+  artificer: ["dagger", "light-crossbow", "quarterstaff"],
+  bard: ["dagger", "rapier", "shortsword", "light-crossbow"],
+  cleric: ["mace", "warhammer", "light-crossbow"],
+  druid: ["club", "dagger", "mace", "quarterstaff", "scimitar", "spear"],
+  fighter: ["longsword", "greatsword", "battleaxe", "warhammer", "shortbow", "light-crossbow"],
+  monk: ["quarterstaff", "shortsword", "dart", "spear"],
+  paladin: ["longsword", "warhammer", "javelin", "light-crossbow"],
+  ranger: ["shortbow", "longbow", "longsword", "shortsword", "dagger"],
+  rogue: ["dagger", "rapier", "shortsword", "shortbow", "light-crossbow"],
+  sorcerer: ["dagger", "quarterstaff", "light-crossbow"],
+  warlock: ["dagger", "mace", "quarterstaff", "light-crossbow"],
+  wizard: ["dagger", "quarterstaff", "light-crossbow"],
+};
+
+export const classArmorOptionIdsByClassId: Record<string, string[]> = {
+  artificer: ["leather", "scale-mail", "shield"],
+  bard: ["leather"],
+  cleric: ["chain-mail", "scale-mail", "shield"],
+  druid: ["leather", "hide", "shield"],
+  fighter: ["chain-mail", "scale-mail", "shield"],
+  monk: ["unarmored"],
+  paladin: ["chain-mail", "scale-mail", "shield"],
+  ranger: ["leather", "scale-mail", "shield"],
+  rogue: ["leather"],
+  sorcerer: ["mage-armor", "unarmored"],
+  warlock: ["leather", "mage-armor"],
+  wizard: ["mage-armor", "unarmored"],
+};
+
 export function getClassSkillOptions(classId: string): string[] {
   return classSkillOptionsByClassId[classId] ?? [];
 }
@@ -55,4 +85,12 @@ export function getBackgroundGrantedProficiencies(backgroundId: string): string[
 export function getClassSkillPickCount(classId: string): number {
   const options = getClassSkillOptions(classId);
   return classSkillPickCountByClassId[classId] ?? Math.min(2, options.length);
+}
+
+export function getClassWeaponOptionIds(classId: string): string[] {
+  return classWeaponOptionIdsByClassId[classId] ?? [];
+}
+
+export function getClassArmorOptionIds(classId: string): string[] {
+  return classArmorOptionIdsByClassId[classId] ?? [];
 }

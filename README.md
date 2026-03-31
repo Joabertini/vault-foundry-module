@@ -59,6 +59,7 @@ What is already done inside the current spell slice:
 5. ranger, paladin, artificer, and warlock fallback coverage has been widened to make normal MVP builds feel less empty.
 6. race language rules and subrace option ownership are beginning to move out of `apps/web/src/App.tsx` into shared data.
 7. class skill options, class skill pick limits, and background granted proficiencies are beginning to move out of `apps/web/src/App.tsx` into shared data.
+8. class weapon and armor availability filters are beginning to move out of `apps/web/src/App.tsx` into shared data.
 
 What remains inside this priority:
 
@@ -91,6 +92,7 @@ Current status of that priority:
 - shared domain now exposes cantrip limits, spell-selection modes, labels, section titles, max-level derivation, selection sanitizing, picker-state assembly, and spell-selection profiles for class and level;
 - shared data-engine now exposes race language rules and subrace option catalogs for reuse outside the web file;
 - shared data-engine now exposes class skill options, class skill pick counts, and background proficiency grants for reuse outside the web file;
+- shared data-engine now exposes class weapon and armor availability filters for reuse outside the web file;
 - API and web fallback paths now read shared spell class metadata instead of separate hardcoded maps;
 - the web builder now applies a first shared spell-selection cap by class and level instead of allowing every valid leveled spell by default.
 
@@ -100,7 +102,8 @@ Next follow-up inside the same priority:
 2. move `apps/web/src/App.tsx` from its local spell labels, section title, max-level derivation, filtered options, selection filtering, picker counts, and spell-cap rules onto the shared domain helper outputs;
 3. move race languages and subrace consumption in `apps/web/src/App.tsx` onto shared data-engine helpers;
 4. move class skills, background proficiencies, and pick-count consumption in `apps/web/src/App.tsx` onto shared data-engine helpers;
-5. refine prepared vs known behavior further for edge cases and higher-level flows.
+5. move class weapon and armor filtering in `apps/web/src/App.tsx` onto shared data-engine helpers;
+6. refine prepared vs known behavior further for edge cases and higher-level flows.
 
 ## Current Builder Baseline
 

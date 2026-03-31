@@ -2,9 +2,11 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  getClassArmorOptionIds,
   getBackgroundGrantedProficiencies,
   getClassSkillOptions,
   getClassSkillPickCount,
+  getClassWeaponOptionIds,
 } from "../dist/index.js";
 
 test("builder rules expose class skill options and pick counts", () => {
@@ -32,4 +34,19 @@ test("builder rules expose background granted proficiencies", () => {
     "History",
   ]);
   assert.deepEqual(getBackgroundGrantedProficiencies("custom"), []);
+});
+
+test("builder rules expose equipment availability by class", () => {
+  assert.deepEqual(getClassWeaponOptionIds("paladin"), [
+    "longsword",
+    "warhammer",
+    "javelin",
+    "light-crossbow",
+  ]);
+  assert.deepEqual(getClassArmorOptionIds("wizard"), [
+    "mage-armor",
+    "unarmored",
+  ]);
+  assert.deepEqual(getClassWeaponOptionIds("unknown-class"), []);
+  assert.deepEqual(getClassArmorOptionIds("unknown-class"), []);
 });

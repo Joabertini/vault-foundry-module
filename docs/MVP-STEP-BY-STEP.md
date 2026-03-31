@@ -86,6 +86,7 @@ Current progress:
 - shared domain now owns cantrip limits, spell-selection modes, spell-selection labels, section titles, max-level derivation, selection sanitizing, picker-state assembly, and spell-selection profiles by class and level;
 - shared data-engine now owns reusable race language rules and subrace option catalogs instead of leaving them only in `apps/web/src/App.tsx`;
 - shared data-engine now owns reusable class skill options, class skill pick counts, and background proficiency grants instead of leaving them only in `apps/web/src/App.tsx`;
+- shared data-engine now owns reusable class weapon and armor availability filters instead of leaving them only in `apps/web/src/App.tsx`;
 - the web builder now applies a first shared spell-selection cap instead of allowing every valid leveled spell by default.
 
 ### Step 4: Move Rule Ownership Out Of The UI
@@ -175,6 +176,7 @@ Continue with spell dataset expansion:
 3. move the web builder off local spell-cap logic and onto the shared selection profile helpers;
 4. start moving race languages and subrace ownership into shared packages so later UI extraction is safer;
 5. start moving class skills and background proficiency ownership into shared packages so later UI extraction is safer;
-6. keep `README.md` and this document current so the next coder can resume without reverse engineering the state.
+6. start moving weapon and armor availability ownership into shared packages so later UI extraction is safer;
+7. keep `README.md` and this document current so the next coder can resume without reverse engineering the state.
 
 This is the active execution priority now.
