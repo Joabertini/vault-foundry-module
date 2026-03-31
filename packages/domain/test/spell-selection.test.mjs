@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 
 import {
   getCantripSelectionLimitForClassLevel,
+  getMaxSpellLevelFromSlots,
+  getSpellSelectionModeLabel,
   getSpellSelectionProfileForClassLevel,
   getSpellSelectionLimitForClassLevel,
   getSpellSelectionModeForClass,
@@ -57,4 +59,15 @@ test("shared spell selection profile combines mode and limits", () => {
     cantripLimit: 3,
     spellLimit: 8,
   });
+});
+
+test("shared spell selection helpers derive labels and max level", () => {
+  assert.equal(getSpellSelectionModeLabel("prepared"), "preparados");
+  assert.equal(getSpellSelectionModeLabel("spellbook"), "libro");
+  assert.equal(getSpellSelectionModeLabel("known"), "conocidos");
+  assert.equal(getSpellSelectionModeLabel("none"), "spells");
+
+  assert.equal(getMaxSpellLevelFromSlots({ spell1: 4, spell2: 3, spell3: 0 }), 2);
+  assert.equal(getMaxSpellLevelFromSlots({ spell1: 0, spell2: 0, spell3: 0 }), 0);
+  assert.equal(getMaxSpellLevelFromSlots({ pact: 2, spell5: 2 }), 5);
 });

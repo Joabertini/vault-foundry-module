@@ -9,6 +9,8 @@ export type SpellSelectionProfile = {
   spellLimit: number;
 };
 
+export type SpellSlots = Record<string, number>;
+
 const bardSpellsKnownByLevel: Record<number, number> = {
   1: 4, 2: 5, 3: 6, 4: 7, 5: 8, 6: 9, 7: 10, 8: 11, 9: 12, 10: 14,
   11: 15, 12: 15, 13: 16, 14: 18, 15: 19, 16: 19, 17: 20, 18: 22, 19: 22, 20: 22,
@@ -141,6 +143,16 @@ export function getSpellSlotsForClassLevel(classId: string, level: number): Reco
   return slots;
 }
 
+export function getMaxSpellLevelFromSlots(slots: SpellSlots): number {
+  return Math.max(
+    0,
+    ...Object.entries(slots)
+      .filter(([, count]) => count > 0)
+      .map(([slotKey]) => Number.parseInt(slotKey.replace("spell", ""), 10))
+      .filter((slotLevel) => Number.isFinite(slotLevel)),
+  );
+}
+
 export function getSpellSelectionLimitForClassLevel(
   classId: string,
   level: number,
@@ -210,6 +222,19 @@ export function getSpellSelectionModeForClass(classId: string): SpellSelectionMo
       return "spellbook";
     default:
       return "none";
+  }
+}
+
+export function getSpellSelectionModeLabel(mode: SpellSelectionMode): string {
+  switch (mode) {
+    case "prepared":
+      return "preparados";
+    case "spellbook":
+      return "libro";
+    case "known":
+      return "conocidos";
+    default:
+      return "spells";
   }
 }
 
