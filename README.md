@@ -17,6 +17,34 @@ This repository now also contains the first shared foundation for the broader Be
 
 The Foundry module at the repository root remains the active prototype while the shared product architecture is built around it.
 
+Operational docs for the current repo:
+
+- [docs/ENVIRONMENT-GUIDE.md](./docs/ENVIRONMENT-GUIDE.md)
+- [docs/PROJECT-COMPLETION-CHECKLIST.md](./docs/PROJECT-COMPLETION-CHECKLIST.md)
+
+## Current Builder Baseline
+
+The active builder baseline is now the dark **9-step wizard** in `apps/web`, aligned to the older `vault-character-form-v2.html` direction instead of the previous demo-style surface.
+
+Most recent functional fixes:
+
+- subraces added to web builder state and canonical snapshot;
+- race languages are now governed by race rules instead of free text;
+- background-granted feats apply automatically;
+- duplicated feat export between background and choices was removed;
+- class skills now enforce selection caps;
+- class equipment is filtered instead of showing everything;
+- `4d6 x6` is now single-use per draft;
+- exporter deduplicates feat items defensively;
+- spellcasting UI now reads canonical derived spellcasting;
+- spell details now attempt to show school, casting time, range, duration, components, and summary;
+- the spell picker no longer hard-caps visible spells below the filtered dataset.
+
+Implementation handoff for this round:
+
+- [apps/web/README.md](./apps/web/README.md)
+- [docs/PROJECT-STATUS.md](./docs/PROJECT-STATUS.md)
+
 ## Features
 
 - Step-by-step character creation wizard (9 steps)
