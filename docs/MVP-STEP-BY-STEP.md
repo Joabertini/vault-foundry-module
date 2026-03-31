@@ -49,7 +49,7 @@ Why first:
 
 Status:
 
-- started in this pass.
+- baseline complete; keep the docs synced as reality changes.
 
 ### Step 2: Lock The MVP Runtime Surface
 
@@ -76,6 +76,14 @@ Highest-value data work:
 Success signal:
 
 - spellcasting classes stop feeling artificially constrained during a normal build.
+
+Current progress:
+
+- started;
+- shared spell class ownership now lives in `packages/data-engine/src/spells.ts`;
+- the shared fallback catalog is broader than before;
+- thin fallback lists for `ranger`, `paladin`, `artificer`, and `warlock` have been widened so normal builds feel less constrained;
+- the web builder now applies a first shared spell-selection cap instead of allowing every valid leveled spell by default.
 
 ### Step 4: Move Rule Ownership Out Of The UI
 
@@ -157,11 +165,11 @@ This is the exact working order I recommend for the next implementation slices:
 
 ## First Active Priority
 
-Start with environment scaffolding:
+Continue with spell dataset expansion:
 
-1. add `.env.example` files;
-2. add root `dev`;
-3. add root `verify:env`;
-4. keep `docs/ENVIRONMENT-GUIDE.md` current.
+1. keep widening spell breadth in the shared catalog where common builds still feel thin;
+2. keep API and web fallback spell ownership aligned through shared data;
+3. leave prepared, known, and spellbook refinement as the next follow-up in the same priority;
+4. keep `README.md` and this document current so the next coder can resume without reverse engineering the state.
 
-This pass begins that work.
+This is the active execution priority now.

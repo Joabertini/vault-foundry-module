@@ -39,7 +39,9 @@ This order is the shortest path to a real MVP because it starts by making the re
 
 ## Current Active Priority
 
-The current active priority is still **Environment scaffolding**, but the first slice is already in place:
+The current active priority is now **Spell dataset expansion**.
+
+The environment scaffolding slice is already in place:
 
 - `apps/api/.env.example`
 - `apps/web/.env.example`
@@ -48,11 +50,19 @@ The current active priority is still **Environment scaffolding**, but the first 
 - [docs/ENVIRONMENT-GUIDE.md](./docs/ENVIRONMENT-GUIDE.md)
 - [docs/MVP-STEP-BY-STEP.md](./docs/MVP-STEP-BY-STEP.md)
 
+What is already done inside the current spell slice:
+
+1. shared spell class ownership now lives in `packages/data-engine/src/spells.ts`;
+2. API and web fallback paths now read shared spell metadata instead of separate hardcoded class maps;
+3. the web builder now applies a first shared spell-selection cap by class and level;
+4. wizard now uses a spellbook-style selection model in shared domain logic;
+5. ranger, paladin, artificer, and warlock fallback coverage has been widened to make normal MVP builds feel less empty.
+
 What remains inside this priority:
 
-1. keep the environment docs synced with reality;
-2. document the Foundry local validation setup more explicitly;
-3. make sure future contributors use `corepack pnpm verify:env` before deeper work.
+1. keep expanding breadth for core level bands where normal builds still feel thin;
+2. tighten prepared vs known vs spellbook behavior for edge cases and higher-level flows;
+3. move more spell-selection ownership out of `apps/web/src/App.tsx` once the shared model is stable.
 
 ## Start Here If You Are Coding Next
 
@@ -64,11 +74,25 @@ corepack pnpm verify:env
 corepack pnpm dev
 ```
 
-After that, the next implementation priority is:
+After that, the active implementation priority is:
 
 1. expand the spell dataset;
 2. keep local and hybrid spell lists aligned;
 3. tighten spell-selection rules before doing broader UI cleanup.
+
+Current status of that priority:
+
+- shared spell class ownership now lives in `packages/data-engine/src/spells.ts`;
+- the fallback spell catalog is materially larger than before;
+- the weakest fallback lists now have better MVP coverage, especially `ranger`, `paladin`, `artificer`, and `warlock`;
+- API and web fallback paths now read shared spell class metadata instead of separate hardcoded maps;
+- the web builder now applies a first shared spell-selection cap by class and level instead of allowing every valid leveled spell by default.
+
+Next follow-up inside the same priority:
+
+1. keep expanding spell breadth, especially wizard, cleric, and druid coverage;
+2. refine prepared vs known behavior further for edge cases and higher-level flows;
+3. move more spell-selection logic out of `apps/web/src/App.tsx` once the shared model is stable.
 
 ## Current Builder Baseline
 
