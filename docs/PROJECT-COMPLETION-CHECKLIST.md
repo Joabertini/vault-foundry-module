@@ -43,6 +43,13 @@ These items unblock contributors immediately:
 4. Add a root verification script for Node version, `corepack`, `pnpm`, and required ports.
 5. Document the Foundry local validation setup in a reproducible way.
 
+Current progress:
+
+- `docs/ENVIRONMENT-GUIDE.md` exists;
+- `.env.example` files now exist for `apps/api` and `apps/web`;
+- root scripts now include `dev` and `verify:env`;
+- the remaining environment gap is mainly Foundry validation setup and keeping the docs in sync.
+
 ## Priority 2: Complete The Spell/Data Layer
 
 This is the biggest product-quality gap left in the active builder:

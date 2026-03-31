@@ -21,6 +21,54 @@ Operational docs for the current repo:
 
 - [docs/ENVIRONMENT-GUIDE.md](./docs/ENVIRONMENT-GUIDE.md)
 - [docs/PROJECT-COMPLETION-CHECKLIST.md](./docs/PROJECT-COMPLETION-CHECKLIST.md)
+- [docs/MVP-STEP-BY-STEP.md](./docs/MVP-STEP-BY-STEP.md)
+
+## Priority Order Of Execution
+
+If you are the next person coding in this repo, follow this order:
+
+1. Environment scaffolding.
+2. Spell dataset expansion.
+3. Spell rule tightening.
+4. Rule extraction out of `apps/web/src/App.tsx`.
+5. Foundry validation matrix.
+6. Export regression hardening.
+7. Legacy cleanup and encoding normalization.
+
+This order is the shortest path to a real MVP because it starts by making the repo runnable and testable, then improves the data/rules users feel most, and only after that spends time on deeper cleanup.
+
+## Current Active Priority
+
+The current active priority is still **Environment scaffolding**, but the first slice is already in place:
+
+- `apps/api/.env.example`
+- `apps/web/.env.example`
+- root `dev` script
+- root `verify:env` script
+- [docs/ENVIRONMENT-GUIDE.md](./docs/ENVIRONMENT-GUIDE.md)
+- [docs/MVP-STEP-BY-STEP.md](./docs/MVP-STEP-BY-STEP.md)
+
+What remains inside this priority:
+
+1. keep the environment docs synced with reality;
+2. document the Foundry local validation setup more explicitly;
+3. make sure future contributors use `corepack pnpm verify:env` before deeper work.
+
+## Start Here If You Are Coding Next
+
+Run these commands from the repository root:
+
+```bash
+corepack pnpm install
+corepack pnpm verify:env
+corepack pnpm dev
+```
+
+After that, the next implementation priority is:
+
+1. expand the spell dataset;
+2. keep local and hybrid spell lists aligned;
+3. tighten spell-selection rules before doing broader UI cleanup.
 
 ## Current Builder Baseline
 

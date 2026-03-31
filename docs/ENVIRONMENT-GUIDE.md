@@ -191,17 +191,20 @@ VITE_BERTINIS_API_URL=https://bertinis-5e-api.onrender.com
 
 Recommended local workflow:
 
-1. Start the API with `corepack pnpm api:dev`.
-2. Start the web builder with `corepack pnpm web:dev`.
-3. Open the builder in the browser.
-4. Confirm `/health` responds from the API.
-5. Build or typecheck before finishing the session.
+1. Run `corepack pnpm verify:env`.
+2. Start both services with `corepack pnpm dev`.
+3. If you only need one side, use `corepack pnpm api:dev` or `corepack pnpm web:dev`.
+4. Open the builder in the browser.
+5. Confirm `/health` responds from the API.
+6. Build or typecheck before finishing the session.
 
 ## Validation Commands
 
 From the repository root:
 
 ```bash
+corepack pnpm verify:env
+corepack pnpm dev
 corepack pnpm web:typecheck
 corepack pnpm web:build
 corepack pnpm web:verify

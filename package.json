@@ -4,12 +4,14 @@
   "private": true,
   "packageManager": "pnpm@10.6.2",
   "scripts": {
+    "dev": "node ./scripts/dev-workspace.mjs",
     "api:dev": "corepack pnpm --filter @bertinis-vault/api dev",
     "web:dev": "corepack pnpm --filter @bertinis-vault/web dev",
     "web:typecheck": "corepack pnpm --filter @bertinis-vault/web typecheck",
     "web:build": "corepack pnpm --filter @bertinis-vault/web build",
     "web:verify": "corepack pnpm --filter @bertinis-vault/web typecheck && corepack pnpm --filter @bertinis-vault/web build",
     "web:preview": "corepack pnpm --filter @bertinis-vault/web preview",
+    "verify:env": "node ./scripts/verify-env.mjs",
     "build": "corepack pnpm -r build",
     "typecheck": "corepack pnpm -r typecheck",
     "test": "corepack pnpm -r test"
