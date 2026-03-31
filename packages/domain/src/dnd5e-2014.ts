@@ -14,6 +14,14 @@ export type SpellChoiceEntry = {
   label: string;
   level: number;
 };
+export type SpellPickerState = {
+  mode: SpellSelectionMode;
+  modeLabel: string;
+  maxSpellLevel: number;
+  spellLimit: number;
+  availableCantripCount: number;
+  availableSpellCount: number;
+};
 
 const bardSpellsKnownByLevel: Record<number, number> = {
   1: 4, 2: 5, 3: 6, 4: 7, 5: 8, 6: 9, 7: 10, 8: 11, 9: 12, 10: 14,
@@ -265,6 +273,25 @@ export function sanitizeSpellSelections(input: {
   return {
     cantrips: trimmedCantrips,
     spells: limitedSpells,
+  };
+}
+
+export function buildSpellPickerState(input: {
+  slots: SpellSlots;
+  profile: SpellSelectionProfile;
+  cantripOptionCount: number;
+  spellOptions: SpellChoiceEntry[];
+}): SpellPickerState {
+  const maxSpellLevel = getMaxSpellLevelFromSlots(input.slots);
+  const filteredSpellOptions = input.spellOptions.filter((entry) => entry.level <= maxSpellLevel);
+
+  return {
+    mode: input.profile.mode,
+    modeLabel: getSpellSelectionModeLabel(input.profile.mode),
+    maxSpellLevel,
+    spellLimit: Math.min(input.profile.spellLimit, filteredSpellOptions.length),
+    availableCantripCount: Math.min(input.profile.cantripLimit, input.cantripOptionCount),
+    availableSpellCount: Math.min(input.profile.spellLimit, filteredSpellOptions.length),
   };
 }
 

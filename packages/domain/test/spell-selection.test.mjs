@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  buildSpellPickerState,
   formatSpellChoiceLabel,
   getCantripSelectionLimitForClassLevel,
   getAllowedSpellChoiceLabels,
@@ -100,6 +101,29 @@ test("shared spell selection helpers filter and trim choices", () => {
     {
       cantrips: ["Mage Hand", "Fire Bolt"],
       spells: ["Nv1: Magic Missile"],
+    },
+  );
+});
+
+test("shared spell picker state assembles counts and labels", () => {
+  assert.deepEqual(
+    buildSpellPickerState({
+      slots: { spell1: 4, spell2: 3, spell3: 0 },
+      profile: { mode: "prepared", cantripLimit: 3, spellLimit: 5 },
+      cantripOptionCount: 2,
+      spellOptions: [
+        { level: 1, label: "Magic Missile" },
+        { level: 2, label: "Invisibility" },
+        { level: 3, label: "Fireball" },
+      ],
+    }),
+    {
+      mode: "prepared",
+      modeLabel: "preparados",
+      maxSpellLevel: 2,
+      spellLimit: 2,
+      availableCantripCount: 2,
+      availableSpellCount: 2,
     },
   );
 });
