@@ -10,6 +10,10 @@ export type SpellSelectionProfile = {
 };
 
 export type SpellSlots = Record<string, number>;
+export type SpellChoiceEntry = {
+  label: string;
+  level: number;
+};
 
 const bardSpellsKnownByLevel: Record<number, number> = {
   1: 4, 2: 5, 3: 6, 4: 7, 5: 8, 6: 9, 7: 10, 8: 11, 9: 12, 10: 14,
@@ -236,6 +240,32 @@ export function getSpellSelectionModeLabel(mode: SpellSelectionMode): string {
     default:
       return "spells";
   }
+}
+
+export function formatSpellChoiceLabel(entry: SpellChoiceEntry): string {
+  return `Nv${entry.level}: ${entry.label}`;
+}
+
+export function getAllowedSpellChoiceLabels(entries: SpellChoiceEntry[]): Set<string> {
+  return new Set(entries.map((entry) => formatSpellChoiceLabel(entry)));
+}
+
+export function sanitizeSpellSelections(input: {
+  selectedCantrips: string[];
+  selectedSpells: string[];
+  cantripLimit: number;
+  spellLimit: number;
+  allowedSpells: SpellChoiceEntry[];
+}): { cantrips: string[]; spells: string[] } {
+  const trimmedCantrips = input.selectedCantrips.slice(0, Math.max(input.cantripLimit, 0));
+  const allowedSpellLabels = getAllowedSpellChoiceLabels(input.allowedSpells);
+  const trimmedSpells = input.selectedSpells.filter((entry) => allowedSpellLabels.has(entry));
+  const limitedSpells = trimmedSpells.slice(0, Math.max(input.spellLimit, 0));
+
+  return {
+    cantrips: trimmedCantrips,
+    spells: limitedSpells,
+  };
 }
 
 export function getSpellSelectionProfileForClassLevel(

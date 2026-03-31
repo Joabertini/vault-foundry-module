@@ -2,8 +2,11 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  formatSpellChoiceLabel,
   getCantripSelectionLimitForClassLevel,
+  getAllowedSpellChoiceLabels,
   getMaxSpellLevelFromSlots,
+  sanitizeSpellSelections,
   getSpellSelectionModeLabel,
   getSpellSelectionProfileForClassLevel,
   getSpellSelectionLimitForClassLevel,
@@ -66,8 +69,37 @@ test("shared spell selection helpers derive labels and max level", () => {
   assert.equal(getSpellSelectionModeLabel("spellbook"), "libro");
   assert.equal(getSpellSelectionModeLabel("known"), "conocidos");
   assert.equal(getSpellSelectionModeLabel("none"), "spells");
+  assert.equal(formatSpellChoiceLabel({ level: 3, label: "Fireball" }), "Nv3: Fireball");
 
   assert.equal(getMaxSpellLevelFromSlots({ spell1: 4, spell2: 3, spell3: 0 }), 2);
   assert.equal(getMaxSpellLevelFromSlots({ spell1: 0, spell2: 0, spell3: 0 }), 0);
   assert.equal(getMaxSpellLevelFromSlots({ pact: 2, spell5: 2 }), 5);
+});
+
+test("shared spell selection helpers filter and trim choices", () => {
+  const allowedLabels = getAllowedSpellChoiceLabels([
+    { level: 1, label: "Magic Missile" },
+    { level: 3, label: "Fireball" },
+  ]);
+
+  assert.ok(allowedLabels.has("Nv1: Magic Missile"));
+  assert.ok(allowedLabels.has("Nv3: Fireball"));
+  assert.equal(allowedLabels.has("Nv2: Invisibility"), false);
+
+  assert.deepEqual(
+    sanitizeSpellSelections({
+      selectedCantrips: ["Mage Hand", "Fire Bolt", "Light"],
+      selectedSpells: ["Nv1: Magic Missile", "Nv2: Invisibility", "Nv3: Fireball"],
+      cantripLimit: 2,
+      spellLimit: 1,
+      allowedSpells: [
+        { level: 1, label: "Magic Missile" },
+        { level: 3, label: "Fireball" },
+      ],
+    }),
+    {
+      cantrips: ["Mage Hand", "Fire Bolt"],
+      spells: ["Nv1: Magic Missile"],
+    },
+  );
 });
