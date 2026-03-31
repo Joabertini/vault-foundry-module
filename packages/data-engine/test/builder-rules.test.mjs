@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  getClassFallbackMeta,
   getClassArmorOptionIds,
   getBackgroundGrantedProficiencies,
   getClassSkillOptions,
@@ -49,4 +50,16 @@ test("builder rules expose equipment availability by class", () => {
   ]);
   assert.deepEqual(getClassWeaponOptionIds("unknown-class"), []);
   assert.deepEqual(getClassArmorOptionIds("unknown-class"), []);
+});
+
+test("builder rules expose fallback class metadata", () => {
+  assert.deepEqual(getClassFallbackMeta("wizard"), {
+    hitDie: 6,
+    spellcastingAbility: "int",
+    casterProgression: "full",
+    startingEquipment: ["quarterstaff", "spellbook", "component-pouch", "scholars-pack"],
+    primaryAbilities: ["int", "con"],
+  });
+  assert.equal(getClassFallbackMeta("fighter")?.spellcastingAbility, null);
+  assert.equal(getClassFallbackMeta("unknown-class"), undefined);
 });

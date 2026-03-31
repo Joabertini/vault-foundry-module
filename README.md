@@ -60,6 +60,7 @@ What is already done inside the current spell slice:
 6. race language rules and subrace option ownership are beginning to move out of `apps/web/src/App.tsx` into shared data.
 7. class skill options, class skill pick limits, and background granted proficiencies are beginning to move out of `apps/web/src/App.tsx` into shared data.
 8. class weapon and armor availability filters are beginning to move out of `apps/web/src/App.tsx` into shared data.
+9. class fallback metadata for hit die, spellcasting, progression, equipment, and primary abilities is beginning to move out of `apps/web/src/App.tsx` into shared data.
 
 What remains inside this priority:
 
@@ -93,6 +94,7 @@ Current status of that priority:
 - shared data-engine now exposes race language rules and subrace option catalogs for reuse outside the web file;
 - shared data-engine now exposes class skill options, class skill pick counts, and background proficiency grants for reuse outside the web file;
 - shared data-engine now exposes class weapon and armor availability filters for reuse outside the web file;
+- shared data-engine now exposes class fallback metadata for reuse outside the web file;
 - API and web fallback paths now read shared spell class metadata instead of separate hardcoded maps;
 - the web builder now applies a first shared spell-selection cap by class and level instead of allowing every valid leveled spell by default.
 
@@ -103,7 +105,8 @@ Next follow-up inside the same priority:
 3. move race languages and subrace consumption in `apps/web/src/App.tsx` onto shared data-engine helpers;
 4. move class skills, background proficiencies, and pick-count consumption in `apps/web/src/App.tsx` onto shared data-engine helpers;
 5. move class weapon and armor filtering in `apps/web/src/App.tsx` onto shared data-engine helpers;
-6. refine prepared vs known behavior further for edge cases and higher-level flows.
+6. move class fallback metadata in `apps/web/src/App.tsx` onto shared data-engine helpers;
+7. refine prepared vs known behavior further for edge cases and higher-level flows.
 
 ## Current Builder Baseline
 
