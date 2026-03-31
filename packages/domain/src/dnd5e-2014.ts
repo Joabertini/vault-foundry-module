@@ -2,6 +2,32 @@ import { resolveClassId } from "@bertinis-vault/data-engine";
 import type { AbilityId } from "@bertinis-vault/contracts";
 
 export type SpellProgression = "full" | "half" | "pact" | "none";
+export type SpellSelectionMode = "known" | "prepared" | "spellbook" | "none";
+export type SpellSelectionProfile = {
+  mode: SpellSelectionMode;
+  cantripLimit: number;
+  spellLimit: number;
+};
+
+const bardSpellsKnownByLevel: Record<number, number> = {
+  1: 4, 2: 5, 3: 6, 4: 7, 5: 8, 6: 9, 7: 10, 8: 11, 9: 12, 10: 14,
+  11: 15, 12: 15, 13: 16, 14: 18, 15: 19, 16: 19, 17: 20, 18: 22, 19: 22, 20: 22,
+};
+
+const sorcererSpellsKnownByLevel: Record<number, number> = {
+  1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10, 10: 11,
+  11: 12, 12: 12, 13: 13, 14: 13, 15: 14, 16: 14, 17: 15, 18: 15, 19: 15, 20: 15,
+};
+
+const warlockSpellsKnownByLevel: Record<number, number> = {
+  1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10, 10: 10,
+  11: 11, 12: 11, 13: 12, 14: 12, 15: 13, 16: 13, 17: 14, 18: 14, 19: 15, 20: 15,
+};
+
+const rangerSpellsKnownByLevel: Record<number, number> = {
+  1: 0, 2: 2, 3: 3, 4: 3, 5: 4, 6: 4, 7: 5, 8: 5, 9: 6, 10: 6,
+  11: 7, 12: 7, 13: 8, 14: 8, 15: 9, 16: 9, 17: 10, 18: 10, 19: 11, 20: 11,
+};
 
 export const spellAbilityByClassId: Partial<Record<string, AbilityId>> = {
   artificer: "int",
@@ -113,4 +139,88 @@ export function getSpellSlotsForClassLevel(classId: string, level: number): Reco
   });
 
   return slots;
+}
+
+export function getSpellSelectionLimitForClassLevel(
+  classId: string,
+  level: number,
+  spellcastingAbilityModifier = 0,
+): number {
+  const normalizedClassId = normalizeClassId(classId);
+
+  switch (normalizedClassId) {
+    case "bard":
+      return bardSpellsKnownByLevel[level] ?? 0;
+    case "sorcerer":
+      return sorcererSpellsKnownByLevel[level] ?? 0;
+    case "warlock":
+      return warlockSpellsKnownByLevel[level] ?? 0;
+    case "ranger":
+      return rangerSpellsKnownByLevel[level] ?? 0;
+    case "cleric":
+    case "druid":
+      return Math.max(level + spellcastingAbilityModifier, 1);
+    case "wizard":
+      return Math.max(6 + (Math.max(level, 1) - 1) * 2, 6);
+    case "paladin":
+      return level < 2 ? 0 : Math.max(Math.floor(level / 2) + spellcastingAbilityModifier, 1);
+    case "artificer":
+      return Math.max(Math.floor(level / 2) + spellcastingAbilityModifier, 1);
+    default:
+      return 0;
+  }
+}
+
+export function getCantripSelectionLimitForClassLevel(classId: string, level: number): number {
+  const normalizedClassId = normalizeClassId(classId);
+
+  switch (normalizedClassId) {
+    case "wizard":
+    case "cleric":
+    case "druid":
+      return level >= 10 ? 5 : level >= 4 ? 4 : 3;
+    case "bard":
+      return level >= 10 ? 4 : level >= 4 ? 3 : 2;
+    case "sorcerer":
+      return level >= 10 ? 6 : level >= 4 ? 5 : 4;
+    case "warlock":
+      return level >= 10 ? 4 : level >= 4 ? 3 : 2;
+    case "artificer":
+      return level >= 14 ? 4 : level >= 10 ? 3 : 2;
+    default:
+      return 0;
+  }
+}
+
+export function getSpellSelectionModeForClass(classId: string): SpellSelectionMode {
+  const normalizedClassId = normalizeClassId(classId);
+
+  switch (normalizedClassId) {
+    case "bard":
+    case "sorcerer":
+    case "warlock":
+    case "ranger":
+      return "known";
+    case "cleric":
+    case "druid":
+    case "paladin":
+    case "artificer":
+      return "prepared";
+    case "wizard":
+      return "spellbook";
+    default:
+      return "none";
+  }
+}
+
+export function getSpellSelectionProfileForClassLevel(
+  classId: string,
+  level: number,
+  spellcastingAbilityModifier = 0,
+): SpellSelectionProfile {
+  return {
+    mode: getSpellSelectionModeForClass(classId),
+    cantripLimit: getCantripSelectionLimitForClassLevel(classId, level),
+    spellLimit: getSpellSelectionLimitForClassLevel(classId, level, spellcastingAbilityModifier),
+  };
 }

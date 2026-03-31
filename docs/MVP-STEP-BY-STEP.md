@@ -83,6 +83,7 @@ Current progress:
 - shared spell class ownership now lives in `packages/data-engine/src/spells.ts`;
 - the shared fallback catalog is broader than before;
 - thin fallback lists for `ranger`, `paladin`, `artificer`, and `warlock` have been widened so normal builds feel less constrained;
+- shared domain now owns cantrip limits, spell-selection modes, and spell-selection profiles by class and level;
 - the web builder now applies a first shared spell-selection cap instead of allowing every valid leveled spell by default.
 
 ### Step 4: Move Rule Ownership Out Of The UI
@@ -169,7 +170,7 @@ Continue with spell dataset expansion:
 
 1. keep widening spell breadth in the shared catalog where common builds still feel thin;
 2. keep API and web fallback spell ownership aligned through shared data;
-3. leave prepared, known, and spellbook refinement as the next follow-up in the same priority;
+3. move the web builder off local spell-cap logic and onto the shared selection profile helpers;
 4. keep `README.md` and this document current so the next coder can resume without reverse engineering the state.
 
 This is the active execution priority now.
