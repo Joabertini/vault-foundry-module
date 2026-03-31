@@ -17,10 +17,12 @@ export type SpellChoiceEntry = {
 export type SpellPickerState = {
   mode: SpellSelectionMode;
   modeLabel: string;
+  sectionTitle: string;
   maxSpellLevel: number;
   spellLimit: number;
   availableCantripCount: number;
   availableSpellCount: number;
+  filteredSpellOptions: SpellChoiceEntry[];
 };
 
 const bardSpellsKnownByLevel: Record<number, number> = {
@@ -250,6 +252,10 @@ export function getSpellSelectionModeLabel(mode: SpellSelectionMode): string {
   }
 }
 
+export function getSpellSelectionSectionTitle(mode: SpellSelectionMode): string {
+  return mode === "spellbook" ? "Libro de spells" : "Spells";
+}
+
 export function formatSpellChoiceLabel(entry: SpellChoiceEntry): string {
   return `Nv${entry.level}: ${entry.label}`;
 }
@@ -288,10 +294,12 @@ export function buildSpellPickerState(input: {
   return {
     mode: input.profile.mode,
     modeLabel: getSpellSelectionModeLabel(input.profile.mode),
+    sectionTitle: getSpellSelectionSectionTitle(input.profile.mode),
     maxSpellLevel,
     spellLimit: Math.min(input.profile.spellLimit, filteredSpellOptions.length),
     availableCantripCount: Math.min(input.profile.cantripLimit, input.cantripOptionCount),
     availableSpellCount: Math.min(input.profile.spellLimit, filteredSpellOptions.length),
+    filteredSpellOptions,
   };
 }
 

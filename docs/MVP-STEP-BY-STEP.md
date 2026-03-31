@@ -83,7 +83,7 @@ Current progress:
 - shared spell class ownership now lives in `packages/data-engine/src/spells.ts`;
 - the shared fallback catalog is broader than before;
 - thin fallback lists for `ranger`, `paladin`, `artificer`, and `warlock` have been widened so normal builds feel less constrained;
-- shared domain now owns cantrip limits, spell-selection modes, spell-selection labels, max-level derivation, selection sanitizing, picker-state assembly, and spell-selection profiles by class and level;
+- shared domain now owns cantrip limits, spell-selection modes, spell-selection labels, section titles, max-level derivation, selection sanitizing, picker-state assembly, and spell-selection profiles by class and level;
 - the web builder now applies a first shared spell-selection cap instead of allowing every valid leveled spell by default.
 
 ### Step 4: Move Rule Ownership Out Of The UI

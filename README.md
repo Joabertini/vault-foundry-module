@@ -85,14 +85,14 @@ Current status of that priority:
 - shared spell class ownership now lives in `packages/data-engine/src/spells.ts`;
 - the fallback spell catalog is materially larger than before;
 - the weakest fallback lists now have better MVP coverage, especially `ranger`, `paladin`, `artificer`, and `warlock`;
-- shared domain now exposes cantrip limits, spell-selection modes, labels, max-level derivation, selection sanitizing, picker-state assembly, and spell-selection profiles for class and level;
+- shared domain now exposes cantrip limits, spell-selection modes, labels, section titles, max-level derivation, selection sanitizing, picker-state assembly, and spell-selection profiles for class and level;
 - API and web fallback paths now read shared spell class metadata instead of separate hardcoded maps;
 - the web builder now applies a first shared spell-selection cap by class and level instead of allowing every valid leveled spell by default.
 
 Next follow-up inside the same priority:
 
 1. keep expanding spell breadth, especially wizard, cleric, and druid coverage;
-2. move `apps/web/src/App.tsx` from its local spell labels, max-level derivation, selection filtering, picker counts, and spell-cap rules onto the shared domain helper outputs;
+2. move `apps/web/src/App.tsx` from its local spell labels, section title, max-level derivation, filtered options, selection filtering, picker counts, and spell-cap rules onto the shared domain helper outputs;
 3. refine prepared vs known behavior further for edge cases and higher-level flows.
 
 ## Current Builder Baseline

@@ -8,6 +8,7 @@ import {
   getAllowedSpellChoiceLabels,
   getMaxSpellLevelFromSlots,
   sanitizeSpellSelections,
+  getSpellSelectionSectionTitle,
   getSpellSelectionModeLabel,
   getSpellSelectionProfileForClassLevel,
   getSpellSelectionLimitForClassLevel,
@@ -70,6 +71,8 @@ test("shared spell selection helpers derive labels and max level", () => {
   assert.equal(getSpellSelectionModeLabel("spellbook"), "libro");
   assert.equal(getSpellSelectionModeLabel("known"), "conocidos");
   assert.equal(getSpellSelectionModeLabel("none"), "spells");
+  assert.equal(getSpellSelectionSectionTitle("spellbook"), "Libro de spells");
+  assert.equal(getSpellSelectionSectionTitle("prepared"), "Spells");
   assert.equal(formatSpellChoiceLabel({ level: 3, label: "Fireball" }), "Nv3: Fireball");
 
   assert.equal(getMaxSpellLevelFromSlots({ spell1: 4, spell2: 3, spell3: 0 }), 2);
@@ -120,10 +123,15 @@ test("shared spell picker state assembles counts and labels", () => {
     {
       mode: "prepared",
       modeLabel: "preparados",
+      sectionTitle: "Spells",
       maxSpellLevel: 2,
       spellLimit: 2,
       availableCantripCount: 2,
       availableSpellCount: 2,
+      filteredSpellOptions: [
+        { level: 1, label: "Magic Missile" },
+        { level: 2, label: "Invisibility" },
+      ],
     },
   );
 });
