@@ -1,8 +1,11 @@
 export * from "./backgrounds.js";
+export * from "./builder-rules.js";
 export * from "./classes.js";
 export * from "./equipment.js";
 export { gearCatalog } from "./equipment.js";
 export * from "./feats.js";
 export * from "./normalize.js";
+export * from "./race-rules.js";
 export * from "./races.js";
 export * from "./spells.js";
+export * from "./subclasses.js";
