@@ -117,6 +117,20 @@ test("buildFoundryActorPayload prefers normalized choices when present", () => {
   assert.equal(payload.items.some((item) => item.name === "wrong-item"), false);
 });
 
+test("buildFoundryActorPayload enriches spell items with lookup metadata", () => {
+  const payload = buildFoundryActorPayload(makeCharacterBuild());
+  const shield = payload.items.find((item) => item.name === "Shield" && item.type === "spell");
+
+  assert.equal(shield?.system?.identifier, "shield");
+  assert.equal(shield?._stats?.compendiumSource, null);
+  assert.equal(shield?.flags?.["bertinis-vault"]?.reference?.spellId, "shield");
+  assert.equal(shield?.flags?.plutonium?.page, "spells.html");
+  assert.equal(shield?.flags?.plutonium?.source, "PHB");
+  assert.equal(shield?.flags?.plutonium?.hash, "shield_phb");
+  assert.equal(shield?.flags?.plutonium?.propDroppable, "spell");
+  assert.equal(shield?.system?.description?.value.includes("Compendium lookup"), true);
+});
+
 test("buildFoundryActorPayload preserves mixed equipment entries and quantities", () => {
   const build = makeCharacterBuild();
   build.choices.normalized.equipment = [
@@ -268,4 +282,144 @@ test("buildFoundryExportResult propagates duplicate warnings from preflight", ()
     ],
   );
   assert.equal(result.payload?.flags["bertinis-vault"].preflight.warnings, 4);
+});
+
+test("buildFoundryActorPayload keeps prepared caster exports coherent for clerics", () => {
+  const build = makeCharacterBuild();
+  build.identity.characterName = "Ilyra Dawn";
+  build.ancestry.raceId = "aasimar";
+  build.classing.classes = [{ classId: "cleric", level: 5 }];
+  build.background.backgroundId = "acolyte";
+  build.background.grantedFeatIds = [];
+  build.abilities.base = { str: 10, dex: 12, con: 14, int: 8, wis: 17, cha: 13 };
+  build.abilities.final = { str: 10, dex: 12, con: 14, int: 8, wis: 17, cha: 13 };
+  build.choices.feats = [];
+  build.choices.proficiencies = ["Insight", "Religion", "Language: Celestial"];
+  build.choices.spells = ["Nv0: Sacred Flame", "Nv3: Spirit Guardians"];
+  build.choices.equipment = ["mace", "shield", "chain-mail", "holy-symbol"];
+  build.choices.features = ["Channel Divinity"];
+  build.choices.normalized = {
+    feats: [],
+    proficiencies: [
+      { kind: "skill", label: "Insight" },
+      { kind: "skill", label: "Religion" },
+      { kind: "language", label: "Celestial" },
+    ],
+    spells: [
+      { label: "Sacred Flame", level: 0 },
+      { label: "Spirit Guardians", level: 3 },
+    ],
+    equipment: [
+      { itemId: "mace", label: "Mace", quantity: 1, category: "weapon" },
+      { itemId: "shield", label: "Shield", quantity: 1, category: "shield" },
+      { itemId: "chain-mail", label: "Chain Mail", quantity: 1, category: "armor" },
+      { label: "holy-symbol", quantity: 1, category: "gear" },
+    ],
+    features: [{ label: "Channel Divinity", source: "class" }],
+  };
+  build.derived = {
+    proficiencyBonus: 3,
+    hp: 33,
+    ac: 18,
+    spellcasting: {
+      ability: "wis",
+      attackBonus: 6,
+      saveDC: 14,
+      slots: {
+        spell1: 4,
+        spell2: 3,
+        spell3: 2,
+        spell4: 0,
+        spell5: 0,
+        spell6: 0,
+        spell7: 0,
+        spell8: 0,
+        spell9: 0,
+      },
+    },
+  };
+
+  const payload = buildFoundryActorPayload(build);
+
+  assert.equal(payload.system.attributes.hp.value, 33);
+  assert.equal(payload.system.attributes.ac.flat, 18);
+  assert.equal(payload.system.attributes.spellcasting, "wis");
+  assert.equal(payload.system.traits.languages.value.includes("celestial"), true);
+  assert.equal(payload.items.some((item) => item.name === "Spirit Guardians" && item.type === "spell"), true);
+  assert.equal(payload.items.some((item) => item.name === "Shield" && item.type === "equipment"), true);
+});
+
+test("buildFoundryActorPayload keeps pact caster exports coherent for warlocks", () => {
+  const build = makeCharacterBuild();
+  build.identity.characterName = "Nox Vey";
+  build.classing.classes = [{ classId: "warlock", level: 5 }];
+  build.background.backgroundId = "charlatan";
+  build.background.grantedFeatIds = [];
+  build.abilities.base = { str: 8, dex: 14, con: 14, int: 10, wis: 12, cha: 18 };
+  build.abilities.final = { str: 8, dex: 14, con: 14, int: 10, wis: 12, cha: 18 };
+  build.choices.feats = [];
+  build.choices.proficiencies = ["Deception", "Arcana"];
+  build.choices.spells = ["Nv0: Eldritch Blast", "Nv3: Hunger of Hadar"];
+  build.choices.equipment = ["dagger", "leather", "arcane-focus"];
+  build.choices.features = ["Pact Magic"];
+  build.choices.normalized = {
+    feats: [],
+    proficiencies: [
+      { kind: "skill", label: "Deception" },
+      { kind: "skill", label: "Arcana" },
+    ],
+    spells: [
+      { label: "Eldritch Blast", level: 0 },
+      { label: "Hunger of Hadar", level: 3 },
+    ],
+    equipment: [
+      { itemId: "dagger", label: "Dagger", quantity: 1, category: "weapon" },
+      { itemId: "leather", label: "Leather Armor", quantity: 1, category: "armor" },
+      { label: "arcane-focus", quantity: 1, category: "gear" },
+    ],
+    features: [{ label: "Pact Magic", source: "class" }],
+  };
+  build.derived = {
+    proficiencyBonus: 3,
+    hp: 38,
+    ac: 14,
+    spellcasting: {
+      ability: "cha",
+      attackBonus: 7,
+      saveDC: 15,
+      slots: {
+        spell1: 0,
+        spell2: 0,
+        spell3: 2,
+        spell4: 0,
+        spell5: 0,
+        spell6: 0,
+        spell7: 0,
+        spell8: 0,
+        spell9: 0,
+      },
+    },
+  };
+
+  const payload = buildFoundryActorPayload(build);
+  const hungerOfHadar = payload.items.find((item) => item.name === "Hunger of Hadar" && item.type === "spell");
+
+  assert.equal(payload.system.attributes.spellcasting, "cha");
+  assert.equal(payload.system.spells.spell3, 2);
+  assert.equal(hungerOfHadar?.system?.level, 3);
+  assert.equal(payload.items.some((item) => item.name === "Pact Magic" && item.type === "feat"), true);
+});
+
+test("buildFoundryActorPayload includes background-granted feats alongside chosen feats", () => {
+  const build = makeCharacterBuild();
+  build.background.backgroundId = "wildspacer";
+  build.background.grantedFeatIds = ["tough"];
+  build.choices.feats = ["alert"];
+  build.choices.normalized.feats = ["alert"];
+
+  const payload = buildFoundryActorPayload(build);
+  const featNames = payload.items.filter((item) => item.type === "feat").map((item) => item.name);
+
+  assert.equal(featNames.includes("Tough"), true);
+  assert.equal(featNames.includes("Alert"), true);
 });

@@ -88,6 +88,7 @@ Current progress:
 - shared data-engine now owns reusable class skill options, class skill pick counts, and background proficiency grants instead of leaving them only in `apps/web/src/App.tsx`;
 - shared data-engine now owns reusable class weapon and armor availability filters instead of leaving them only in `apps/web/src/App.tsx`;
 - shared data-engine now owns reusable class fallback metadata instead of leaving it only in `apps/web/src/App.tsx`;
+- exporter regression coverage now includes representative prepared-caster, pact-caster, and background-feat cases;
 - the web builder now applies a first shared spell-selection cap instead of allowing every valid leveled spell by default.
 
 ### Step 4: Move Rule Ownership Out Of The UI
@@ -170,15 +171,18 @@ This is the exact working order I recommend for the next implementation slices:
 
 ## First Active Priority
 
-Continue with spell dataset expansion:
+Continue with export regression hardening:
 
-1. keep widening spell breadth in the shared catalog where common builds still feel thin;
-2. keep API and web fallback spell ownership aligned through shared data;
-3. move the web builder off local spell-cap logic and onto the shared selection profile helpers;
-4. start moving race languages and subrace ownership into shared packages so later UI extraction is safer;
-5. start moving class skills and background proficiency ownership into shared packages so later UI extraction is safer;
-6. start moving weapon and armor availability ownership into shared packages so later UI extraction is safer;
-7. start moving class fallback metadata ownership into shared packages so later UI extraction is safer;
-8. keep `README.md` and this document current so the next coder can resume without reverse engineering the state.
+1. keep representative exporter tests aligned to real MVP character shapes;
+2. resolve payload labels through shared catalogs so Foundry items do not leak raw ids;
+3. keep [docs/FOUNDRY-VALIDATION-MATRIX.md](./FOUNDRY-VALIDATION-MATRIX.md) current with the automated regression surface;
+4. run and record manual Foundry validation for the five MVP shapes when the current exporter slice stabilizes;
+5. return to the larger `apps/web/src/App.tsx` rule-consumption extraction after the clean exporter and validation slices are merged.
+
+Current status inside this priority:
+
+- exporter tests now cover prepared cleric, pact warlock, and background-granted feat cases;
+- the exporter now resolves feat labels through the shared feat catalog before building Foundry feat items;
+- the Foundry validation matrix exists as a standalone handoff doc for the next validation pass.
 
 This is the active execution priority now.

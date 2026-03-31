@@ -13,6 +13,13 @@ export type SpellCatalogEntry = {
   components?: Array<"vocal" | "somatic" | "material">;
   materials?: string;
   summary?: string;
+  source?: { book?: string; page?: string };
+  plutonium?: {
+    source?: string;
+    page?: string;
+    hash?: string;
+    propDroppable?: string;
+  };
 };
 
 function spell(entry: Omit<SpellCatalogEntry, "id"> & { id?: string }): SpellCatalogEntry {

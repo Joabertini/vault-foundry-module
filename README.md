@@ -20,6 +20,7 @@ The Foundry module at the repository root remains the active prototype while the
 Operational docs for the current repo:
 
 - [docs/ENVIRONMENT-GUIDE.md](./docs/ENVIRONMENT-GUIDE.md)
+- [docs/FOUNDRY-VALIDATION-MATRIX.md](./docs/FOUNDRY-VALIDATION-MATRIX.md)
 - [docs/PROJECT-COMPLETION-CHECKLIST.md](./docs/PROJECT-COMPLETION-CHECKLIST.md)
 - [docs/MVP-STEP-BY-STEP.md](./docs/MVP-STEP-BY-STEP.md)
 
@@ -39,7 +40,7 @@ This order is the shortest path to a real MVP because it starts by making the re
 
 ## Current Active Priority
 
-The current active priority is now **Spell dataset expansion**.
+The current active priority is now **Export regression hardening**.
 
 The environment scaffolding slice is already in place:
 
@@ -61,6 +62,8 @@ What is already done inside the current spell slice:
 7. class skill options, class skill pick limits, and background granted proficiencies are beginning to move out of `apps/web/src/App.tsx` into shared data.
 8. class weapon and armor availability filters are beginning to move out of `apps/web/src/App.tsx` into shared data.
 9. class fallback metadata for hit die, spellcasting, progression, equipment, and primary abilities is beginning to move out of `apps/web/src/App.tsx` into shared data.
+10. Foundry exporter regression coverage now includes representative prepared-caster, pact-caster, and background-feat cases.
+11. Foundry exporter feat items now resolve catalog labels for both background-granted feats and chosen feats, so import payloads stop leaking raw feat ids like `tough`.
 
 What remains inside this priority:
 
@@ -95,6 +98,7 @@ Current status of that priority:
 - shared data-engine now exposes class skill options, class skill pick counts, and background proficiency grants for reuse outside the web file;
 - shared data-engine now exposes class weapon and armor availability filters for reuse outside the web file;
 - shared data-engine now exposes class fallback metadata for reuse outside the web file;
+- Foundry validation now has a concrete five-build matrix and broader exporter regression coverage;
 - API and web fallback paths now read shared spell class metadata instead of separate hardcoded maps;
 - the web builder now applies a first shared spell-selection cap by class and level instead of allowing every valid leveled spell by default.
 
@@ -106,7 +110,20 @@ Next follow-up inside the same priority:
 4. move class skills, background proficiencies, and pick-count consumption in `apps/web/src/App.tsx` onto shared data-engine helpers;
 5. move class weapon and armor filtering in `apps/web/src/App.tsx` onto shared data-engine helpers;
 6. move class fallback metadata in `apps/web/src/App.tsx` onto shared data-engine helpers;
-7. refine prepared vs known behavior further for edge cases and higher-level flows.
+7. keep extending Foundry exporter regression coverage around real MVP build shapes;
+8. refine prepared vs known behavior further for edge cases and higher-level flows.
+
+Current export hardening status:
+
+- `packages/foundry-exporter/test/index.test.mjs` now covers prepared cleric, pact warlock, background-granted feat, duplicate, mismatch, and equipment-shape cases.
+- `packages/foundry-exporter/src/index.ts` now resolves feat ids through the shared feat catalog before building Foundry feat items.
+- [docs/FOUNDRY-VALIDATION-MATRIX.md](./docs/FOUNDRY-VALIDATION-MATRIX.md) is the handoff doc for the current Foundry validation slice.
+
+Next follow-up after this push:
+
+1. keep hardening exporter coverage around wizard spellbook and mixed-equipment MVP cases;
+2. run the manual Foundry matrix against a recent build and record outcomes;
+3. return to the large `apps/web/src/App.tsx` shared-rule integration once it can be isolated cleanly.
 
 ## Current Builder Baseline
 

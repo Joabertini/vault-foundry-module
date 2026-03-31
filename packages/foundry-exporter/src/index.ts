@@ -8,7 +8,9 @@ import {
 import { findWeaponCatalogEntry } from "@bertinis-vault/data-engine";
 import {
   getArmorCatalogEntry,
+  getFeatCatalogEntry,
   getGearCatalogEntry,
+  getSpellCatalogEntry,
 } from "@bertinis-vault/data-engine";
 import {
   abilityModifierMap,
@@ -37,6 +39,21 @@ type FoundryAbilityData = {
   };
 };
 type FoundryAbilities = Record<AbilityId, FoundryAbilityData>;
+type DerivedSpellEntry = {
+  name: string;
+  level: number;
+  spellId?: string;
+};
+type SpellReferenceCatalogMeta = {
+  label?: string;
+  source?: { book?: string };
+  plutonium?: {
+    source?: string;
+    page?: string;
+    hash?: string;
+    propDroppable?: string;
+  };
+};
 export type FoundryExportResult = {
   preflight: PreflightResult;
   payload?: FoundryActorPayload;
@@ -226,9 +243,9 @@ function slugify(value: string): string {
     .replace(/[\s/]+/g, "-");
 }
 
-function makeStats() {
+function makeStats(compendiumSource: string | null = null) {
   return {
-    compendiumSource: null,
+    compendiumSource,
     duplicateSource: null,
     exportSource: null,
     coreVersion: "13.351",
@@ -522,9 +539,81 @@ function buildFeatItem(name: string, featType: string): FoundryItem {
   };
 }
 
-function buildSpellItem(name: string, level: number, classId: string): FoundryItem {
+function buildSpellReference(spellId: string | undefined) {
+  if (!spellId) {
+    return null;
+  }
+
+  return {
+    type: "spell",
+    spellId,
+    compendiumPack: "dnd5e.spells",
+    lookup: `identifier:${spellId}`,
+    comparable: true,
+  };
+}
+
+function toPlutoniumSource(book?: string) {
+  if (!book) {
+    return "PHB";
+  }
+
+  return book
+    .replace(/'14/g, "")
+    .replace(/'24/g, "")
+    .replace(/[^A-Za-z0-9]/g, "")
+    .toUpperCase();
+}
+
+function toPlutoniumHash(name: string, source: string) {
+  return `${encodeURIComponent(name.trim().toLowerCase())}_${source.trim().toLowerCase()}`;
+}
+
+function buildPlutoniumSpellReference(
+  name: string,
+  spellId: string,
+  catalogEntry?: SpellReferenceCatalogMeta,
+) {
+  const source = catalogEntry?.plutonium?.source ?? toPlutoniumSource(catalogEntry?.source?.book);
+  const page = catalogEntry?.plutonium?.page ?? "spells.html";
+  const hash = catalogEntry?.plutonium?.hash ?? toPlutoniumHash(catalogEntry?.label ?? name, source);
+  const propDroppable = catalogEntry?.plutonium?.propDroppable ?? "spell";
+
+  return {
+    page,
+    source,
+    hash,
+    propDroppable,
+    spellId,
+  };
+}
+
+function buildSpellDescription(name: string, summary?: string, reference?: ReturnType<typeof buildSpellReference>) {
+  const lines = [`<p>${summary || `${name} exported from the canonical Bertini's Vault build.`}</p>`];
+
+  if (reference) {
+    lines.push(
+      `<p><strong>Compendium lookup:</strong> ${reference.compendiumPack} / ${reference.lookup}</p>`,
+    );
+  }
+
+  return lines.join("");
+}
+
+function buildSpellItem(entry: DerivedSpellEntry, classId: string): FoundryItem {
+  const catalogEntry = getSpellCatalogEntry(entry.spellId ?? entry.name);
+  const spellId = entry.spellId ?? catalogEntry?.id ?? slugify(entry.name);
+  const name = catalogEntry?.label ?? entry.name;
+  const level = catalogEntry?.level ?? entry.level;
   const spellAbility = getSpellAbilityForClass(classId) ?? "int";
   const activityId = "dnd5eactivity000";
+  const reference = buildSpellReference(spellId);
+  const plutoniumReference = buildPlutoniumSpellReference(name, spellId, catalogEntry);
+  const description = buildSpellDescription(name, catalogEntry?.summary, reference);
+  const components = catalogEntry?.components ?? ["vocal", "somatic"];
+  const castingTime = catalogEntry?.castingTime ?? { type: "action", value: 1 };
+  const range = catalogEntry?.range ?? { value: null, units: "ft" };
+  const duration = catalogEntry?.duration ?? { value: "", units: "inst" };
 
   return {
     _id: makeId(),
@@ -532,45 +621,60 @@ function buildSpellItem(name: string, level: number, classId: string): FoundryIt
     type: "spell",
     img: "icons/svg/book.svg",
     system: {
-      source: { custom: "", book: "", page: "", license: "", rules: "2014", revision: 1 },
-      description: { value: "", chat: "" },
+      source: {
+        custom: "",
+        book: "",
+        page: "",
+        license: "",
+        rules: "2014",
+        revision: 1,
+      },
+      description: { value: description, chat: catalogEntry?.summary ?? "" },
       level,
-      school: "evo",
-      properties: ["vocal", "somatic"],
+      school: catalogEntry?.school ?? "evo",
+      properties: components,
       ability: spellAbility,
-      materials: { value: "", consumed: false, cost: 0, supply: 0 },
+      materials: { value: catalogEntry?.materials ?? "", consumed: false, cost: 0, supply: 0 },
       target: { template: { contiguous: false, units: "ft" }, affects: { count: "1", type: "creature", choice: false } },
-      range: { value: null, units: "ft" },
-      activation: { type: "action", value: 1, condition: "" },
-      duration: { value: "", units: "inst" },
+      range: { value: range.value, units: range.units },
+      activation: { type: castingTime.type, value: castingTime.value, condition: "" },
+      duration: { value: duration.value, units: duration.units },
       uses: { max: "", recovery: [], spent: 0 },
       method: "spell",
       prepared: level === 0 ? 2 : 1,
       sourceClass: classId,
       activities: {
         [activityId]: {
-          _id: activityId,
-          type: "utility",
-          activation: { type: "action", value: null, override: false },
-          consumption: { targets: [], scaling: { allowed: false, max: "" }, spellSlot: true },
-          description: { chatFlavor: "" },
-          duration: { units: "inst", concentration: false, override: false },
-          effects: [],
-          range: { override: false, units: "ft" },
-          target: { prompt: true, template: { contiguous: false, units: "ft" }, affects: { choice: false }, override: false },
-          uses: { spent: 0, recovery: [] },
-          sort: 0,
-          flags: {},
+            _id: activityId,
+            type: "utility",
+            activation: { type: castingTime.type, value: null, override: false },
+            consumption: { targets: [], scaling: { allowed: false, max: "" }, spellSlot: true },
+            description: { chatFlavor: catalogEntry?.summary ?? "" },
+            duration: { units: duration.units, concentration: false, override: false },
+            effects: [],
+            range: { override: false, units: range.units },
+            target: { prompt: true, template: { contiguous: false, units: "ft" }, affects: { choice: false }, override: false },
+            uses: { spent: 0, recovery: [] },
+            sort: 0,
+            flags: {},
+          },
+        },
+        identifier: spellId,
+      },
+      flags: {
+        plutonium: {
+          ...plutoniumReference,
+        },
+        "bertinis-vault": {
+          reference,
+          plutonium: plutoniumReference,
         },
       },
-      identifier: slugify(name),
-    },
-    flags: {},
-    effects: [],
-    _stats: makeStats(),
-    folder: null,
-    sort: 0,
-    ownership: { default: 0 },
+      effects: [],
+      _stats: makeStats(),
+      folder: null,
+      sort: 0,
+      ownership: { default: 0 },
   };
 }
 
@@ -578,20 +682,31 @@ function buildSpellItems(character: CharacterBuild): FoundryItem[] {
   const primaryClassId = normalizeClassId(character.classing.classes[0]?.classId ?? "");
 
   return getSpellEntries(character).map((entry) =>
-    buildSpellItem(entry.name, entry.level, primaryClassId),
+    buildSpellItem(entry, primaryClassId),
   );
 }
 
 function buildFeatItems(character: CharacterBuild): FoundryItem[] {
   const backgroundFeats = character.background.grantedFeatIds.map((featId) =>
-    buildFeatItem(featId, "background"),
+    buildFeatItem(getFeatCatalogEntry(featId)?.label ?? featId, "background"),
   );
-  const chosenFeats = character.choices.feats.map((featId) => buildFeatItem(featId, "feat"));
+  const chosenFeats = character.choices.feats.map((featId) =>
+    buildFeatItem(getFeatCatalogEntry(featId)?.label ?? featId, "feat"),
+  );
   const featureItems = getFeatureEntries(character).map((feature) =>
     buildFeatItem(feature.name, feature.source),
   );
+  const dedupedItems: FoundryItem[] = [];
+  const seen = new Set<string>();
 
-  return [...backgroundFeats, ...chosenFeats, ...featureItems];
+  for (const item of [...backgroundFeats, ...chosenFeats, ...featureItems]) {
+    const key = `${String(item.type)}:${String(item.name).toLowerCase()}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    dedupedItems.push(item);
+  }
+
+  return dedupedItems;
 }
 
 function parseDamageFormula(formula: string) {
