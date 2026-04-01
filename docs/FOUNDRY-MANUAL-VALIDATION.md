@@ -18,6 +18,8 @@ Run a final human validation pass inside live Foundry VTT before calling the pro
 Use these repo artifacts during the pass:
 
 - `docs/foundry-validation-fixtures/summary.json`
+- `docs/foundry-validation-fixtures/README.md`
+- `docs/foundry-validation-fixtures/WORKING-REPORT.md`
 - `docs/foundry-validation-fixtures/*.json`
 - `docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md`
 

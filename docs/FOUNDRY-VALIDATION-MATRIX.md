@@ -26,6 +26,7 @@ Generated validation payloads can be refreshed with:
 
 - `corepack pnpm foundry:fixtures`
 - output directory: `docs/foundry-validation-fixtures/`
+- human packet entrypoint: `docs/foundry-validation-fixtures/README.md`
 
 ## Manual Foundry Matrix
 

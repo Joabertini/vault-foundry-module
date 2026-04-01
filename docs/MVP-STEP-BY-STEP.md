@@ -186,6 +186,7 @@ Current status inside this priority:
 - the Foundry validation matrix exists as a standalone handoff doc for the next validation pass;
 - reusable Foundry validation fixtures now live in `packages/foundry-exporter/test/fixtures.mjs`;
 - `corepack pnpm foundry:fixtures` now exports reviewable payload snapshots for the live validation pass;
+- the fixture export now also generates a human-readable validation packet and working report in `docs/foundry-validation-fixtures/`;
 - `docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md` now exists as the repo-native handoff/report template for the human pass.
 
 This is the active execution priority now.

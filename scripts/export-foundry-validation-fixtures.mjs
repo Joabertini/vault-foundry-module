@@ -44,10 +44,65 @@ for (const fixture of manualValidationFixtures) {
   });
 }
 
+const generatedAt = new Date().toISOString();
+
 await writeFile(
   path.join(outputDir, "summary.json"),
-  `${JSON.stringify({ generatedAt: new Date().toISOString(), fixtures: summary }, null, 2)}\n`,
+  `${JSON.stringify({ generatedAt, fixtures: summary }, null, 2)}\n`,
   "utf8",
 );
+
+const packetLines = [
+  "# Foundry Validation Packet",
+  "",
+  `Generated at: \`${generatedAt}\``,
+  "",
+  "## Fixture Summary",
+  "",
+  "| Fixture | Result | Blockers | Warnings | Output |",
+  "| --- | --- | ---: | ---: | --- |",
+  ...summary.map((fixture) =>
+    `| \`${fixture.id}\` | ${fixture.ok ? "ok" : "blocked"} | ${fixture.blockers} | ${fixture.warnings} | \`${fixture.output}\` |`,
+  ),
+  "",
+  "## Manual Validation Workflow",
+  "",
+  "1. Run `corepack pnpm foundry:fixtures` to refresh the packet.",
+  "2. Open `docs/FOUNDRY-MANUAL-VALIDATION.md` for the live Foundry checklist.",
+  "3. Record human results in `docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md` or the generated working copy below.",
+];
+
+await writeFile(path.join(outputDir, "README.md"), `${packetLines.join("\n")}\n`, "utf8");
+
+const reportLines = [
+  "# Foundry Manual Validation Working Copy",
+  "",
+  `Generated at: \`${generatedAt}\``,
+  "",
+  "Start from `docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md` for the canonical template.",
+  "",
+  "## Automatic Baseline",
+  "",
+  "| Fixture | Label | Preflight | Blockers | Warnings | Output |",
+  "| --- | --- | --- | ---: | ---: | --- |",
+  ...summary.map((fixture) =>
+    `| \`${fixture.id}\` | ${fixture.label} | ${fixture.ok ? "ok" : "blocked"} | ${fixture.blockers} | ${fixture.warnings} | \`${fixture.output}\` |`,
+  ),
+  "",
+  "## Manual Notes",
+  "",
+  ...summary.flatMap((fixture, index) => [
+    `### ${index + 1}. ${fixture.label}`,
+    "",
+    `- Fixture: \`${fixture.id}\``,
+    `- Automatic baseline: ${fixture.ok ? "ok" : "blocked"}; blockers=${fixture.blockers}; warnings=${fixture.warnings}`,
+    "- Live Foundry result:",
+    "- Notes:",
+    "- Screenshot paths:",
+    "",
+  ]),
+];
+
+await writeFile(path.join(outputDir, "WORKING-REPORT.md"), `${reportLines.join("\n")}\n`, "utf8");
 
 console.log(`Exported ${summary.length} Foundry validation fixtures to ${outputDir}`);
