@@ -12,6 +12,7 @@
     "web:verify": "corepack pnpm --filter @bertinis-vault/web typecheck && corepack pnpm --filter @bertinis-vault/web build",
     "web:preview": "corepack pnpm --filter @bertinis-vault/web preview",
     "foundry:fixtures": "corepack pnpm --filter @bertinis-vault/foundry-exporter build && node ./scripts/export-foundry-validation-fixtures.mjs",
+    "foundry:verify": "corepack pnpm foundry:fixtures && node ./scripts/verify-foundry-validation-baseline.mjs",
     "verify:env": "node ./scripts/verify-env.mjs",
     "build": "corepack pnpm -r build",
     "typecheck": "corepack pnpm -r typecheck",

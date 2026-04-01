@@ -8,7 +8,7 @@ Run a final human validation pass inside live Foundry VTT before calling the pro
 
 - open a clean world with the expected `dnd5e` system version;
 - enable the Bertini's Vault module;
-- generate the current validation fixtures with `corepack pnpm foundry:fixtures`;
+- generate and verify the current validation fixtures with `corepack pnpm foundry:verify`;
 - confirm module settings for:
   - default folder
   - create folder if missing

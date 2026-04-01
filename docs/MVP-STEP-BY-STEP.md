@@ -186,6 +186,7 @@ Current status inside this priority:
 - the Foundry validation matrix exists as a standalone handoff doc for the next validation pass;
 - reusable Foundry validation fixtures now live in `packages/foundry-exporter/test/fixtures.mjs`;
 - `corepack pnpm foundry:fixtures` now exports reviewable payload snapshots for the live validation pass;
+- `corepack pnpm foundry:verify` now acts as a guard that regenerates the packet and checks baseline drift before the human pass;
 - the fixture export now also generates a human-readable validation packet and working report in `docs/foundry-validation-fixtures/`;
 - the generated packet now includes automatic issue codes so manual validation starts with the known warning/blocker baseline in view;
 - `docs/FOUNDRY-VALIDATION-BASELINE.md` now tells the next operator which warnings are intentional and which fixtures should remain clean;

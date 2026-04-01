@@ -56,3 +56,17 @@ During manual Foundry validation:
 1. if a clean fixture emits a new warning, log it as a likely regression;
 2. if an intentionally noisy fixture behaves differently from its expected issue codes, log that as workflow drift;
 3. if a blocker appears on a clean fixture, stop and treat it as high priority.
+
+## Automated Gate
+
+Before a manual pass, run:
+
+```bash
+corepack pnpm foundry:verify
+```
+
+This command:
+
+1. regenerates the Foundry validation packet;
+2. verifies that all clean fixtures remain warning-free;
+3. verifies that intentionally noisy fixtures still emit the expected issue codes.
