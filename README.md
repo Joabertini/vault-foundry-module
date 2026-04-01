@@ -115,14 +115,14 @@ Next follow-up inside the same priority:
 
 Current export hardening status:
 
-- `packages/foundry-exporter/test/index.test.mjs` now covers prepared cleric, pact warlock, background-granted feat, duplicate, mismatch, and equipment-shape cases.
-- `packages/foundry-exporter/src/index.ts` now resolves feat ids through the shared feat catalog before building Foundry feat items.
+- `packages/foundry-exporter/test/index.test.mjs` now covers prepared cleric, pact warlock, wizard spellbook-adjacent exports, background-granted feat, duplicate, mismatch, and equipment-shape cases.
+- `packages/foundry-exporter/src/index.ts` now resolves feat ids through the shared feat catalog before building Foundry feat items and defensively deduplicates duplicate spell items.
 - [docs/FOUNDRY-VALIDATION-MATRIX.md](./docs/FOUNDRY-VALIDATION-MATRIX.md) is the handoff doc for the current Foundry validation slice.
 
 Next follow-up after this push:
 
-1. keep hardening exporter coverage around wizard spellbook and mixed-equipment MVP cases;
-2. run the manual Foundry matrix against a recent build and record outcomes;
+1. run the manual Foundry matrix against a recent build and record outcomes;
+2. keep hardening exporter coverage only if a manual Foundry import exposes another MVP-critical gap;
 3. return to the large `apps/web/src/App.tsx` shared-rule integration once it can be isolated cleanly.
 
 ## Current Builder Baseline

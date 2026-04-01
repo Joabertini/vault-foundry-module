@@ -423,3 +423,77 @@ test("buildFoundryActorPayload includes background-granted feats alongside chose
   assert.equal(featNames.includes("Tough"), true);
   assert.equal(featNames.includes("Alert"), true);
 });
+
+test("buildFoundryActorPayload keeps wizard spellbook exports stable", () => {
+  const build = makeCharacterBuild();
+  build.identity.characterName = "Mira Quill";
+  build.classing.classes = [{ classId: "wizard", level: 5 }];
+  build.background.backgroundId = "sage";
+  build.background.grantedFeatIds = ["magic-initiate"];
+  build.abilities.base = { str: 8, dex: 14, con: 14, int: 18, wis: 12, cha: 10 };
+  build.abilities.final = { str: 8, dex: 14, con: 14, int: 18, wis: 12, cha: 10 };
+  build.choices.spells = ["Nv0: Mage Hand", "Nv1: Shield", "Nv3: Fireball"];
+  build.choices.equipment = ["quarterstaff", "spellbook", "component-pouch"];
+  build.choices.features = ["Arcane Recovery"];
+  build.choices.normalized.spells = [
+    { spellId: "mage-hand", label: "Mage Hand", level: 0 },
+    { spellId: "shield", label: "Shield", level: 1 },
+    { spellId: "fireball", label: "Fireball", level: 3 },
+  ];
+  build.choices.normalized.equipment = [
+    { itemId: "quarterstaff", label: "Quarterstaff", quantity: 1, category: "weapon" },
+    { label: "spellbook", quantity: 1, category: "gear" },
+    { label: "component-pouch", quantity: 1, category: "gear" },
+  ];
+  build.derived = {
+    proficiencyBonus: 3,
+    hp: 32,
+    ac: 14,
+    spellcasting: {
+      ability: "int",
+      attackBonus: 7,
+      saveDC: 15,
+      slots: {
+        spell1: 4,
+        spell2: 3,
+        spell3: 2,
+        spell4: 0,
+        spell5: 0,
+        spell6: 0,
+        spell7: 0,
+        spell8: 0,
+        spell9: 0,
+      },
+    },
+  };
+
+  const payload = buildFoundryActorPayload(build);
+  const lootItems = payload.items.filter((item) => item.type === "loot");
+  const spellNames = payload.items.filter((item) => item.type === "spell").map((item) => item.name);
+  const fireball = payload.items.find((item) => item.name === "Fireball" && item.type === "spell");
+
+  assert.equal(payload.system.attributes.spellcasting, "int");
+  assert.equal(payload.system.spells.spell3, 2);
+  assert.equal(lootItems.some((item) => item.name === "Spellbook"), true);
+  assert.equal(lootItems.some((item) => item.name === "Component Pouch"), true);
+  assert.equal(spellNames.includes("Mage Hand"), true);
+  assert.equal(spellNames.includes("Shield"), true);
+  assert.equal(spellNames.includes("Fireball"), true);
+  assert.equal(fireball?.flags?.["bertinis-vault"]?.reference?.spellId, "fireball");
+});
+
+test("buildFoundryActorPayload defensively deduplicates duplicate spell items", () => {
+  const build = makeCharacterBuild();
+  build.choices.normalized.spells = [
+    { spellId: "shield", label: "Shield", level: 1 },
+    { spellId: "shield", label: "Shield", level: 1 },
+    { label: "Mage Hand", level: 0 },
+    { label: "Mage Hand", level: 0 },
+  ];
+
+  const payload = buildFoundryActorPayload(build);
+  const spellItems = payload.items.filter((item) => item.type === "spell");
+
+  assert.equal(spellItems.filter((item) => item.name === "Shield").length, 1);
+  assert.equal(spellItems.filter((item) => item.name === "Mage Hand").length, 1);
+});

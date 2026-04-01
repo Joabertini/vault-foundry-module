@@ -181,8 +181,8 @@ Continue with export regression hardening:
 
 Current status inside this priority:
 
-- exporter tests now cover prepared cleric, pact warlock, and background-granted feat cases;
-- the exporter now resolves feat labels through the shared feat catalog before building Foundry feat items;
+- exporter tests now cover prepared cleric, pact warlock, wizard spellbook-adjacent exports, and background-granted feat cases;
+- the exporter now resolves feat labels through the shared feat catalog before building Foundry feat items and defensively deduplicates repeated spell entries in payload assembly;
 - the Foundry validation matrix exists as a standalone handoff doc for the next validation pass.
 
 This is the active execution priority now.

@@ -12,7 +12,9 @@ Automated exporter coverage now includes representative cases for:
 2. Prepared caster export shape with cleric spellcasting and language handling.
 3. Pact caster export shape with warlock slot behavior.
 4. Background-granted feat inclusion alongside chosen feats.
-5. Preflight warnings for mismatched or duplicate normalized choices.
+5. Wizard spellbook-adjacent export shape with spell metadata and spellbook gear preserved.
+6. Defensive deduplication for repeated spell selections in exporter payloads.
+7. Preflight warnings for mismatched or duplicate normalized choices.
 
 Primary automated coverage lives in:
 

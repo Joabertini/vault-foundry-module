@@ -680,10 +680,21 @@ function buildSpellItem(entry: DerivedSpellEntry, classId: string): FoundryItem 
 
 function buildSpellItems(character: CharacterBuild): FoundryItem[] {
   const primaryClassId = normalizeClassId(character.classing.classes[0]?.classId ?? "");
+  const dedupedItems: FoundryItem[] = [];
+  const seen = new Set<string>();
 
-  return getSpellEntries(character).map((entry) =>
-    buildSpellItem(entry, primaryClassId),
-  );
+  for (const entry of getSpellEntries(character)) {
+    const catalogEntry = getSpellCatalogEntry(entry.spellId ?? entry.name);
+    const spellKey = `${catalogEntry?.id ?? slugify(entry.name)}:${entry.level}`;
+    if (seen.has(spellKey)) {
+      continue;
+    }
+
+    seen.add(spellKey);
+    dedupedItems.push(buildSpellItem(entry, primaryClassId));
+  }
+
+  return dedupedItems;
 }
 
 function buildFeatItems(character: CharacterBuild): FoundryItem[] {
