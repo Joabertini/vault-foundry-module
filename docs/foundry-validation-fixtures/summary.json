@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-01T00:45:56.907Z",
+  "generatedAt": "2026-04-01T01:47:48.385Z",
   "fixtures": [
     {
       "id": "martial-fighter-5",
@@ -7,6 +7,8 @@
       "ok": true,
       "blockers": 0,
       "warnings": 0,
+      "issueCodes": [],
+      "issueMessages": [],
       "output": "docs/foundry-validation-fixtures/martial-fighter-5.json"
     },
     {
@@ -15,6 +17,8 @@
       "ok": true,
       "blockers": 0,
       "warnings": 0,
+      "issueCodes": [],
+      "issueMessages": [],
       "output": "docs/foundry-validation-fixtures/prepared-cleric-5.json"
     },
     {
@@ -22,7 +26,9 @@
       "label": "Pact caster warlock",
       "ok": true,
       "blockers": 0,
-      "warnings": 1,
+      "warnings": 0,
+      "issueCodes": [],
+      "issueMessages": [],
       "output": "docs/foundry-validation-fixtures/pact-warlock-5.json"
     },
     {
@@ -31,6 +37,8 @@
       "ok": true,
       "blockers": 0,
       "warnings": 0,
+      "issueCodes": [],
+      "issueMessages": [],
       "output": "docs/foundry-validation-fixtures/background-feat.json"
     },
     {
@@ -39,6 +47,8 @@
       "ok": true,
       "blockers": 0,
       "warnings": 0,
+      "issueCodes": [],
+      "issueMessages": [],
       "output": "docs/foundry-validation-fixtures/wizard-spellbook-5.json"
     },
     {
@@ -47,6 +57,16 @@
       "ok": true,
       "blockers": 0,
       "warnings": 3,
+      "issueCodes": [
+        "SPELL_ID_LABEL_MISMATCH",
+        "SPELL_LEVEL_MISMATCH",
+        "EQUIPMENT_CATEGORY_MISMATCH"
+      ],
+      "issueMessages": [
+        "Spell entry \"Shield\" resolves to \"shield\", but provided spellId was \"fireball\".",
+        "Spell \"Shield\" has level 1, but the shared catalog expects level 3.",
+        "Equipment \"Shield\" is categorized as \"armor\", but the shared catalog expects \"shield\"."
+      ],
       "output": "docs/foundry-validation-fixtures/warning-only.json"
     },
     {
@@ -55,6 +75,14 @@
       "ok": false,
       "blockers": 1,
       "warnings": 1,
+      "issueCodes": [
+        "UNKNOWN_CLASS_ID",
+        "UNEXPECTED_DERIVED_SPELLCASTING"
+      ],
+      "issueMessages": [
+        "Class id \"unknown-class\" is not present in the shared catalog.",
+        "Primary class \"unknown-class\" does not normally derive spellcasting, but derived.spellcasting is present."
+      ],
       "output": "docs/foundry-validation-fixtures/blocked-invalid-class.json"
     }
   ]

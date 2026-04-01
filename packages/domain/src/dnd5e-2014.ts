@@ -112,6 +112,52 @@ export const spellSlotsFullCasterTable: Record<number, number[]> = {
   20: [4, 3, 3, 3, 3, 2, 2, 1, 1],
 };
 
+const warlockPactSlotCountByLevel: Record<number, number> = {
+  1: 1,
+  2: 2,
+  3: 2,
+  4: 2,
+  5: 2,
+  6: 2,
+  7: 2,
+  8: 2,
+  9: 2,
+  10: 2,
+  11: 3,
+  12: 3,
+  13: 3,
+  14: 3,
+  15: 3,
+  16: 3,
+  17: 4,
+  18: 4,
+  19: 4,
+  20: 4,
+};
+
+const warlockPactSlotLevelByClassLevel: Record<number, number> = {
+  1: 1,
+  2: 1,
+  3: 2,
+  4: 2,
+  5: 3,
+  6: 3,
+  7: 4,
+  8: 4,
+  9: 5,
+  10: 5,
+  11: 5,
+  12: 5,
+  13: 5,
+  14: 5,
+  15: 5,
+  16: 5,
+  17: 5,
+  18: 5,
+  19: 5,
+  20: 5,
+};
+
 export function normalizeClassId(classId: string): string {
   return resolveClassId(classId);
 }
@@ -141,8 +187,8 @@ export function getSpellSlotsForClassLevel(classId: string, level: number): Reco
   }
 
   if (progression === "pact") {
-    const pactSlots = Math.min(2 + Math.floor((level - 1) / 4), 4);
-    const pactLevel = Math.min(Math.ceil(level / 2), 5);
+    const pactSlots = warlockPactSlotCountByLevel[level] ?? 0;
+    const pactLevel = warlockPactSlotLevelByClassLevel[level] ?? 0;
     slots[`spell${pactLevel}`] = pactSlots;
     return slots;
   }

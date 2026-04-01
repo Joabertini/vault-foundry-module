@@ -3,7 +3,7 @@
   "label": "Pact caster warlock",
   "preflight": {
     "ok": true,
-    "generatedAt": "2026-04-01T00:45:56.895Z",
+    "generatedAt": "2026-04-01T01:47:48.378Z",
     "target": {
       "rulesVersion": "5e-2014",
       "sourceProfile": "vault-v1",
@@ -11,45 +11,12 @@
       "systemId": "dnd5e",
       "systemVersion": "5.2.5"
     },
-    "issues": [
-      {
-        "code": "DERIVED_SPELL_SLOTS_MISMATCH",
-        "message": "Derived spell slots do not match the expected progression for warlock level 5.",
-        "severity": "warning",
-        "scope": "canonical-build",
-        "path": "derived.spellcasting.slots",
-        "source": "domain",
-        "details": {
-          "expectedSlots": {
-            "spell1": 0,
-            "spell2": 0,
-            "spell3": 3,
-            "spell4": 0,
-            "spell5": 0,
-            "spell6": 0,
-            "spell7": 0,
-            "spell8": 0,
-            "spell9": 0
-          },
-          "providedSlots": {
-            "spell1": 0,
-            "spell2": 0,
-            "spell3": 2,
-            "spell4": 0,
-            "spell5": 0,
-            "spell6": 0,
-            "spell7": 0,
-            "spell8": 0,
-            "spell9": 0
-          }
-        }
-      }
-    ],
+    "issues": [],
     "summary": {
       "blockers": 0,
-      "warnings": 1,
+      "warnings": 0,
       "info": 0,
-      "total": 1
+      "total": 0
     }
   },
   "payload": {
@@ -572,7 +539,7 @@
     },
     "items": [
       {
-        "_id": "XPjer8wn404Kf6u4",
+        "_id": "uzhLep1utBWfUzei",
         "name": "warlock",
         "type": "class",
         "img": "systems/dnd5e/icons/svg/items/class.svg",
@@ -632,7 +599,7 @@
         }
       },
       {
-        "_id": "FzHs0XEGmj1Z5Ev0",
+        "_id": "hgcTJbipgXBL7O5Z",
         "name": "Pact Magic",
         "type": "feat",
         "img": "icons/svg/item-bag.svg",
@@ -690,7 +657,7 @@
         }
       },
       {
-        "_id": "meHOw4ZVcop4EfB8",
+        "_id": "0IpmhJ0eDeA0s7y8",
         "name": "Eldritch Blast",
         "type": "spell",
         "img": "icons/svg/book.svg",
@@ -847,7 +814,7 @@
         }
       },
       {
-        "_id": "iTpcSzh1rdiHNKnA",
+        "_id": "SnMtvIIOGsCSUPe0",
         "name": "Hunger of Hadar",
         "type": "spell",
         "img": "icons/svg/book.svg",
@@ -1004,7 +971,7 @@
         }
       },
       {
-        "_id": "BZZIJyT8brvbWLpy",
+        "_id": "C7K1JIqWTFwtSAY3",
         "name": "dagger",
         "type": "weapon",
         "img": "icons/svg/sword.svg",
@@ -1197,7 +1164,7 @@
         }
       },
       {
-        "_id": "76uxboEGrl5MHPKt",
+        "_id": "kU5ZdawaBgWohGKc",
         "name": "Leather Armor",
         "type": "equipment",
         "img": "icons/svg/shield.svg",
@@ -1263,7 +1230,7 @@
         }
       },
       {
-        "_id": "YEEeu4UGbz5F6UaQ",
+        "_id": "5nT9P0eaXt8UI5pO",
         "name": "Arcane Focus",
         "type": "loot",
         "img": "icons/svg/item-bag.svg",
@@ -1321,9 +1288,9 @@
         "rulesVersion": "5e-2014",
         "preflight": {
           "blockers": 0,
-          "warnings": 1,
+          "warnings": 0,
           "info": 0,
-          "total": 1
+          "total": 0
         }
       }
     },

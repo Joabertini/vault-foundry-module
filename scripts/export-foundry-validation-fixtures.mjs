@@ -2,7 +2,8 @@ import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { buildFoundryExportResult } from "../packages/foundry-exporter/dist/index.js";
+import { buildFoundryActorPayload } from "../packages/foundry-exporter/dist/index.js";
+import { buildPreflightResult } from "../packages/domain/dist/index.js";
 import { manualValidationFixtures } from "../packages/foundry-exporter/test/fixtures.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -16,7 +17,16 @@ const summary = [];
 
 for (const fixture of manualValidationFixtures) {
   const character = fixture.build();
-  const result = buildFoundryExportResult(character);
+  const preflight = buildPreflightResult(character, {
+    target: {
+      rulesVersion: character.meta.rulesVersion,
+      sourceProfile: character.meta.sourceProfile,
+      foundryVersion: "13.351",
+      systemId: "dnd5e",
+      systemVersion: "5.2.5",
+    },
+  });
+  const payload = preflight.ok ? buildFoundryActorPayload(character) : null;
   const outputPath = path.join(outputDir, `${fixture.id}.json`);
 
   await writeFile(
@@ -25,8 +35,8 @@ for (const fixture of manualValidationFixtures) {
       {
         fixtureId: fixture.id,
         label: fixture.label,
-        preflight: result.preflight,
-        payload: result.payload ?? null,
+        preflight,
+        payload,
       },
       null,
       2,
@@ -37,11 +47,11 @@ for (const fixture of manualValidationFixtures) {
   summary.push({
     id: fixture.id,
     label: fixture.label,
-    ok: result.preflight.ok,
-    blockers: result.preflight.summary.blockers,
-    warnings: result.preflight.summary.warnings,
-    issueCodes: result.preflight.issues.map((issue) => issue.code),
-    issueMessages: result.preflight.issues.map((issue) => issue.message),
+    ok: preflight.ok,
+    blockers: preflight.summary.blockers,
+    warnings: preflight.summary.warnings,
+    issueCodes: preflight.issues.map((issue) => issue.code),
+    issueMessages: preflight.issues.map((issue) => issue.message),
     output: path.relative(repoRoot, outputPath).replace(/\\/g, "/"),
   });
 }

@@ -73,3 +73,29 @@ test("deriveCharacterBuild omits spellcasting for non-casters", () => {
   assert.equal(build.derived.ac, 18);
   assert.equal(build.derived.spellcasting, undefined);
 });
+
+test("deriveCharacterBuild uses pact slot progression for warlocks", () => {
+  const build = deriveCharacterBuild(
+    makeInput({
+      classing: {
+        classes: [{ classId: "warlock", level: 5 }],
+      },
+      abilities: {
+        generationMethod: "manual",
+        base: { str: 8, dex: 14, con: 14, int: 10, wis: 12, cha: 18 },
+        final: { str: 8, dex: 14, con: 14, int: 10, wis: 12, cha: 18 },
+      },
+      choices: {
+        feats: [],
+        proficiencies: [],
+        spells: ["Nv0: Eldritch Blast", "Nv3: Hunger of Hadar"],
+        equipment: ["dagger", "leather", "arcane-focus"],
+        features: [],
+      },
+    }),
+  );
+
+  assert.equal(build.derived.spellcasting?.ability, "cha");
+  assert.equal(build.derived.spellcasting?.slots.spell3, 2);
+  assert.equal(build.derived.spellcasting?.slots.spell5, 0);
+});

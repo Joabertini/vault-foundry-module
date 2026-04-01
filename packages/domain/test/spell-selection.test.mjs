@@ -7,6 +7,7 @@ import {
   getCantripSelectionLimitForClassLevel,
   getAllowedSpellChoiceLabels,
   getMaxSpellLevelFromSlots,
+  getSpellSlotsForClassLevel,
   sanitizeSpellSelections,
   getSpellSelectionSectionTitle,
   getSpellSelectionModeLabel,
@@ -78,6 +79,53 @@ test("shared spell selection helpers derive labels and max level", () => {
   assert.equal(getMaxSpellLevelFromSlots({ spell1: 4, spell2: 3, spell3: 0 }), 2);
   assert.equal(getMaxSpellLevelFromSlots({ spell1: 0, spell2: 0, spell3: 0 }), 0);
   assert.equal(getMaxSpellLevelFromSlots({ pact: 2, spell5: 2 }), 5);
+});
+
+test("shared pact slot progression matches warlock milestones", () => {
+  assert.deepEqual(getSpellSlotsForClassLevel("warlock", 1), {
+    spell1: 1,
+    spell2: 0,
+    spell3: 0,
+    spell4: 0,
+    spell5: 0,
+    spell6: 0,
+    spell7: 0,
+    spell8: 0,
+    spell9: 0,
+  });
+  assert.deepEqual(getSpellSlotsForClassLevel("warlock", 5), {
+    spell1: 0,
+    spell2: 0,
+    spell3: 2,
+    spell4: 0,
+    spell5: 0,
+    spell6: 0,
+    spell7: 0,
+    spell8: 0,
+    spell9: 0,
+  });
+  assert.deepEqual(getSpellSlotsForClassLevel("warlock", 11), {
+    spell1: 0,
+    spell2: 0,
+    spell3: 0,
+    spell4: 0,
+    spell5: 3,
+    spell6: 0,
+    spell7: 0,
+    spell8: 0,
+    spell9: 0,
+  });
+  assert.deepEqual(getSpellSlotsForClassLevel("warlock", 17), {
+    spell1: 0,
+    spell2: 0,
+    spell3: 0,
+    spell4: 0,
+    spell5: 4,
+    spell6: 0,
+    spell7: 0,
+    spell8: 0,
+    spell9: 0,
+  });
 });
 
 test("shared spell selection helpers filter and trim choices", () => {

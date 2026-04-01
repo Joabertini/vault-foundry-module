@@ -124,7 +124,8 @@ Current export hardening status:
 - `corepack pnpm foundry:fixtures` now exports reviewable payloads into `docs/foundry-validation-fixtures/` for the manual Foundry pass.
 - `docs/foundry-validation-fixtures/README.md` and `docs/foundry-validation-fixtures/WORKING-REPORT.md` now give the operator a prebuilt human-readable packet instead of raw JSON only.
 - that generated packet now surfaces automatic issue codes per fixture, so known warnings and blockers are visible before anyone opens the raw payload JSON.
-- `docs/FOUNDRY-VALIDATION-BASELINE.md` now explains which warnings are intentional test coverage and which one is still real follow-up debt.
+- the pact-warlock fixture is now clean after fixing shared pact slot progression in domain rules.
+- `docs/FOUNDRY-VALIDATION-BASELINE.md` now explains which warnings are intentional test coverage and which fixtures should now stay clean.
 - [docs/FOUNDRY-VALIDATION-MATRIX.md](./docs/FOUNDRY-VALIDATION-MATRIX.md) is the handoff doc for the current Foundry validation slice.
 
 Next follow-up after this push:

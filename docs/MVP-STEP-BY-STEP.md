@@ -188,7 +188,8 @@ Current status inside this priority:
 - `corepack pnpm foundry:fixtures` now exports reviewable payload snapshots for the live validation pass;
 - the fixture export now also generates a human-readable validation packet and working report in `docs/foundry-validation-fixtures/`;
 - the generated packet now includes automatic issue codes so manual validation starts with the known warning/blocker baseline in view;
-- `docs/FOUNDRY-VALIDATION-BASELINE.md` now tells the next operator which warnings are intentional and which warning is still real follow-up work;
+- `docs/FOUNDRY-VALIDATION-BASELINE.md` now tells the next operator which warnings are intentional and which fixtures should remain clean;
+- shared pact-magic progression now aligns with the canonical warlock validation fixture, so the main MVP caster fixtures are clean again;
 - `docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md` now exists as the repo-native handoff/report template for the human pass.
 
 This is the active execution priority now.

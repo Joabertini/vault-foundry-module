@@ -1,6 +1,6 @@
 # Foundry Manual Validation Working Copy
 
-Generated at: `2026-04-01T01:33:40.053Z`
+Generated at: `2026-04-01T01:47:48.385Z`
 
 Start from `docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md` for the canonical template.
 
@@ -10,7 +10,7 @@ Start from `docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md` for the canonical template
 | --- | --- | --- | ---: | ---: | --- | --- |
 | `martial-fighter-5` | Martial with armor and shield | ok | 0 | 0 | - | `docs/foundry-validation-fixtures/martial-fighter-5.json` |
 | `prepared-cleric-5` | Prepared caster cleric | ok | 0 | 0 | - | `docs/foundry-validation-fixtures/prepared-cleric-5.json` |
-| `pact-warlock-5` | Pact caster warlock | ok | 0 | 1 | `DERIVED_SPELL_SLOTS_MISMATCH` | `docs/foundry-validation-fixtures/pact-warlock-5.json` |
+| `pact-warlock-5` | Pact caster warlock | ok | 0 | 0 | - | `docs/foundry-validation-fixtures/pact-warlock-5.json` |
 | `background-feat` | Background feat plus chosen feat | ok | 0 | 0 | - | `docs/foundry-validation-fixtures/background-feat.json` |
 | `wizard-spellbook-5` | Wizard spellbook | ok | 0 | 0 | - | `docs/foundry-validation-fixtures/wizard-spellbook-5.json` |
 | `warning-only` | Warning-only validation case | ok | 0 | 3 | `SPELL_ID_LABEL_MISMATCH`, `SPELL_LEVEL_MISMATCH`, `EQUIPMENT_CATEGORY_MISMATCH` | `docs/foundry-validation-fixtures/warning-only.json` |
@@ -39,8 +39,8 @@ Start from `docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md` for the canonical template
 ### 3. Pact caster warlock
 
 - Fixture: `pact-warlock-5`
-- Automatic baseline: ok; blockers=0; warnings=1
-- Automatic issues: DERIVED_SPELL_SLOTS_MISMATCH
+- Automatic baseline: ok; blockers=0; warnings=0
+- Automatic issues: none
 - Live Foundry result:
 - Notes:
 - Screenshot paths:
