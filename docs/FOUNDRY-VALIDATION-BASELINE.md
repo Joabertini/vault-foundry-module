@@ -70,3 +70,5 @@ This command:
 1. regenerates the Foundry validation packet;
 2. verifies that all clean fixtures remain warning-free;
 3. verifies that intentionally noisy fixtures still emit the expected issue codes.
+
+The same gate now runs in GitHub Actions via `.github/workflows/verify.yml`.

@@ -27,6 +27,13 @@ Operational docs for the current repo:
 - [docs/PROJECT-COMPLETION-CHECKLIST.md](./docs/PROJECT-COMPLETION-CHECKLIST.md)
 - [docs/MVP-STEP-BY-STEP.md](./docs/MVP-STEP-BY-STEP.md)
 
+Verification entrypoints:
+
+- `corepack pnpm verify:env`
+- `corepack pnpm --filter @bertinis-vault/domain test`
+- `corepack pnpm foundry:verify`
+- `.github/workflows/verify.yml` mirrors those checks on `pull_request` and `push` to `main`
+
 ## Priority Order Of Execution
 
 If you are the next person coding in this repo, follow this order:
