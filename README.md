@@ -122,6 +122,7 @@ Current export hardening status:
 - `packages/foundry-exporter/test/fixtures.mjs` now contains reusable MVP validation builds for martial, prepared caster, pact caster, background feat, wizard spellbook, warning-only, and blocked cases.
 - `corepack pnpm foundry:fixtures` now exports reviewable payloads into `docs/foundry-validation-fixtures/` for the manual Foundry pass.
 - `docs/foundry-validation-fixtures/README.md` and `docs/foundry-validation-fixtures/WORKING-REPORT.md` now give the operator a prebuilt human-readable packet instead of raw JSON only.
+- that generated packet now surfaces automatic issue codes per fixture, so known warnings and blockers are visible before anyone opens the raw payload JSON.
 - [docs/FOUNDRY-VALIDATION-MATRIX.md](./docs/FOUNDRY-VALIDATION-MATRIX.md) is the handoff doc for the current Foundry validation slice.
 
 Next follow-up after this push:
