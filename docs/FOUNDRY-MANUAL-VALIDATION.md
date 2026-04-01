@@ -21,6 +21,7 @@ Use these repo artifacts during the pass:
 - `docs/foundry-validation-fixtures/README.md`
 - `docs/foundry-validation-fixtures/WORKING-REPORT.md`
 - `docs/foundry-validation-fixtures/*.json`
+- `docs/FOUNDRY-VALIDATION-BASELINE.md`
 - `docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md`
 
 ## Core Scenarios
