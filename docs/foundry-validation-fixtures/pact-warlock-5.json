@@ -1,0 +1,1440 @@
+{
+  "fixtureId": "pact-warlock-5",
+  "label": "Pact caster warlock",
+  "preflight": {
+    "ok": true,
+    "generatedAt": "2026-04-01T00:45:56.895Z",
+    "target": {
+      "rulesVersion": "5e-2014",
+      "sourceProfile": "vault-v1",
+      "foundryVersion": "13.351",
+      "systemId": "dnd5e",
+      "systemVersion": "5.2.5"
+    },
+    "issues": [
+      {
+        "code": "DERIVED_SPELL_SLOTS_MISMATCH",
+        "message": "Derived spell slots do not match the expected progression for warlock level 5.",
+        "severity": "warning",
+        "scope": "canonical-build",
+        "path": "derived.spellcasting.slots",
+        "source": "domain",
+        "details": {
+          "expectedSlots": {
+            "spell1": 0,
+            "spell2": 0,
+            "spell3": 3,
+            "spell4": 0,
+            "spell5": 0,
+            "spell6": 0,
+            "spell7": 0,
+            "spell8": 0,
+            "spell9": 0
+          },
+          "providedSlots": {
+            "spell1": 0,
+            "spell2": 0,
+            "spell3": 2,
+            "spell4": 0,
+            "spell5": 0,
+            "spell6": 0,
+            "spell7": 0,
+            "spell8": 0,
+            "spell9": 0
+          }
+        }
+      }
+    ],
+    "summary": {
+      "blockers": 0,
+      "warnings": 1,
+      "info": 0,
+      "total": 1
+    }
+  },
+  "payload": {
+    "name": "Nox Vey",
+    "type": "character",
+    "img": "systems/dnd5e/icons/svg/actors/character.svg",
+    "system": {
+      "currency": {
+        "pp": 0,
+        "gp": 0,
+        "ep": 0,
+        "sp": 0,
+        "cp": 0
+      },
+      "abilities": {
+        "str": {
+          "value": 8,
+          "mod": -1,
+          "proficient": 0,
+          "bonuses": {
+            "check": "",
+            "save": ""
+          }
+        },
+        "dex": {
+          "value": 14,
+          "mod": 2,
+          "proficient": 0,
+          "bonuses": {
+            "check": "",
+            "save": ""
+          }
+        },
+        "con": {
+          "value": 14,
+          "mod": 2,
+          "proficient": 0,
+          "bonuses": {
+            "check": "",
+            "save": ""
+          }
+        },
+        "int": {
+          "value": 10,
+          "mod": 0,
+          "proficient": 0,
+          "bonuses": {
+            "check": "",
+            "save": ""
+          }
+        },
+        "wis": {
+          "value": 12,
+          "mod": 1,
+          "proficient": 1,
+          "bonuses": {
+            "check": "",
+            "save": ""
+          }
+        },
+        "cha": {
+          "value": 18,
+          "mod": 4,
+          "proficient": 1,
+          "bonuses": {
+            "check": "",
+            "save": ""
+          }
+        }
+      },
+      "bonuses": {
+        "mwak": {
+          "attack": "",
+          "damage": ""
+        },
+        "rwak": {
+          "attack": "",
+          "damage": ""
+        },
+        "msak": {
+          "attack": "",
+          "damage": ""
+        },
+        "rsak": {
+          "attack": "",
+          "damage": ""
+        },
+        "abilities": {
+          "check": "",
+          "save": "",
+          "skill": ""
+        },
+        "spell": {
+          "dc": ""
+        }
+      },
+      "skills": {
+        "acr": {
+          "ability": "dex",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "ani": {
+          "ability": "wis",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "arc": {
+          "ability": "int",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 1,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "ath": {
+          "ability": "str",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "dec": {
+          "ability": "cha",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 1,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "his": {
+          "ability": "int",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "ins": {
+          "ability": "wis",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "itm": {
+          "ability": "cha",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "inv": {
+          "ability": "int",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "med": {
+          "ability": "wis",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "nat": {
+          "ability": "int",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "prc": {
+          "ability": "wis",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "prf": {
+          "ability": "cha",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "per": {
+          "ability": "cha",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "rel": {
+          "ability": "int",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "slt": {
+          "ability": "dex",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 1,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "ste": {
+          "ability": "dex",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "sur": {
+          "ability": "wis",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        }
+      },
+      "tools": {
+        "disg": {
+          "ability": "cha",
+          "bonus": "",
+          "value": 1,
+          "prof": 1,
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "custom": "Disguise Kit"
+        },
+        "forg": {
+          "ability": "dex",
+          "bonus": "",
+          "value": 1,
+          "prof": 1,
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "custom": "Forgery Kit"
+        }
+      },
+      "attributes": {
+        "ac": {
+          "flat": 14
+        },
+        "hp": {
+          "value": 38,
+          "max": 38
+        },
+        "spellcasting": "cha",
+        "init": {
+          "ability": "",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "bonus": ""
+        },
+        "movement": {
+          "units": null,
+          "hover": false,
+          "ignoredDifficultTerrain": []
+        },
+        "attunement": {
+          "max": 3
+        },
+        "senses": {
+          "darkvision": null,
+          "blindsight": null,
+          "tremorsense": null,
+          "truesight": null,
+          "units": null,
+          "special": ""
+        },
+        "exhaustion": 0,
+        "concentration": {
+          "ability": "",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "bonuses": {
+            "save": ""
+          },
+          "limit": 1
+        },
+        "loyalty": {},
+        "death": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "success": 0,
+          "failure": 0,
+          "bonuses": {
+            "save": ""
+          }
+        },
+        "inspiration": false
+      },
+      "bastion": {
+        "name": "",
+        "description": ""
+      },
+      "details": {
+        "alignment": "Neutral Good",
+        "biography": {
+          "value": "<p><em>Trait:</em> Always writes everything down.</p><p><em>Ideal:</em> Knowledge before fear.</p>",
+          "public": ""
+        },
+        "race": "human",
+        "background": "charlatan",
+        "originalClass": "warlock",
+        "trait": "Always writes everything down.",
+        "appearance": "",
+        "ideal": "Knowledge before fear.",
+        "bond": "",
+        "flaw": ""
+      },
+      "spells": {
+        "spell1": 0,
+        "spell2": 0,
+        "spell3": 2,
+        "spell4": 0,
+        "spell5": 0,
+        "spell6": 0,
+        "spell7": 0,
+        "spell8": 0,
+        "spell9": 0
+      },
+      "traits": {
+        "size": "med",
+        "di": {
+          "value": [],
+          "custom": "",
+          "bypasses": []
+        },
+        "dr": {
+          "value": [],
+          "custom": "",
+          "bypasses": []
+        },
+        "dv": {
+          "value": [],
+          "custom": "",
+          "bypasses": []
+        },
+        "dm": {
+          "amount": {},
+          "bypasses": []
+        },
+        "ci": {
+          "value": [],
+          "custom": ""
+        },
+        "languages": {
+          "value": [],
+          "custom": "",
+          "communication": {}
+        },
+        "weaponProf": {
+          "value": [],
+          "custom": "simple",
+          "mastery": {
+            "value": [],
+            "bonus": []
+          }
+        },
+        "armorProf": {
+          "value": [
+            "light"
+          ],
+          "custom": ""
+        }
+      },
+      "resources": {
+        "primary": {
+          "value": 0,
+          "max": 0,
+          "sr": false,
+          "lr": false,
+          "label": ""
+        },
+        "secondary": {
+          "value": 0,
+          "max": 0,
+          "sr": false,
+          "lr": false,
+          "label": ""
+        },
+        "tertiary": {
+          "value": 0,
+          "max": 0,
+          "sr": false,
+          "lr": false,
+          "label": ""
+        }
+      },
+      "favorites": []
+    },
+    "items": [
+      {
+        "_id": "XPjer8wn404Kf6u4",
+        "name": "warlock",
+        "type": "class",
+        "img": "systems/dnd5e/icons/svg/items/class.svg",
+        "system": {
+          "identifier": "warlock",
+          "description": {
+            "value": "<p>warlock</p>",
+            "chat": ""
+          },
+          "source": {
+            "custom": "",
+            "book": "PHB'14",
+            "page": "",
+            "license": "",
+            "rules": "2014",
+            "revision": 1
+          },
+          "levels": 5,
+          "hd": {
+            "denomination": "d8",
+            "spent": 0,
+            "additional": ""
+          },
+          "spellcasting": {
+            "progression": "pact",
+            "ability": "cha",
+            "preparation": {}
+          },
+          "primaryAbility": {
+            "value": [
+              "cha"
+            ],
+            "all": false
+          },
+          "wealth": "",
+          "advancement": [],
+          "startingEquipment": [],
+          "properties": []
+        },
+        "flags": {},
+        "effects": [],
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.351",
+          "systemId": "dnd5e",
+          "systemVersion": "5.2.5",
+          "createdTime": null,
+          "modifiedTime": null,
+          "lastModifiedBy": null
+        },
+        "folder": null,
+        "sort": 0,
+        "ownership": {
+          "default": 0
+        }
+      },
+      {
+        "_id": "FzHs0XEGmj1Z5Ev0",
+        "name": "Pact Magic",
+        "type": "feat",
+        "img": "icons/svg/item-bag.svg",
+        "system": {
+          "source": {
+            "custom": "",
+            "book": "",
+            "page": "",
+            "license": "",
+            "rules": "2014",
+            "revision": 1
+          },
+          "description": {
+            "value": "",
+            "chat": ""
+          },
+          "requirements": "",
+          "uses": {
+            "max": "",
+            "recovery": [],
+            "spent": 0
+          },
+          "type": {
+            "value": "class",
+            "subtype": ""
+          },
+          "properties": [],
+          "advancement": [],
+          "activities": {},
+          "identifier": "pact-magic",
+          "crewed": false,
+          "enchant": {},
+          "prerequisites": {
+            "items": [],
+            "repeatable": false
+          }
+        },
+        "flags": {},
+        "effects": [],
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.351",
+          "systemId": "dnd5e",
+          "systemVersion": "5.2.5",
+          "createdTime": null,
+          "modifiedTime": null,
+          "lastModifiedBy": null
+        },
+        "folder": null,
+        "sort": 0,
+        "ownership": {
+          "default": 0
+        }
+      },
+      {
+        "_id": "meHOw4ZVcop4EfB8",
+        "name": "Eldritch Blast",
+        "type": "spell",
+        "img": "icons/svg/book.svg",
+        "system": {
+          "source": {
+            "custom": "",
+            "book": "",
+            "page": "",
+            "license": "",
+            "rules": "2014",
+            "revision": 1
+          },
+          "description": {
+            "value": "<p>Descarga arcana que escala en numero de rayos.</p><p><strong>Compendium lookup:</strong> dnd5e.spells / identifier:eldritch-blast</p>",
+            "chat": "Descarga arcana que escala en numero de rayos."
+          },
+          "level": 0,
+          "school": "evo",
+          "properties": [
+            "vocal",
+            "somatic"
+          ],
+          "ability": "cha",
+          "materials": {
+            "value": "",
+            "consumed": false,
+            "cost": 0,
+            "supply": 0
+          },
+          "target": {
+            "template": {
+              "contiguous": false,
+              "units": "ft"
+            },
+            "affects": {
+              "count": "1",
+              "type": "creature",
+              "choice": false
+            }
+          },
+          "range": {
+            "value": null,
+            "units": "ft"
+          },
+          "activation": {
+            "type": "action",
+            "value": 1,
+            "condition": ""
+          },
+          "duration": {
+            "value": "",
+            "units": "inst"
+          },
+          "uses": {
+            "max": "",
+            "recovery": [],
+            "spent": 0
+          },
+          "method": "spell",
+          "prepared": 2,
+          "sourceClass": "warlock",
+          "activities": {
+            "dnd5eactivity000": {
+              "_id": "dnd5eactivity000",
+              "type": "utility",
+              "activation": {
+                "type": "action",
+                "value": null,
+                "override": false
+              },
+              "consumption": {
+                "targets": [],
+                "scaling": {
+                  "allowed": false,
+                  "max": ""
+                },
+                "spellSlot": true
+              },
+              "description": {
+                "chatFlavor": "Descarga arcana que escala en numero de rayos."
+              },
+              "duration": {
+                "units": "inst",
+                "concentration": false,
+                "override": false
+              },
+              "effects": [],
+              "range": {
+                "override": false,
+                "units": "ft"
+              },
+              "target": {
+                "prompt": true,
+                "template": {
+                  "contiguous": false,
+                  "units": "ft"
+                },
+                "affects": {
+                  "choice": false
+                },
+                "override": false
+              },
+              "uses": {
+                "spent": 0,
+                "recovery": []
+              },
+              "sort": 0,
+              "flags": {}
+            }
+          },
+          "identifier": "eldritch-blast"
+        },
+        "flags": {
+          "plutonium": {
+            "page": "spells.html",
+            "source": "PHB",
+            "hash": "eldritch%20blast_phb",
+            "propDroppable": "spell",
+            "spellId": "eldritch-blast"
+          },
+          "bertinis-vault": {
+            "reference": {
+              "type": "spell",
+              "spellId": "eldritch-blast",
+              "compendiumPack": "dnd5e.spells",
+              "lookup": "identifier:eldritch-blast",
+              "comparable": true
+            },
+            "plutonium": {
+              "page": "spells.html",
+              "source": "PHB",
+              "hash": "eldritch%20blast_phb",
+              "propDroppable": "spell",
+              "spellId": "eldritch-blast"
+            }
+          }
+        },
+        "effects": [],
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.351",
+          "systemId": "dnd5e",
+          "systemVersion": "5.2.5",
+          "createdTime": null,
+          "modifiedTime": null,
+          "lastModifiedBy": null
+        },
+        "folder": null,
+        "sort": 0,
+        "ownership": {
+          "default": 0
+        }
+      },
+      {
+        "_id": "iTpcSzh1rdiHNKnA",
+        "name": "Hunger of Hadar",
+        "type": "spell",
+        "img": "icons/svg/book.svg",
+        "system": {
+          "source": {
+            "custom": "",
+            "book": "",
+            "page": "",
+            "license": "",
+            "rules": "2014",
+            "revision": 1
+          },
+          "description": {
+            "value": "<p>Una esfera de oscuridad famelica ciega, hiere y obstaculiza.</p><p><strong>Compendium lookup:</strong> dnd5e.spells / identifier:hunger-of-hadar</p>",
+            "chat": "Una esfera de oscuridad famelica ciega, hiere y obstaculiza."
+          },
+          "level": 3,
+          "school": "con",
+          "properties": [
+            "vocal",
+            "somatic"
+          ],
+          "ability": "cha",
+          "materials": {
+            "value": "",
+            "consumed": false,
+            "cost": 0,
+            "supply": 0
+          },
+          "target": {
+            "template": {
+              "contiguous": false,
+              "units": "ft"
+            },
+            "affects": {
+              "count": "1",
+              "type": "creature",
+              "choice": false
+            }
+          },
+          "range": {
+            "value": null,
+            "units": "ft"
+          },
+          "activation": {
+            "type": "action",
+            "value": 1,
+            "condition": ""
+          },
+          "duration": {
+            "value": "",
+            "units": "inst"
+          },
+          "uses": {
+            "max": "",
+            "recovery": [],
+            "spent": 0
+          },
+          "method": "spell",
+          "prepared": 1,
+          "sourceClass": "warlock",
+          "activities": {
+            "dnd5eactivity000": {
+              "_id": "dnd5eactivity000",
+              "type": "utility",
+              "activation": {
+                "type": "action",
+                "value": null,
+                "override": false
+              },
+              "consumption": {
+                "targets": [],
+                "scaling": {
+                  "allowed": false,
+                  "max": ""
+                },
+                "spellSlot": true
+              },
+              "description": {
+                "chatFlavor": "Una esfera de oscuridad famelica ciega, hiere y obstaculiza."
+              },
+              "duration": {
+                "units": "inst",
+                "concentration": false,
+                "override": false
+              },
+              "effects": [],
+              "range": {
+                "override": false,
+                "units": "ft"
+              },
+              "target": {
+                "prompt": true,
+                "template": {
+                  "contiguous": false,
+                  "units": "ft"
+                },
+                "affects": {
+                  "choice": false
+                },
+                "override": false
+              },
+              "uses": {
+                "spent": 0,
+                "recovery": []
+              },
+              "sort": 0,
+              "flags": {}
+            }
+          },
+          "identifier": "hunger-of-hadar"
+        },
+        "flags": {
+          "plutonium": {
+            "page": "spells.html",
+            "source": "PHB",
+            "hash": "hunger%20of%20hadar_phb",
+            "propDroppable": "spell",
+            "spellId": "hunger-of-hadar"
+          },
+          "bertinis-vault": {
+            "reference": {
+              "type": "spell",
+              "spellId": "hunger-of-hadar",
+              "compendiumPack": "dnd5e.spells",
+              "lookup": "identifier:hunger-of-hadar",
+              "comparable": true
+            },
+            "plutonium": {
+              "page": "spells.html",
+              "source": "PHB",
+              "hash": "hunger%20of%20hadar_phb",
+              "propDroppable": "spell",
+              "spellId": "hunger-of-hadar"
+            }
+          }
+        },
+        "effects": [],
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.351",
+          "systemId": "dnd5e",
+          "systemVersion": "5.2.5",
+          "createdTime": null,
+          "modifiedTime": null,
+          "lastModifiedBy": null
+        },
+        "folder": null,
+        "sort": 0,
+        "ownership": {
+          "default": 0
+        }
+      },
+      {
+        "_id": "BZZIJyT8brvbWLpy",
+        "name": "dagger",
+        "type": "weapon",
+        "img": "icons/svg/sword.svg",
+        "system": {
+          "source": {
+            "custom": "",
+            "book": "",
+            "page": "",
+            "license": "",
+            "rules": "2014",
+            "revision": 1
+          },
+          "description": {
+            "value": "",
+            "chat": ""
+          },
+          "quantity": 1,
+          "weight": {
+            "value": 0,
+            "units": "lb"
+          },
+          "price": {
+            "value": 0,
+            "denomination": "gp"
+          },
+          "attunement": {
+            "required": false
+          },
+          "equipped": true,
+          "identified": true,
+          "rarity": "common",
+          "uses": {
+            "max": "",
+            "recovery": [],
+            "spent": 0
+          },
+          "activation": {
+            "type": "action",
+            "value": 1,
+            "condition": ""
+          },
+          "duration": {
+            "value": "",
+            "units": "inst"
+          },
+          "target": {
+            "template": {
+              "contiguous": false,
+              "units": "ft"
+            },
+            "affects": {
+              "count": "1",
+              "type": "creature",
+              "choice": false
+            }
+          },
+          "range": {
+            "value": null,
+            "units": "ft"
+          },
+          "damage": {
+            "base": {
+              "number": 1,
+              "denomination": 4,
+              "bonus": "",
+              "types": [
+                "piercing"
+              ],
+              "custom": {
+                "enabled": false
+              },
+              "scaling": {
+                "mode": "whole",
+                "number": 1,
+                "formula": ""
+              }
+            }
+          },
+          "type": {
+            "value": "simpleM",
+            "baseItem": ""
+          },
+          "properties": [],
+          "proficient": null,
+          "activities": {
+            "dnd5eactivity000": {
+              "_id": "dnd5eactivity000",
+              "type": "attack",
+              "activation": {
+                "type": "action",
+                "value": null,
+                "override": false
+              },
+              "consumption": {
+                "targets": [],
+                "scaling": {
+                  "allowed": false,
+                  "max": ""
+                },
+                "spellSlot": false
+              },
+              "description": {
+                "chatFlavor": ""
+              },
+              "duration": {
+                "units": "inst",
+                "concentration": false,
+                "override": false
+              },
+              "effects": [],
+              "range": {
+                "override": false,
+                "units": "ft"
+              },
+              "target": {
+                "prompt": true,
+                "template": {
+                  "contiguous": false,
+                  "units": "ft"
+                },
+                "affects": {
+                  "choice": false
+                },
+                "override": false
+              },
+              "attack": {
+                "ability": "",
+                "bonus": "",
+                "critical": {
+                  "threshold": null
+                },
+                "flat": false,
+                "type": {
+                  "value": "melee",
+                  "classification": "weapon"
+                }
+              },
+              "damage": {
+                "critical": {
+                  "bonus": ""
+                },
+                "includeBase": true,
+                "parts": [
+                  {
+                    "number": 1,
+                    "denomination": 4,
+                    "bonus": "",
+                    "types": [
+                      "piercing"
+                    ],
+                    "custom": {
+                      "enabled": false,
+                      "formula": ""
+                    },
+                    "scaling": {
+                      "mode": "whole",
+                      "number": 1,
+                      "formula": ""
+                    }
+                  }
+                ]
+              },
+              "uses": {
+                "spent": 0,
+                "recovery": []
+              },
+              "sort": 0,
+              "flags": {}
+            }
+          },
+          "identifier": "dagger"
+        },
+        "flags": {},
+        "effects": [],
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.351",
+          "systemId": "dnd5e",
+          "systemVersion": "5.2.5",
+          "createdTime": null,
+          "modifiedTime": null,
+          "lastModifiedBy": null
+        },
+        "folder": null,
+        "sort": 0,
+        "ownership": {
+          "default": 0
+        }
+      },
+      {
+        "_id": "76uxboEGrl5MHPKt",
+        "name": "Leather Armor",
+        "type": "equipment",
+        "img": "icons/svg/shield.svg",
+        "system": {
+          "source": {
+            "custom": "",
+            "book": "",
+            "page": "",
+            "license": "",
+            "rules": "2014",
+            "revision": 1
+          },
+          "description": {
+            "value": "",
+            "chat": ""
+          },
+          "quantity": 1,
+          "weight": {
+            "value": 0,
+            "units": "lb"
+          },
+          "price": {
+            "value": 0,
+            "denomination": "gp"
+          },
+          "attunement": {
+            "required": false
+          },
+          "equipped": true,
+          "identified": true,
+          "rarity": "common",
+          "uses": {
+            "max": "",
+            "recovery": [],
+            "spent": 0
+          },
+          "armor": {
+            "type": "light",
+            "value": "11+DEX"
+          },
+          "strength": 0,
+          "stealth": false,
+          "proficient": null,
+          "identifier": "leather"
+        },
+        "flags": {},
+        "effects": [],
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.351",
+          "systemId": "dnd5e",
+          "systemVersion": "5.2.5",
+          "createdTime": null,
+          "modifiedTime": null,
+          "lastModifiedBy": null
+        },
+        "folder": null,
+        "sort": 0,
+        "ownership": {
+          "default": 0
+        }
+      },
+      {
+        "_id": "YEEeu4UGbz5F6UaQ",
+        "name": "Arcane Focus",
+        "type": "loot",
+        "img": "icons/svg/item-bag.svg",
+        "system": {
+          "source": {
+            "custom": "",
+            "book": "",
+            "page": "",
+            "license": "",
+            "rules": "2014",
+            "revision": 1
+          },
+          "description": {
+            "value": "",
+            "chat": ""
+          },
+          "quantity": 1,
+          "weight": {
+            "value": 0,
+            "units": "lb"
+          },
+          "price": {
+            "value": 0,
+            "denomination": "gp"
+          },
+          "rarity": "common",
+          "identified": true,
+          "container": null,
+          "identifier": "arcane-focus"
+        },
+        "flags": {},
+        "effects": [],
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.351",
+          "systemId": "dnd5e",
+          "systemVersion": "5.2.5",
+          "createdTime": null,
+          "modifiedTime": null,
+          "lastModifiedBy": null
+        },
+        "folder": null,
+        "sort": 0,
+        "ownership": {
+          "default": 0
+        }
+      }
+    ],
+    "effects": [],
+    "flags": {
+      "bertinis-vault": {
+        "sourceProfile": "vault-v1",
+        "rulesVersion": "5e-2014",
+        "preflight": {
+          "blockers": 0,
+          "warnings": 1,
+          "info": 0,
+          "total": 1
+        }
+      }
+    },
+    "prototypeToken": {
+      "name": "Nox Vey",
+      "displayName": 0,
+      "actorLink": true,
+      "width": 1,
+      "height": 1,
+      "texture": {
+        "src": "systems/dnd5e/icons/svg/actors/character.svg",
+        "anchorX": 0.5,
+        "anchorY": 0.5,
+        "offsetX": 0,
+        "offsetY": 0,
+        "fit": "contain",
+        "scaleX": 1,
+        "scaleY": 1,
+        "rotation": 0,
+        "tint": "#ffffff",
+        "alphaThreshold": 0.75
+      },
+      "lockRotation": false,
+      "rotation": 0,
+      "alpha": 1,
+      "disposition": 1,
+      "displayBars": 0,
+      "bar1": {
+        "attribute": "attributes.hp"
+      },
+      "bar2": {
+        "attribute": null
+      },
+      "light": {
+        "negative": false,
+        "priority": 0,
+        "alpha": 0.5,
+        "angle": 360,
+        "bright": 0,
+        "color": null,
+        "coloration": 1,
+        "dim": 0,
+        "attenuation": 0.5,
+        "luminosity": 0.5,
+        "saturation": 0,
+        "contrast": 0,
+        "shadows": 0,
+        "animation": {
+          "type": null,
+          "speed": 5,
+          "intensity": 5,
+          "reverse": false
+        },
+        "darkness": {
+          "min": 0,
+          "max": 1
+        }
+      },
+      "sight": {
+        "enabled": true,
+        "range": 0,
+        "angle": 360,
+        "visionMode": "basic",
+        "color": null,
+        "attenuation": 0.1,
+        "brightness": 0,
+        "saturation": 0,
+        "contrast": 0
+      },
+      "detectionModes": [],
+      "occludable": {
+        "radius": 0
+      },
+      "ring": {
+        "enabled": false,
+        "colors": {
+          "ring": null,
+          "background": null
+        },
+        "effects": 1,
+        "subject": {
+          "scale": 1,
+          "texture": null
+        }
+      },
+      "turnMarker": {
+        "mode": 1,
+        "animation": null,
+        "src": null,
+        "disposition": false
+      },
+      "movementAction": null,
+      "flags": {},
+      "randomImg": false,
+      "appendNumber": false,
+      "prependAdjective": false
+    },
+    "folder": null,
+    "ownership": {
+      "default": 0
+    },
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.351",
+      "systemId": "dnd5e",
+      "systemVersion": "5.2.5",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null
+    }
+  }
+}

@@ -8,17 +8,24 @@ Run a final human validation pass inside live Foundry VTT before calling the pro
 
 - open a clean world with the expected `dnd5e` system version;
 - enable the Bertini's Vault module;
+- generate the current validation fixtures with `corepack pnpm foundry:fixtures`;
 - confirm module settings for:
   - default folder
   - create folder if missing
   - show preflight warnings
   - open sheet on create
 
+Use these repo artifacts during the pass:
+
+- `docs/foundry-validation-fixtures/summary.json`
+- `docs/foundry-validation-fixtures/*.json`
+- `docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md`
+
 ## Core Scenarios
 
 ### 1. Martial Build
 
-- create a straightforward martial preset or manual build;
+- use fixture `martial-fighter-5`;
 - confirm actor is created without blockers;
 - verify:
   - class item exists
@@ -28,32 +35,48 @@ Run a final human validation pass inside live Foundry VTT before calling the pro
 
 ### 2. Caster Build
 
-- create a caster preset or manual build;
+- use fixture `prepared-cleric-5`;
 - verify:
   - spell items are present
   - spellcasting ability is correct
   - spell slots look correct
   - preflight does not diverge from final actor data
 
-### 3. Multiclass Build
+### 3. Pact Caster Build
 
-- create a multiclass build;
+- use fixture `pact-warlock-5`;
 - verify:
-  - classes are represented correctly
-  - preflight warnings are understandable if any appear
-  - actor still creates when warnings exist but blockers do not
+  - pact slot count is preserved
+  - CHA remains the spellcasting ability
+  - warlock spell items carry metadata
 
-### 4. Warning-Only Build
+### 4. Background Feat Build
 
-- intentionally create a build that triggers warnings but not blockers;
+- use fixture `background-feat`;
+- verify:
+  - background feat appears
+  - chosen feat appears
+  - no duplicate feat item leaks into the actor
+
+### 5. Wizard Spellbook Build
+
+- use fixture `wizard-spellbook-5`;
+- verify:
+  - spellbook-style wizard export remains stable
+  - `Spellbook` and `Component Pouch` gear survive import
+  - leveled spell metadata survives import
+
+### 6. Warning-Only Build
+
+- use fixture `warning-only`;
 - verify:
   - warning notification is visible
   - actor creation still succeeds
   - warning summary is understandable to the operator
 
-### 5. Blocked Build
+### 7. Blocked Build
 
-- intentionally create a build that should fail preflight;
+- use fixture `blocked-invalid-class`;
 - verify:
   - actor is not created
   - blocker message is visible

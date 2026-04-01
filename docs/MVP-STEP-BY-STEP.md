@@ -183,6 +183,9 @@ Current status inside this priority:
 
 - exporter tests now cover prepared cleric, pact warlock, wizard spellbook-adjacent exports, and background-granted feat cases;
 - the exporter now resolves feat labels through the shared feat catalog before building Foundry feat items and defensively deduplicates repeated spell entries in payload assembly;
-- the Foundry validation matrix exists as a standalone handoff doc for the next validation pass.
+- the Foundry validation matrix exists as a standalone handoff doc for the next validation pass;
+- reusable Foundry validation fixtures now live in `packages/foundry-exporter/test/fixtures.mjs`;
+- `corepack pnpm foundry:fixtures` now exports reviewable payload snapshots for the live validation pass;
+- `docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md` now exists as the repo-native handoff/report template for the human pass.
 
 This is the active execution priority now.

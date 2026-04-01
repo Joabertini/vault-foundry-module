@@ -1,0 +1,1654 @@
+{
+  "fixtureId": "wizard-spellbook-5",
+  "label": "Wizard spellbook",
+  "preflight": {
+    "ok": true,
+    "generatedAt": "2026-04-01T00:45:56.901Z",
+    "target": {
+      "rulesVersion": "5e-2014",
+      "sourceProfile": "vault-v1",
+      "foundryVersion": "13.351",
+      "systemId": "dnd5e",
+      "systemVersion": "5.2.5"
+    },
+    "issues": [],
+    "summary": {
+      "blockers": 0,
+      "warnings": 0,
+      "info": 0,
+      "total": 0
+    }
+  },
+  "payload": {
+    "name": "Mira Quill",
+    "type": "character",
+    "img": "systems/dnd5e/icons/svg/actors/character.svg",
+    "system": {
+      "currency": {
+        "pp": 0,
+        "gp": 0,
+        "ep": 0,
+        "sp": 0,
+        "cp": 0
+      },
+      "abilities": {
+        "str": {
+          "value": 8,
+          "mod": -1,
+          "proficient": 0,
+          "bonuses": {
+            "check": "",
+            "save": ""
+          }
+        },
+        "dex": {
+          "value": 14,
+          "mod": 2,
+          "proficient": 0,
+          "bonuses": {
+            "check": "",
+            "save": ""
+          }
+        },
+        "con": {
+          "value": 14,
+          "mod": 2,
+          "proficient": 0,
+          "bonuses": {
+            "check": "",
+            "save": ""
+          }
+        },
+        "int": {
+          "value": 18,
+          "mod": 4,
+          "proficient": 1,
+          "bonuses": {
+            "check": "",
+            "save": ""
+          }
+        },
+        "wis": {
+          "value": 12,
+          "mod": 1,
+          "proficient": 1,
+          "bonuses": {
+            "check": "",
+            "save": ""
+          }
+        },
+        "cha": {
+          "value": 10,
+          "mod": 0,
+          "proficient": 0,
+          "bonuses": {
+            "check": "",
+            "save": ""
+          }
+        }
+      },
+      "bonuses": {
+        "mwak": {
+          "attack": "",
+          "damage": ""
+        },
+        "rwak": {
+          "attack": "",
+          "damage": ""
+        },
+        "msak": {
+          "attack": "",
+          "damage": ""
+        },
+        "rsak": {
+          "attack": "",
+          "damage": ""
+        },
+        "abilities": {
+          "check": "",
+          "save": "",
+          "skill": ""
+        },
+        "spell": {
+          "dc": ""
+        }
+      },
+      "skills": {
+        "acr": {
+          "ability": "dex",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "ani": {
+          "ability": "wis",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "arc": {
+          "ability": "int",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 1,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "ath": {
+          "ability": "str",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "dec": {
+          "ability": "cha",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "his": {
+          "ability": "int",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 1,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "ins": {
+          "ability": "wis",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "itm": {
+          "ability": "cha",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "inv": {
+          "ability": "int",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 1,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "med": {
+          "ability": "wis",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "nat": {
+          "ability": "int",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "prc": {
+          "ability": "wis",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "prf": {
+          "ability": "cha",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "per": {
+          "ability": "cha",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "rel": {
+          "ability": "int",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "slt": {
+          "ability": "dex",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "ste": {
+          "ability": "dex",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        },
+        "sur": {
+          "ability": "wis",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "value": 0,
+          "bonuses": {
+            "check": "",
+            "passive": ""
+          }
+        }
+      },
+      "tools": {
+        "thief": {
+          "ability": "dex",
+          "bonus": "",
+          "value": 1,
+          "prof": 1,
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "custom": "Thieves' Tools"
+        }
+      },
+      "attributes": {
+        "ac": {
+          "flat": 14
+        },
+        "hp": {
+          "value": 32,
+          "max": 32
+        },
+        "spellcasting": "int",
+        "init": {
+          "ability": "",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "bonus": ""
+        },
+        "movement": {
+          "units": null,
+          "hover": false,
+          "ignoredDifficultTerrain": []
+        },
+        "attunement": {
+          "max": 3
+        },
+        "senses": {
+          "darkvision": null,
+          "blindsight": null,
+          "tremorsense": null,
+          "truesight": null,
+          "units": null,
+          "special": ""
+        },
+        "exhaustion": 0,
+        "concentration": {
+          "ability": "",
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "bonuses": {
+            "save": ""
+          },
+          "limit": 1
+        },
+        "loyalty": {},
+        "death": {
+          "roll": {
+            "min": null,
+            "max": null,
+            "mode": 0
+          },
+          "success": 0,
+          "failure": 0,
+          "bonuses": {
+            "save": ""
+          }
+        },
+        "inspiration": false
+      },
+      "bastion": {
+        "name": "",
+        "description": ""
+      },
+      "details": {
+        "alignment": "Neutral Good",
+        "biography": {
+          "value": "<p><em>Trait:</em> Always writes everything down.</p><p><em>Ideal:</em> Knowledge before fear.</p>",
+          "public": ""
+        },
+        "race": "human",
+        "background": "sage",
+        "originalClass": "wizard",
+        "trait": "Always writes everything down.",
+        "appearance": "",
+        "ideal": "Knowledge before fear.",
+        "bond": "",
+        "flaw": ""
+      },
+      "spells": {
+        "spell1": 4,
+        "spell2": 3,
+        "spell3": 2,
+        "spell4": 0,
+        "spell5": 0,
+        "spell6": 0,
+        "spell7": 0,
+        "spell8": 0,
+        "spell9": 0
+      },
+      "traits": {
+        "size": "med",
+        "di": {
+          "value": [],
+          "custom": "",
+          "bypasses": []
+        },
+        "dr": {
+          "value": [],
+          "custom": "",
+          "bypasses": []
+        },
+        "dv": {
+          "value": [],
+          "custom": "",
+          "bypasses": []
+        },
+        "dm": {
+          "amount": {},
+          "bypasses": []
+        },
+        "ci": {
+          "value": [],
+          "custom": ""
+        },
+        "languages": {
+          "value": [
+            "common",
+            "elvish"
+          ],
+          "custom": "",
+          "communication": {}
+        },
+        "weaponProf": {
+          "value": [],
+          "custom": "daggers, darts, slings, quarterstaffs, light crossbows",
+          "mastery": {
+            "value": [],
+            "bonus": []
+          }
+        },
+        "armorProf": {
+          "value": [],
+          "custom": ""
+        }
+      },
+      "resources": {
+        "primary": {
+          "value": 0,
+          "max": 0,
+          "sr": false,
+          "lr": false,
+          "label": ""
+        },
+        "secondary": {
+          "value": 0,
+          "max": 0,
+          "sr": false,
+          "lr": false,
+          "label": ""
+        },
+        "tertiary": {
+          "value": 0,
+          "max": 0,
+          "sr": false,
+          "lr": false,
+          "label": ""
+        }
+      },
+      "favorites": []
+    },
+    "items": [
+      {
+        "_id": "vQ15Ol9EXZr0OwFF",
+        "name": "wizard",
+        "type": "class",
+        "img": "systems/dnd5e/icons/svg/items/class.svg",
+        "system": {
+          "identifier": "wizard",
+          "description": {
+            "value": "<p>wizard</p>",
+            "chat": ""
+          },
+          "source": {
+            "custom": "",
+            "book": "PHB'14",
+            "page": "",
+            "license": "",
+            "rules": "2014",
+            "revision": 1
+          },
+          "levels": 5,
+          "hd": {
+            "denomination": "d6",
+            "spent": 0,
+            "additional": ""
+          },
+          "spellcasting": {
+            "progression": "full",
+            "ability": "int",
+            "preparation": {}
+          },
+          "primaryAbility": {
+            "value": [
+              "int"
+            ],
+            "all": false
+          },
+          "wealth": "",
+          "advancement": [],
+          "startingEquipment": [],
+          "properties": []
+        },
+        "flags": {},
+        "effects": [],
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.351",
+          "systemId": "dnd5e",
+          "systemVersion": "5.2.5",
+          "createdTime": null,
+          "modifiedTime": null,
+          "lastModifiedBy": null
+        },
+        "folder": null,
+        "sort": 0,
+        "ownership": {
+          "default": 0
+        }
+      },
+      {
+        "_id": "ONG3ykOTo7SBIEvq",
+        "name": "Magic Initiate",
+        "type": "feat",
+        "img": "icons/svg/item-bag.svg",
+        "system": {
+          "source": {
+            "custom": "",
+            "book": "",
+            "page": "",
+            "license": "",
+            "rules": "2014",
+            "revision": 1
+          },
+          "description": {
+            "value": "",
+            "chat": ""
+          },
+          "requirements": "",
+          "uses": {
+            "max": "",
+            "recovery": [],
+            "spent": 0
+          },
+          "type": {
+            "value": "background",
+            "subtype": ""
+          },
+          "properties": [],
+          "advancement": [],
+          "activities": {},
+          "identifier": "magic-initiate",
+          "crewed": false,
+          "enchant": {},
+          "prerequisites": {
+            "items": [],
+            "repeatable": false
+          }
+        },
+        "flags": {},
+        "effects": [],
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.351",
+          "systemId": "dnd5e",
+          "systemVersion": "5.2.5",
+          "createdTime": null,
+          "modifiedTime": null,
+          "lastModifiedBy": null
+        },
+        "folder": null,
+        "sort": 0,
+        "ownership": {
+          "default": 0
+        }
+      },
+      {
+        "_id": "dawSRgR6Fw7yohyt",
+        "name": "Alert",
+        "type": "feat",
+        "img": "icons/svg/item-bag.svg",
+        "system": {
+          "source": {
+            "custom": "",
+            "book": "",
+            "page": "",
+            "license": "",
+            "rules": "2014",
+            "revision": 1
+          },
+          "description": {
+            "value": "",
+            "chat": ""
+          },
+          "requirements": "",
+          "uses": {
+            "max": "",
+            "recovery": [],
+            "spent": 0
+          },
+          "type": {
+            "value": "feat",
+            "subtype": ""
+          },
+          "properties": [],
+          "advancement": [],
+          "activities": {},
+          "identifier": "alert",
+          "crewed": false,
+          "enchant": {},
+          "prerequisites": {
+            "items": [],
+            "repeatable": false
+          }
+        },
+        "flags": {},
+        "effects": [],
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.351",
+          "systemId": "dnd5e",
+          "systemVersion": "5.2.5",
+          "createdTime": null,
+          "modifiedTime": null,
+          "lastModifiedBy": null
+        },
+        "folder": null,
+        "sort": 0,
+        "ownership": {
+          "default": 0
+        }
+      },
+      {
+        "_id": "2ttZtighInc4vieg",
+        "name": "Arcane Recovery",
+        "type": "feat",
+        "img": "icons/svg/item-bag.svg",
+        "system": {
+          "source": {
+            "custom": "",
+            "book": "",
+            "page": "",
+            "license": "",
+            "rules": "2014",
+            "revision": 1
+          },
+          "description": {
+            "value": "",
+            "chat": ""
+          },
+          "requirements": "",
+          "uses": {
+            "max": "",
+            "recovery": [],
+            "spent": 0
+          },
+          "type": {
+            "value": "class",
+            "subtype": ""
+          },
+          "properties": [],
+          "advancement": [],
+          "activities": {},
+          "identifier": "arcane-recovery",
+          "crewed": false,
+          "enchant": {},
+          "prerequisites": {
+            "items": [],
+            "repeatable": false
+          }
+        },
+        "flags": {},
+        "effects": [],
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.351",
+          "systemId": "dnd5e",
+          "systemVersion": "5.2.5",
+          "createdTime": null,
+          "modifiedTime": null,
+          "lastModifiedBy": null
+        },
+        "folder": null,
+        "sort": 0,
+        "ownership": {
+          "default": 0
+        }
+      },
+      {
+        "_id": "5A6woby0jBsc2uUY",
+        "name": "Mage Hand",
+        "type": "spell",
+        "img": "icons/svg/book.svg",
+        "system": {
+          "source": {
+            "custom": "",
+            "book": "",
+            "page": "",
+            "license": "",
+            "rules": "2014",
+            "revision": 1
+          },
+          "description": {
+            "value": "<p>Una mano espectral manipula objetos a distancia.</p><p><strong>Compendium lookup:</strong> dnd5e.spells / identifier:mage-hand</p>",
+            "chat": "Una mano espectral manipula objetos a distancia."
+          },
+          "level": 0,
+          "school": "con",
+          "properties": [
+            "vocal",
+            "somatic"
+          ],
+          "ability": "int",
+          "materials": {
+            "value": "",
+            "consumed": false,
+            "cost": 0,
+            "supply": 0
+          },
+          "target": {
+            "template": {
+              "contiguous": false,
+              "units": "ft"
+            },
+            "affects": {
+              "count": "1",
+              "type": "creature",
+              "choice": false
+            }
+          },
+          "range": {
+            "value": null,
+            "units": "ft"
+          },
+          "activation": {
+            "type": "action",
+            "value": 1,
+            "condition": ""
+          },
+          "duration": {
+            "value": "",
+            "units": "inst"
+          },
+          "uses": {
+            "max": "",
+            "recovery": [],
+            "spent": 0
+          },
+          "method": "spell",
+          "prepared": 2,
+          "sourceClass": "wizard",
+          "activities": {
+            "dnd5eactivity000": {
+              "_id": "dnd5eactivity000",
+              "type": "utility",
+              "activation": {
+                "type": "action",
+                "value": null,
+                "override": false
+              },
+              "consumption": {
+                "targets": [],
+                "scaling": {
+                  "allowed": false,
+                  "max": ""
+                },
+                "spellSlot": true
+              },
+              "description": {
+                "chatFlavor": "Una mano espectral manipula objetos a distancia."
+              },
+              "duration": {
+                "units": "inst",
+                "concentration": false,
+                "override": false
+              },
+              "effects": [],
+              "range": {
+                "override": false,
+                "units": "ft"
+              },
+              "target": {
+                "prompt": true,
+                "template": {
+                  "contiguous": false,
+                  "units": "ft"
+                },
+                "affects": {
+                  "choice": false
+                },
+                "override": false
+              },
+              "uses": {
+                "spent": 0,
+                "recovery": []
+              },
+              "sort": 0,
+              "flags": {}
+            }
+          },
+          "identifier": "mage-hand"
+        },
+        "flags": {
+          "plutonium": {
+            "page": "spells.html",
+            "source": "PHB",
+            "hash": "mage%20hand_phb",
+            "propDroppable": "spell",
+            "spellId": "mage-hand"
+          },
+          "bertinis-vault": {
+            "reference": {
+              "type": "spell",
+              "spellId": "mage-hand",
+              "compendiumPack": "dnd5e.spells",
+              "lookup": "identifier:mage-hand",
+              "comparable": true
+            },
+            "plutonium": {
+              "page": "spells.html",
+              "source": "PHB",
+              "hash": "mage%20hand_phb",
+              "propDroppable": "spell",
+              "spellId": "mage-hand"
+            }
+          }
+        },
+        "effects": [],
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.351",
+          "systemId": "dnd5e",
+          "systemVersion": "5.2.5",
+          "createdTime": null,
+          "modifiedTime": null,
+          "lastModifiedBy": null
+        },
+        "folder": null,
+        "sort": 0,
+        "ownership": {
+          "default": 0
+        }
+      },
+      {
+        "_id": "RVEFMzspO47T3ZUF",
+        "name": "Shield",
+        "type": "spell",
+        "img": "icons/svg/book.svg",
+        "system": {
+          "source": {
+            "custom": "",
+            "book": "",
+            "page": "",
+            "license": "",
+            "rules": "2014",
+            "revision": 1
+          },
+          "description": {
+            "value": "<p>Barrera invisible de +5 AC.</p><p><strong>Compendium lookup:</strong> dnd5e.spells / identifier:shield</p>",
+            "chat": "Barrera invisible de +5 AC."
+          },
+          "level": 1,
+          "school": "abj",
+          "properties": [
+            "vocal",
+            "somatic"
+          ],
+          "ability": "int",
+          "materials": {
+            "value": "",
+            "consumed": false,
+            "cost": 0,
+            "supply": 0
+          },
+          "target": {
+            "template": {
+              "contiguous": false,
+              "units": "ft"
+            },
+            "affects": {
+              "count": "1",
+              "type": "creature",
+              "choice": false
+            }
+          },
+          "range": {
+            "value": null,
+            "units": "ft"
+          },
+          "activation": {
+            "type": "action",
+            "value": 1,
+            "condition": ""
+          },
+          "duration": {
+            "value": "",
+            "units": "inst"
+          },
+          "uses": {
+            "max": "",
+            "recovery": [],
+            "spent": 0
+          },
+          "method": "spell",
+          "prepared": 1,
+          "sourceClass": "wizard",
+          "activities": {
+            "dnd5eactivity000": {
+              "_id": "dnd5eactivity000",
+              "type": "utility",
+              "activation": {
+                "type": "action",
+                "value": null,
+                "override": false
+              },
+              "consumption": {
+                "targets": [],
+                "scaling": {
+                  "allowed": false,
+                  "max": ""
+                },
+                "spellSlot": true
+              },
+              "description": {
+                "chatFlavor": "Barrera invisible de +5 AC."
+              },
+              "duration": {
+                "units": "inst",
+                "concentration": false,
+                "override": false
+              },
+              "effects": [],
+              "range": {
+                "override": false,
+                "units": "ft"
+              },
+              "target": {
+                "prompt": true,
+                "template": {
+                  "contiguous": false,
+                  "units": "ft"
+                },
+                "affects": {
+                  "choice": false
+                },
+                "override": false
+              },
+              "uses": {
+                "spent": 0,
+                "recovery": []
+              },
+              "sort": 0,
+              "flags": {}
+            }
+          },
+          "identifier": "shield"
+        },
+        "flags": {
+          "plutonium": {
+            "page": "spells.html",
+            "source": "PHB",
+            "hash": "shield_phb",
+            "propDroppable": "spell",
+            "spellId": "shield"
+          },
+          "bertinis-vault": {
+            "reference": {
+              "type": "spell",
+              "spellId": "shield",
+              "compendiumPack": "dnd5e.spells",
+              "lookup": "identifier:shield",
+              "comparable": true
+            },
+            "plutonium": {
+              "page": "spells.html",
+              "source": "PHB",
+              "hash": "shield_phb",
+              "propDroppable": "spell",
+              "spellId": "shield"
+            }
+          }
+        },
+        "effects": [],
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.351",
+          "systemId": "dnd5e",
+          "systemVersion": "5.2.5",
+          "createdTime": null,
+          "modifiedTime": null,
+          "lastModifiedBy": null
+        },
+        "folder": null,
+        "sort": 0,
+        "ownership": {
+          "default": 0
+        }
+      },
+      {
+        "_id": "vSa29mtXhZAITvQ7",
+        "name": "Fireball",
+        "type": "spell",
+        "img": "icons/svg/book.svg",
+        "system": {
+          "source": {
+            "custom": "",
+            "book": "",
+            "page": "",
+            "license": "",
+            "rules": "2014",
+            "revision": 1
+          },
+          "description": {
+            "value": "<p>Explosion de fuego en gran area.</p><p><strong>Compendium lookup:</strong> dnd5e.spells / identifier:fireball</p>",
+            "chat": "Explosion de fuego en gran area."
+          },
+          "level": 3,
+          "school": "evo",
+          "properties": [
+            "vocal",
+            "somatic"
+          ],
+          "ability": "int",
+          "materials": {
+            "value": "",
+            "consumed": false,
+            "cost": 0,
+            "supply": 0
+          },
+          "target": {
+            "template": {
+              "contiguous": false,
+              "units": "ft"
+            },
+            "affects": {
+              "count": "1",
+              "type": "creature",
+              "choice": false
+            }
+          },
+          "range": {
+            "value": null,
+            "units": "ft"
+          },
+          "activation": {
+            "type": "action",
+            "value": 1,
+            "condition": ""
+          },
+          "duration": {
+            "value": "",
+            "units": "inst"
+          },
+          "uses": {
+            "max": "",
+            "recovery": [],
+            "spent": 0
+          },
+          "method": "spell",
+          "prepared": 1,
+          "sourceClass": "wizard",
+          "activities": {
+            "dnd5eactivity000": {
+              "_id": "dnd5eactivity000",
+              "type": "utility",
+              "activation": {
+                "type": "action",
+                "value": null,
+                "override": false
+              },
+              "consumption": {
+                "targets": [],
+                "scaling": {
+                  "allowed": false,
+                  "max": ""
+                },
+                "spellSlot": true
+              },
+              "description": {
+                "chatFlavor": "Explosion de fuego en gran area."
+              },
+              "duration": {
+                "units": "inst",
+                "concentration": false,
+                "override": false
+              },
+              "effects": [],
+              "range": {
+                "override": false,
+                "units": "ft"
+              },
+              "target": {
+                "prompt": true,
+                "template": {
+                  "contiguous": false,
+                  "units": "ft"
+                },
+                "affects": {
+                  "choice": false
+                },
+                "override": false
+              },
+              "uses": {
+                "spent": 0,
+                "recovery": []
+              },
+              "sort": 0,
+              "flags": {}
+            }
+          },
+          "identifier": "fireball"
+        },
+        "flags": {
+          "plutonium": {
+            "page": "spells.html",
+            "source": "PHB",
+            "hash": "fireball_phb",
+            "propDroppable": "spell",
+            "spellId": "fireball"
+          },
+          "bertinis-vault": {
+            "reference": {
+              "type": "spell",
+              "spellId": "fireball",
+              "compendiumPack": "dnd5e.spells",
+              "lookup": "identifier:fireball",
+              "comparable": true
+            },
+            "plutonium": {
+              "page": "spells.html",
+              "source": "PHB",
+              "hash": "fireball_phb",
+              "propDroppable": "spell",
+              "spellId": "fireball"
+            }
+          }
+        },
+        "effects": [],
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.351",
+          "systemId": "dnd5e",
+          "systemVersion": "5.2.5",
+          "createdTime": null,
+          "modifiedTime": null,
+          "lastModifiedBy": null
+        },
+        "folder": null,
+        "sort": 0,
+        "ownership": {
+          "default": 0
+        }
+      },
+      {
+        "_id": "20QXU0lMI5T2UsfP",
+        "name": "quarterstaff",
+        "type": "weapon",
+        "img": "icons/svg/sword.svg",
+        "system": {
+          "source": {
+            "custom": "",
+            "book": "",
+            "page": "",
+            "license": "",
+            "rules": "2014",
+            "revision": 1
+          },
+          "description": {
+            "value": "",
+            "chat": ""
+          },
+          "quantity": 1,
+          "weight": {
+            "value": 0,
+            "units": "lb"
+          },
+          "price": {
+            "value": 0,
+            "denomination": "gp"
+          },
+          "attunement": {
+            "required": false
+          },
+          "equipped": true,
+          "identified": true,
+          "rarity": "common",
+          "uses": {
+            "max": "",
+            "recovery": [],
+            "spent": 0
+          },
+          "activation": {
+            "type": "action",
+            "value": 1,
+            "condition": ""
+          },
+          "duration": {
+            "value": "",
+            "units": "inst"
+          },
+          "target": {
+            "template": {
+              "contiguous": false,
+              "units": "ft"
+            },
+            "affects": {
+              "count": "1",
+              "type": "creature",
+              "choice": false
+            }
+          },
+          "range": {
+            "value": null,
+            "units": "ft"
+          },
+          "damage": {
+            "base": {
+              "number": 1,
+              "denomination": 6,
+              "bonus": "",
+              "types": [
+                "bludgeoning"
+              ],
+              "custom": {
+                "enabled": false
+              },
+              "scaling": {
+                "mode": "whole",
+                "number": 1,
+                "formula": ""
+              }
+            }
+          },
+          "type": {
+            "value": "simpleM",
+            "baseItem": ""
+          },
+          "properties": [],
+          "proficient": null,
+          "activities": {
+            "dnd5eactivity000": {
+              "_id": "dnd5eactivity000",
+              "type": "attack",
+              "activation": {
+                "type": "action",
+                "value": null,
+                "override": false
+              },
+              "consumption": {
+                "targets": [],
+                "scaling": {
+                  "allowed": false,
+                  "max": ""
+                },
+                "spellSlot": false
+              },
+              "description": {
+                "chatFlavor": ""
+              },
+              "duration": {
+                "units": "inst",
+                "concentration": false,
+                "override": false
+              },
+              "effects": [],
+              "range": {
+                "override": false,
+                "units": "ft"
+              },
+              "target": {
+                "prompt": true,
+                "template": {
+                  "contiguous": false,
+                  "units": "ft"
+                },
+                "affects": {
+                  "choice": false
+                },
+                "override": false
+              },
+              "attack": {
+                "ability": "",
+                "bonus": "",
+                "critical": {
+                  "threshold": null
+                },
+                "flat": false,
+                "type": {
+                  "value": "melee",
+                  "classification": "weapon"
+                }
+              },
+              "damage": {
+                "critical": {
+                  "bonus": ""
+                },
+                "includeBase": true,
+                "parts": [
+                  {
+                    "number": 1,
+                    "denomination": 6,
+                    "bonus": "",
+                    "types": [
+                      "bludgeoning"
+                    ],
+                    "custom": {
+                      "enabled": false,
+                      "formula": ""
+                    },
+                    "scaling": {
+                      "mode": "whole",
+                      "number": 1,
+                      "formula": ""
+                    }
+                  }
+                ]
+              },
+              "uses": {
+                "spent": 0,
+                "recovery": []
+              },
+              "sort": 0,
+              "flags": {}
+            }
+          },
+          "identifier": "quarterstaff"
+        },
+        "flags": {},
+        "effects": [],
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.351",
+          "systemId": "dnd5e",
+          "systemVersion": "5.2.5",
+          "createdTime": null,
+          "modifiedTime": null,
+          "lastModifiedBy": null
+        },
+        "folder": null,
+        "sort": 0,
+        "ownership": {
+          "default": 0
+        }
+      },
+      {
+        "_id": "5m1rPcVs6bIEATTd",
+        "name": "Spellbook",
+        "type": "loot",
+        "img": "icons/svg/item-bag.svg",
+        "system": {
+          "source": {
+            "custom": "",
+            "book": "",
+            "page": "",
+            "license": "",
+            "rules": "2014",
+            "revision": 1
+          },
+          "description": {
+            "value": "",
+            "chat": ""
+          },
+          "quantity": 1,
+          "weight": {
+            "value": 0,
+            "units": "lb"
+          },
+          "price": {
+            "value": 0,
+            "denomination": "gp"
+          },
+          "rarity": "common",
+          "identified": true,
+          "container": null,
+          "identifier": "spellbook"
+        },
+        "flags": {},
+        "effects": [],
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.351",
+          "systemId": "dnd5e",
+          "systemVersion": "5.2.5",
+          "createdTime": null,
+          "modifiedTime": null,
+          "lastModifiedBy": null
+        },
+        "folder": null,
+        "sort": 0,
+        "ownership": {
+          "default": 0
+        }
+      },
+      {
+        "_id": "izLCHWHuvSvLL4Kd",
+        "name": "Component Pouch",
+        "type": "loot",
+        "img": "icons/svg/item-bag.svg",
+        "system": {
+          "source": {
+            "custom": "",
+            "book": "",
+            "page": "",
+            "license": "",
+            "rules": "2014",
+            "revision": 1
+          },
+          "description": {
+            "value": "",
+            "chat": ""
+          },
+          "quantity": 1,
+          "weight": {
+            "value": 0,
+            "units": "lb"
+          },
+          "price": {
+            "value": 0,
+            "denomination": "gp"
+          },
+          "rarity": "common",
+          "identified": true,
+          "container": null,
+          "identifier": "component-pouch"
+        },
+        "flags": {},
+        "effects": [],
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.351",
+          "systemId": "dnd5e",
+          "systemVersion": "5.2.5",
+          "createdTime": null,
+          "modifiedTime": null,
+          "lastModifiedBy": null
+        },
+        "folder": null,
+        "sort": 0,
+        "ownership": {
+          "default": 0
+        }
+      }
+    ],
+    "effects": [],
+    "flags": {
+      "bertinis-vault": {
+        "sourceProfile": "vault-v1",
+        "rulesVersion": "5e-2014",
+        "preflight": {
+          "blockers": 0,
+          "warnings": 0,
+          "info": 0,
+          "total": 0
+        }
+      }
+    },
+    "prototypeToken": {
+      "name": "Mira Quill",
+      "displayName": 0,
+      "actorLink": true,
+      "width": 1,
+      "height": 1,
+      "texture": {
+        "src": "systems/dnd5e/icons/svg/actors/character.svg",
+        "anchorX": 0.5,
+        "anchorY": 0.5,
+        "offsetX": 0,
+        "offsetY": 0,
+        "fit": "contain",
+        "scaleX": 1,
+        "scaleY": 1,
+        "rotation": 0,
+        "tint": "#ffffff",
+        "alphaThreshold": 0.75
+      },
+      "lockRotation": false,
+      "rotation": 0,
+      "alpha": 1,
+      "disposition": 1,
+      "displayBars": 0,
+      "bar1": {
+        "attribute": "attributes.hp"
+      },
+      "bar2": {
+        "attribute": null
+      },
+      "light": {
+        "negative": false,
+        "priority": 0,
+        "alpha": 0.5,
+        "angle": 360,
+        "bright": 0,
+        "color": null,
+        "coloration": 1,
+        "dim": 0,
+        "attenuation": 0.5,
+        "luminosity": 0.5,
+        "saturation": 0,
+        "contrast": 0,
+        "shadows": 0,
+        "animation": {
+          "type": null,
+          "speed": 5,
+          "intensity": 5,
+          "reverse": false
+        },
+        "darkness": {
+          "min": 0,
+          "max": 1
+        }
+      },
+      "sight": {
+        "enabled": true,
+        "range": 0,
+        "angle": 360,
+        "visionMode": "basic",
+        "color": null,
+        "attenuation": 0.1,
+        "brightness": 0,
+        "saturation": 0,
+        "contrast": 0
+      },
+      "detectionModes": [],
+      "occludable": {
+        "radius": 0
+      },
+      "ring": {
+        "enabled": false,
+        "colors": {
+          "ring": null,
+          "background": null
+        },
+        "effects": 1,
+        "subject": {
+          "scale": 1,
+          "texture": null
+        }
+      },
+      "turnMarker": {
+        "mode": 1,
+        "animation": null,
+        "src": null,
+        "disposition": false
+      },
+      "movementAction": null,
+      "flags": {},
+      "randomImg": false,
+      "appendNumber": false,
+      "prependAdjective": false
+    },
+    "folder": null,
+    "ownership": {
+      "default": 0
+    },
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.351",
+      "systemId": "dnd5e",
+      "systemVersion": "5.2.5",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null
+    }
+  }
+}

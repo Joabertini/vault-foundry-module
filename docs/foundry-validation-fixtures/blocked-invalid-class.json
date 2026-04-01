@@ -1,0 +1,41 @@
+{
+  "fixtureId": "blocked-invalid-class",
+  "label": "Blocked invalid class case",
+  "preflight": {
+    "ok": false,
+    "generatedAt": "2026-04-01T00:45:56.906Z",
+    "target": {
+      "rulesVersion": "5e-2014",
+      "sourceProfile": "vault-v1",
+      "foundryVersion": "13.351",
+      "systemId": "dnd5e",
+      "systemVersion": "5.2.5"
+    },
+    "issues": [
+      {
+        "code": "UNKNOWN_CLASS_ID",
+        "message": "Class id \"unknown-class\" is not present in the shared catalog.",
+        "severity": "blocker",
+        "scope": "canonical-build",
+        "path": "classing.classes[0].classId",
+        "source": "domain",
+        "canonicalId": "unknown-class"
+      },
+      {
+        "code": "UNEXPECTED_DERIVED_SPELLCASTING",
+        "message": "Primary class \"unknown-class\" does not normally derive spellcasting, but derived.spellcasting is present.",
+        "severity": "warning",
+        "scope": "canonical-build",
+        "path": "derived.spellcasting",
+        "source": "domain"
+      }
+    ],
+    "summary": {
+      "blockers": 1,
+      "warnings": 1,
+      "info": 0,
+      "total": 2
+    }
+  },
+  "payload": null
+}

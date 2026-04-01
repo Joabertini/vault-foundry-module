@@ -20,6 +20,8 @@ The Foundry module at the repository root remains the active prototype while the
 Operational docs for the current repo:
 
 - [docs/ENVIRONMENT-GUIDE.md](./docs/ENVIRONMENT-GUIDE.md)
+- [docs/FOUNDRY-MANUAL-VALIDATION.md](./docs/FOUNDRY-MANUAL-VALIDATION.md)
+- [docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md](./docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md)
 - [docs/FOUNDRY-VALIDATION-MATRIX.md](./docs/FOUNDRY-VALIDATION-MATRIX.md)
 - [docs/PROJECT-COMPLETION-CHECKLIST.md](./docs/PROJECT-COMPLETION-CHECKLIST.md)
 - [docs/MVP-STEP-BY-STEP.md](./docs/MVP-STEP-BY-STEP.md)
@@ -117,12 +119,14 @@ Current export hardening status:
 
 - `packages/foundry-exporter/test/index.test.mjs` now covers prepared cleric, pact warlock, wizard spellbook-adjacent exports, background-granted feat, duplicate, mismatch, and equipment-shape cases.
 - `packages/foundry-exporter/src/index.ts` now resolves feat ids through the shared feat catalog before building Foundry feat items and defensively deduplicates duplicate spell items.
+- `packages/foundry-exporter/test/fixtures.mjs` now contains reusable MVP validation builds for martial, prepared caster, pact caster, background feat, wizard spellbook, warning-only, and blocked cases.
+- `corepack pnpm foundry:fixtures` now exports reviewable payloads into `docs/foundry-validation-fixtures/` for the manual Foundry pass.
 - [docs/FOUNDRY-VALIDATION-MATRIX.md](./docs/FOUNDRY-VALIDATION-MATRIX.md) is the handoff doc for the current Foundry validation slice.
 
 Next follow-up after this push:
 
-1. run the manual Foundry matrix against a recent build and record outcomes;
-2. keep hardening exporter coverage only if a manual Foundry import exposes another MVP-critical gap;
+1. run `corepack pnpm foundry:fixtures`, then execute the live Foundry pass using [docs/FOUNDRY-MANUAL-VALIDATION.md](./docs/FOUNDRY-MANUAL-VALIDATION.md);
+2. record the outcomes in [docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md](./docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md);
 3. return to the large `apps/web/src/App.tsx` shared-rule integration once it can be isolated cleanly.
 
 ## Current Builder Baseline

@@ -1,0 +1,61 @@
+{
+  "generatedAt": "2026-04-01T00:45:56.907Z",
+  "fixtures": [
+    {
+      "id": "martial-fighter-5",
+      "label": "Martial with armor and shield",
+      "ok": true,
+      "blockers": 0,
+      "warnings": 0,
+      "output": "docs/foundry-validation-fixtures/martial-fighter-5.json"
+    },
+    {
+      "id": "prepared-cleric-5",
+      "label": "Prepared caster cleric",
+      "ok": true,
+      "blockers": 0,
+      "warnings": 0,
+      "output": "docs/foundry-validation-fixtures/prepared-cleric-5.json"
+    },
+    {
+      "id": "pact-warlock-5",
+      "label": "Pact caster warlock",
+      "ok": true,
+      "blockers": 0,
+      "warnings": 1,
+      "output": "docs/foundry-validation-fixtures/pact-warlock-5.json"
+    },
+    {
+      "id": "background-feat",
+      "label": "Background feat plus chosen feat",
+      "ok": true,
+      "blockers": 0,
+      "warnings": 0,
+      "output": "docs/foundry-validation-fixtures/background-feat.json"
+    },
+    {
+      "id": "wizard-spellbook-5",
+      "label": "Wizard spellbook",
+      "ok": true,
+      "blockers": 0,
+      "warnings": 0,
+      "output": "docs/foundry-validation-fixtures/wizard-spellbook-5.json"
+    },
+    {
+      "id": "warning-only",
+      "label": "Warning-only validation case",
+      "ok": true,
+      "blockers": 0,
+      "warnings": 3,
+      "output": "docs/foundry-validation-fixtures/warning-only.json"
+    },
+    {
+      "id": "blocked-invalid-class",
+      "label": "Blocked invalid class case",
+      "ok": false,
+      "blockers": 1,
+      "warnings": 1,
+      "output": "docs/foundry-validation-fixtures/blocked-invalid-class.json"
+    }
+  ]
+}

@@ -19,7 +19,13 @@ Automated exporter coverage now includes representative cases for:
 Primary automated coverage lives in:
 
 - `packages/foundry-exporter/test/index.test.mjs`
+- `packages/foundry-exporter/test/fixtures.mjs`
 - `packages/domain/test/preflight.test.mjs`
+
+Generated validation payloads can be refreshed with:
+
+- `corepack pnpm foundry:fixtures`
+- output directory: `docs/foundry-validation-fixtures/`
 
 ## Manual Foundry Matrix
 

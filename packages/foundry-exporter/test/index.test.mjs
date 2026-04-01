@@ -2,87 +2,16 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { buildFoundryActorPayload, buildFoundryExportResult } from "../dist/index.js";
+import {
+  makeBackgroundFeatValidationBuild,
+  makeBaseCharacterBuild,
+  makePreparedCasterValidationBuild,
+  makePactCasterValidationBuild,
+  makeWizardSpellbookValidationBuild,
+} from "./fixtures.mjs";
 
 function makeCharacterBuild() {
-  return {
-    meta: {
-      rulesVersion: "5e-2014",
-      sourceProfile: "vault-v1",
-      createdAt: "2026-03-22T00:00:00.000Z",
-      updatedAt: "2026-03-22T00:00:00.000Z",
-    },
-    identity: {
-      characterName: "Seraphina Vale",
-      alignment: "Neutral Good",
-      biography: {
-        trait: "Always writes everything down.",
-        ideal: "Knowledge before fear.",
-      },
-    },
-    ancestry: {
-      raceId: "human",
-    },
-    classing: {
-      classes: [{ classId: "wizard", level: 3 }],
-    },
-    background: {
-      backgroundId: "sage",
-      grantedFeatIds: ["magic-initiate"],
-    },
-    abilities: {
-      generationMethod: "manual",
-      base: { str: 8, dex: 14, con: 13, int: 17, wis: 12, cha: 10 },
-      final: { str: 8, dex: 14, con: 13, int: 17, wis: 12, cha: 10 },
-    },
-    choices: {
-      feats: ["alert"],
-      proficiencies: ["Arcana", "Investigation", "Language: Elvish", "Tool: Thieves' Tools"],
-      spells: ["Nv0: Mage Hand", "Nv1: Shield"],
-      equipment: ["quarterstaff", "mage-armor", "spellbook", "component-pouch"],
-      features: ["Arcane Recovery"],
-      normalized: {
-        feats: ["alert"],
-        proficiencies: [
-          { kind: "skill", label: "Arcana" },
-          { kind: "skill", label: "Investigation" },
-          { kind: "language", label: "Elvish" },
-          { kind: "tool", label: "Thieves' Tools" },
-        ],
-        spells: [
-          { label: "Mage Hand", level: 0 },
-          { label: "Shield", level: 1 },
-        ],
-        equipment: [
-          { itemId: "quarterstaff", label: "Quarterstaff", quantity: 1, category: "weapon" },
-          { itemId: "mage-armor", label: "Mage Armor", quantity: 1, category: "armor" },
-          { label: "spellbook", quantity: 1, category: "gear" },
-          { label: "component-pouch", quantity: 1, category: "gear" },
-        ],
-        features: [{ label: "Arcane Recovery", source: "class" }],
-      },
-    },
-    derived: {
-      proficiencyBonus: 2,
-      hp: 14,
-      ac: 15,
-      spellcasting: {
-        ability: "int",
-        attackBonus: 5,
-        saveDC: 13,
-        slots: {
-          spell1: 4,
-          spell2: 2,
-          spell3: 0,
-          spell4: 0,
-          spell5: 0,
-          spell6: 0,
-          spell7: 0,
-          spell8: 0,
-          spell9: 0,
-        },
-      },
-    },
-  };
+  return makeBaseCharacterBuild();
 }
 
 test("buildFoundryActorPayload maps canonical build into a richer Foundry actor", () => {
@@ -285,59 +214,7 @@ test("buildFoundryExportResult propagates duplicate warnings from preflight", ()
 });
 
 test("buildFoundryActorPayload keeps prepared caster exports coherent for clerics", () => {
-  const build = makeCharacterBuild();
-  build.identity.characterName = "Ilyra Dawn";
-  build.ancestry.raceId = "aasimar";
-  build.classing.classes = [{ classId: "cleric", level: 5 }];
-  build.background.backgroundId = "acolyte";
-  build.background.grantedFeatIds = [];
-  build.abilities.base = { str: 10, dex: 12, con: 14, int: 8, wis: 17, cha: 13 };
-  build.abilities.final = { str: 10, dex: 12, con: 14, int: 8, wis: 17, cha: 13 };
-  build.choices.feats = [];
-  build.choices.proficiencies = ["Insight", "Religion", "Language: Celestial"];
-  build.choices.spells = ["Nv0: Sacred Flame", "Nv3: Spirit Guardians"];
-  build.choices.equipment = ["mace", "shield", "chain-mail", "holy-symbol"];
-  build.choices.features = ["Channel Divinity"];
-  build.choices.normalized = {
-    feats: [],
-    proficiencies: [
-      { kind: "skill", label: "Insight" },
-      { kind: "skill", label: "Religion" },
-      { kind: "language", label: "Celestial" },
-    ],
-    spells: [
-      { label: "Sacred Flame", level: 0 },
-      { label: "Spirit Guardians", level: 3 },
-    ],
-    equipment: [
-      { itemId: "mace", label: "Mace", quantity: 1, category: "weapon" },
-      { itemId: "shield", label: "Shield", quantity: 1, category: "shield" },
-      { itemId: "chain-mail", label: "Chain Mail", quantity: 1, category: "armor" },
-      { label: "holy-symbol", quantity: 1, category: "gear" },
-    ],
-    features: [{ label: "Channel Divinity", source: "class" }],
-  };
-  build.derived = {
-    proficiencyBonus: 3,
-    hp: 33,
-    ac: 18,
-    spellcasting: {
-      ability: "wis",
-      attackBonus: 6,
-      saveDC: 14,
-      slots: {
-        spell1: 4,
-        spell2: 3,
-        spell3: 2,
-        spell4: 0,
-        spell5: 0,
-        spell6: 0,
-        spell7: 0,
-        spell8: 0,
-        spell9: 0,
-      },
-    },
-  };
+  const build = makePreparedCasterValidationBuild();
 
   const payload = buildFoundryActorPayload(build);
 
@@ -350,56 +227,7 @@ test("buildFoundryActorPayload keeps prepared caster exports coherent for cleric
 });
 
 test("buildFoundryActorPayload keeps pact caster exports coherent for warlocks", () => {
-  const build = makeCharacterBuild();
-  build.identity.characterName = "Nox Vey";
-  build.classing.classes = [{ classId: "warlock", level: 5 }];
-  build.background.backgroundId = "charlatan";
-  build.background.grantedFeatIds = [];
-  build.abilities.base = { str: 8, dex: 14, con: 14, int: 10, wis: 12, cha: 18 };
-  build.abilities.final = { str: 8, dex: 14, con: 14, int: 10, wis: 12, cha: 18 };
-  build.choices.feats = [];
-  build.choices.proficiencies = ["Deception", "Arcana"];
-  build.choices.spells = ["Nv0: Eldritch Blast", "Nv3: Hunger of Hadar"];
-  build.choices.equipment = ["dagger", "leather", "arcane-focus"];
-  build.choices.features = ["Pact Magic"];
-  build.choices.normalized = {
-    feats: [],
-    proficiencies: [
-      { kind: "skill", label: "Deception" },
-      { kind: "skill", label: "Arcana" },
-    ],
-    spells: [
-      { label: "Eldritch Blast", level: 0 },
-      { label: "Hunger of Hadar", level: 3 },
-    ],
-    equipment: [
-      { itemId: "dagger", label: "Dagger", quantity: 1, category: "weapon" },
-      { itemId: "leather", label: "Leather Armor", quantity: 1, category: "armor" },
-      { label: "arcane-focus", quantity: 1, category: "gear" },
-    ],
-    features: [{ label: "Pact Magic", source: "class" }],
-  };
-  build.derived = {
-    proficiencyBonus: 3,
-    hp: 38,
-    ac: 14,
-    spellcasting: {
-      ability: "cha",
-      attackBonus: 7,
-      saveDC: 15,
-      slots: {
-        spell1: 0,
-        spell2: 0,
-        spell3: 2,
-        spell4: 0,
-        spell5: 0,
-        spell6: 0,
-        spell7: 0,
-        spell8: 0,
-        spell9: 0,
-      },
-    },
-  };
+  const build = makePactCasterValidationBuild();
 
   const payload = buildFoundryActorPayload(build);
   const hungerOfHadar = payload.items.find((item) => item.name === "Hunger of Hadar" && item.type === "spell");
@@ -411,11 +239,7 @@ test("buildFoundryActorPayload keeps pact caster exports coherent for warlocks",
 });
 
 test("buildFoundryActorPayload includes background-granted feats alongside chosen feats", () => {
-  const build = makeCharacterBuild();
-  build.background.backgroundId = "wildspacer";
-  build.background.grantedFeatIds = ["tough"];
-  build.choices.feats = ["alert"];
-  build.choices.normalized.feats = ["alert"];
+  const build = makeBackgroundFeatValidationBuild();
 
   const payload = buildFoundryActorPayload(build);
   const featNames = payload.items.filter((item) => item.type === "feat").map((item) => item.name);
@@ -425,47 +249,7 @@ test("buildFoundryActorPayload includes background-granted feats alongside chose
 });
 
 test("buildFoundryActorPayload keeps wizard spellbook exports stable", () => {
-  const build = makeCharacterBuild();
-  build.identity.characterName = "Mira Quill";
-  build.classing.classes = [{ classId: "wizard", level: 5 }];
-  build.background.backgroundId = "sage";
-  build.background.grantedFeatIds = ["magic-initiate"];
-  build.abilities.base = { str: 8, dex: 14, con: 14, int: 18, wis: 12, cha: 10 };
-  build.abilities.final = { str: 8, dex: 14, con: 14, int: 18, wis: 12, cha: 10 };
-  build.choices.spells = ["Nv0: Mage Hand", "Nv1: Shield", "Nv3: Fireball"];
-  build.choices.equipment = ["quarterstaff", "spellbook", "component-pouch"];
-  build.choices.features = ["Arcane Recovery"];
-  build.choices.normalized.spells = [
-    { spellId: "mage-hand", label: "Mage Hand", level: 0 },
-    { spellId: "shield", label: "Shield", level: 1 },
-    { spellId: "fireball", label: "Fireball", level: 3 },
-  ];
-  build.choices.normalized.equipment = [
-    { itemId: "quarterstaff", label: "Quarterstaff", quantity: 1, category: "weapon" },
-    { label: "spellbook", quantity: 1, category: "gear" },
-    { label: "component-pouch", quantity: 1, category: "gear" },
-  ];
-  build.derived = {
-    proficiencyBonus: 3,
-    hp: 32,
-    ac: 14,
-    spellcasting: {
-      ability: "int",
-      attackBonus: 7,
-      saveDC: 15,
-      slots: {
-        spell1: 4,
-        spell2: 3,
-        spell3: 2,
-        spell4: 0,
-        spell5: 0,
-        spell6: 0,
-        spell7: 0,
-        spell8: 0,
-        spell9: 0,
-      },
-    },
-  };
+  const build = makeWizardSpellbookValidationBuild();
 
   const payload = buildFoundryActorPayload(build);
   const lootItems = payload.items.filter((item) => item.type === "loot");
