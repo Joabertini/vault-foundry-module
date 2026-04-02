@@ -109,6 +109,9 @@ What changed materially before this handoff:
 - the active builder remains the dark 9-step wizard baseline;
 - the Foundry pipeline was unified so the runtime and compatibility wrapper drift less;
 - shared export fixtures and baseline verification are in place;
+- API regression coverage now includes cache behavior, hybrid fallback, and upstream failure responses;
+- the API now explicitly allows its legacy default upstream dataset paths, so `source=hybrid` and `source=upstream` do not fail by default just because of path filtering;
+- CI verification now also runs the web verification gate and API tests instead of relying only on manual local checks;
 - web and API builds are passing in the current state.
 
 What not to do next:

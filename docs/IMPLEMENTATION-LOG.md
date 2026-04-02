@@ -1820,3 +1820,31 @@ Impacto:
 - el repo ahora comunica mejor que el siguiente paso real hacia MVP es probar en Foundry y endurecer contra evidencia;
 - reduce el riesgo de que el siguiente DEV reabra rediseños o vuelva a dispersar prioridades;
 - deja una entrada mas clara para cerrar MVP antes de pasar a post-beta hardening.
+
+### Hardening rapido del API y del gate de CI para la deadline MVP
+
+Se hizo una pasada corta y de alto impacto para reducir riesgo operativo antes de la validacion manual final en Foundry.
+
+Ahora incluye:
+
+- nuevos tests en `apps/api/test/server.test.mjs` para cubrir:
+  - cache de `/upstream/json`;
+  - fallback de datasets `hybrid` cuando el upstream falla;
+  - respuestas `502` de datasets `upstream` cuando el upstream falla;
+- `apps/api/src/server.ts` ahora permite tambien las rutas upstream legacy exactas usadas por defecto por el propio API (`/classes`, `/races`, `/backgrounds`, `/feats`, `/items`, `/spells`) ademas de los prefijos `/data/` y `/api/`;
+- `.github/workflows/verify.yml` ahora exige:
+  - `corepack pnpm web:verify`
+  - `corepack pnpm --filter @bertinis-vault/api test`
+  - ademas de los checks que ya existian.
+
+Validacion ejecutada:
+
+- `corepack pnpm --filter @bertinis-vault/api test`
+- `corepack pnpm web:verify`
+- `corepack pnpm foundry:verify`
+
+Impacto:
+
+- baja el riesgo de llegar a la demo/validacion manual con el API rompiendo solo cuando se usa `source=hybrid` o `source=upstream`;
+- sube el piso del CI para que web y API queden cubiertos en cada push/PR;
+- da una base bastante mejor para usar los 3 dias restantes en validacion real y no en descubrir regresiones evitables.

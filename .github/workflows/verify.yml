@@ -28,6 +28,12 @@ jobs:
       - name: Verify Environment Scaffolding
         run: corepack pnpm verify:env
 
+      - name: Verify Web Surface
+        run: corepack pnpm web:verify
+
+      - name: Verify API Backend
+        run: corepack pnpm --filter @bertinis-vault/api test
+
       - name: Verify Domain Rules
         run: corepack pnpm --filter @bertinis-vault/domain test
 
