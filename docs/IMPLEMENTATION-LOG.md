@@ -1,5 +1,40 @@
 # Bertini's Vault - Implementation Log
 
+## 2026-04-02
+
+### Slice urgente sobre spell metadata e import JSON
+
+Se abrio un slice directo sobre los dos bugs mas graves de MVP: spells mostrando `Sin dato` en la UI y JSON builder-side que todavia no entra limpio en Foundry.
+
+Cambios principales:
+
+- `apps/web/src/App.tsx` ahora resuelve la ficha activa del spell por `spellId`, mezclando:
+  - entry visible en la grilla;
+  - `builderOptions` cargadas;
+  - fallback local;
+  - detalle puntual de `GET /spells/:id`;
+- `packages/contracts/src/foundry.ts` ahora permite `_id` y `sort` en el actor exportado;
+- `packages/foundry-exporter/src/index.ts` alinea mejor el actor exportado con Foundry:
+  - `_id` root;
+  - `sort`;
+  - `system.attributes.ac.calc = "default"`;
+  - `system.attributes.ac.flat = null`;
+  - HP con `min`, `temp`, `tempmax`, `bonuses`;
+  - movement y senses mas compatibles;
+  - `system.spells.spell1..spell9` con `override: null`;
+- `packages/foundry-exporter/test/index.test.mjs` se actualizo para cubrir el nuevo shape esperado;
+- se dejo handoff tecnico focalizado en `docs/FOUNDRY-IMPORT-HANDOFF.md` y version imprimible en `docs/FOUNDRY-IMPORT-HANDOFF.html`.
+
+Referencia usada:
+
+- `D:/Users/Martin/Desktop/RESPALDO/D&D 5e/Documents/web builder/Bertinis-Foundry-Technical-Reference.docx`
+
+Estado al cierre:
+
+- la ausencia de datos de spell ya no deberia depender solo del payload resumido de la grilla;
+- el actor exportado queda mas cerca del formato nativo que Foundry exporta/importa;
+- sigue pendiente la prueba manual definitiva de import con un actor regenerado desde este commit.
+
 ## 2026-03-22
 
 ### Roadmap de tres etapas para salida a beta

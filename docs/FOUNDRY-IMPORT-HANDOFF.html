@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Foundry Import Handoff</title>
+  <style>
+    body { font-family: Georgia, "Times New Roman", serif; margin: 48px; color: #181818; line-height: 1.45; }
+    h1, h2 { color: #5d3f00; }
+    h1 { margin-bottom: 8px; }
+    h2 { margin-top: 28px; margin-bottom: 10px; }
+    p, li { font-size: 14px; }
+    code { background: #f4eee2; padding: 1px 4px; border-radius: 4px; }
+    .meta { color: #555; margin-bottom: 24px; }
+  </style>
+</head>
+<body>
+  <h1>Foundry Import Handoff</h1>
+  <p class="meta">Reporte tecnico para continuidad de MVP</p>
+
+  <h2>Contexto</h2>
+  <p>Este reporte deja el estado real del bug de MVP al cierre de la jornada. Los dos sintomas reportados por usuario siguen siendo la ausencia de datos visibles en spells dentro de la UI y la falla de import del JSON exportado a Foundry.</p>
+
+  <h2>Que se verifico</h2>
+  <ul>
+    <li>Se leyo el documento tecnico <code>Bertinis-Foundry-Technical-Reference.docx</code> y se uso como guia.</li>
+    <li>La API local ya devuelve metadata rica para spells comunes.</li>
+    <li>El catalogo local ya contiene spells MVP enriquecidos.</li>
+    <li>Se compararon <code>rambo.foundry-actor.json</code>, <code>rambo.foundry-actor2.json</code> y <code>fvtt-Actor-alpaca-L8nBWSEkSrHKABu3.json</code>.</li>
+  </ul>
+
+  <h2>Hallazgos tecnicos</h2>
+  <p>La UI puede seguir mostrando <code>Sin dato</code> si la vista activa depende solo del payload resumido de la grilla. Para bajar ese riesgo, la app ahora resuelve metadata por <code>spellId</code> mezclando fallback local, builder options y detalle puntual de <code>/spells/:id</code>.</p>
+  <p>En paralelo, el exporter se acerco mas al shape nativo de actor exportado por Foundry: actor root con <code>_id</code> y <code>sort</code>, AC con <code>calc: "default"</code> y <code>flat: null</code>, HP mas completo, movement/senses mas compatibles y slots de spell con <code>override: null</code>.</p>
+
+  <h2>Siguiente paso</h2>
+  <ol>
+    <li>Regenerar un actor nuevo desde la web con este commit.</li>
+    <li>Intentar importarlo otra vez en Foundry.</li>
+    <li>Si falla, capturar mensaje exacto de error o consola.</li>
+    <li>Si el root ya pasa, auditar uno por uno los <code>items</code> embebidos.</li>
+  </ol>
+
+  <h2>Archivos tocados</h2>
+  <ul>
+    <li><code>apps/web/src/App.tsx</code></li>
+    <li><code>packages/contracts/src/foundry.ts</code></li>
+    <li><code>packages/foundry-exporter/src/index.ts</code></li>
+    <li><code>packages/foundry-exporter/test/index.test.mjs</code></li>
+  </ul>
+</body>
+</html>

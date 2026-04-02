@@ -117,7 +117,10 @@ What changed materially before this handoff:
 - the GitHub release workflow now installs dependencies, runs `corepack pnpm mvp:verify`, updates release manifests, and attaches the ZIP from the correct path before publishing;
 - the GitHub release workflow now also runs `corepack pnpm release:ready`, so a tag cannot publish while manual validation/signoff docs are still pending;
 - the exporter now emits a more Foundry-13-friendly actor shape for `abilities`, `ac`, `hp`, and `spells`, which directly targets the JSON import failure reported against builder-generated actors;
+- the web spell panel now resolves details by `spellId` using both loaded datasets and `/spells/:id`, so the operator is not limited to the shallow list payload when checking a spell;
+- the exporter now also emits root `_id` / `sort`, default AC recalculation fields, richer HP and movement fields, and spell-slot overrides aligned more closely with native Foundry exports;
 - the spell data path now preserves richer upstream metadata and the local spell catalog includes more concrete MVP spell details, so common spells no longer collapse to `Sin dato` as often in the web builder;
+- the focused handoff for the current import/export bug now lives in [docs/FOUNDRY-IMPORT-HANDOFF.md](./docs/FOUNDRY-IMPORT-HANDOFF.md);
 - the generated Foundry validation packet now includes expected live outcomes per fixture so the operator can validate faster in Foundry;
 - web and API builds are passing in the current state.
 

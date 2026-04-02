@@ -1,18 +1,29 @@
 import { buildFoundryExportResult } from "@bertinis-vault/foundry-exporter";
-import { useEffect, useState } from "react";
+import {
+  getBackgroundGrantedProficiencies,
+  getClassArmorOptionIds,
+  getClassFallbackMeta,
+  getClassSkillOptions,
+  getClassSkillPickCount,
+  getClassWeaponOptionIds,
+  getRaceLanguageRule,
+  getSubracesForRace,
+} from "@bertinis-vault/data-engine";
+import {
+  buildSpellPickerState,
+  formatSpellChoiceLabel,
+  getSpellProgressionForClass,
+  getSpellSelectionProfileForClassLevel,
+  sanitizeSpellSelections,
+} from "@bertinis-vault/domain";
+import { useEffect, useMemo, useState } from "react";
 import {
   type BuilderState,
-  abilityModifier,
   appendUniqueLine,
   builderDraftStorageKey,
   buildCanonicalSnapshot,
   coerceBuilderState,
   initialState,
-  parseCantripLines,
-  parseEquipmentLines,
-  parseFeatureLines,
-  parseProficiencyLines,
-  parseSpellLines,
   removeLine,
 } from "./builder";
 import {
@@ -20,1432 +31,913 @@ import {
   loadBuilderOptions,
   type BuilderOptionsPayload,
 } from "./builder-options";
-import { CharacterSheet } from "./components/CharacterSheet";
-import { DEMO_PRESETS } from "./demo-presets";
 import { getFeatureSuggestions } from "./feature-suggestions";
 
+const numericDraftKeys = ["str", "dex", "con", "int", "wis", "cha"] as const;
+type NumericDraftKey = (typeof numericDraftKeys)[number];
+type StatMethod = "manual" | "array" | "pointbuy" | "roll";
+
 const steps = [
-  { id: "identity", label: "Identidad" },
-  { id: "build", label: "Base" },
-  { id: "abilities", label: "Atributos" },
-  { id: "choices", label: "Elecciones" },
-  { id: "magic", label: "Magia" },
-  { id: "persona", label: "Persona" },
+  { id: "basic", title: "Datos Basicos", desc: "Lo primero es lo primero: identifica a tu aventurero." },
+  { id: "class", title: "Clase y Subclase", desc: "Tu clase define la mayoria de tus capacidades." },
+  { id: "race", title: "Raza / Especie", desc: "Tu raza otorga rasgos, idiomas y parte del tono del personaje." },
+  { id: "background", title: "Trasfondo", desc: "El origen del personaje afecta skills, flavor y feat sugerida." },
+  { id: "stats", title: "Atributos", desc: "Elige como generar los atributos y asignalos antes de seguir." },
+  { id: "training", title: "Skills e Idiomas", desc: "Las opciones responden a clase, raza y trasfondo." },
+  { id: "equipment", title: "Equipo", desc: "Arma, armadura y loadout inicial guiados por la clase." },
+  { id: "magic", title: "Magia y Rasgos", desc: "Cantrips, spells y features sin texto libre como eje." },
+  { id: "review", title: "Revision y Export", desc: "Chequea el resultado y descarga el actor para Foundry." },
 ];
 
-function HeroSection({
-  datasetState,
-  onExplore,
-  onFocusSheet,
-}: {
-  datasetState: string;
-  onExplore: () => void;
-  onFocusSheet: () => void;
-}) {
-  return (
-    <section className="hero hero-product">
-      <div className="hero-content">
-        <div className="eyebrow">Bertini&apos;s Vault</div>
-        <h1>Builder de personajes D&amp;D 5e listo para mesa</h1>
-        <p className="hero-copy">
-          Modelo canónico propio, exportación directa a Foundry y fichas pensadas para
-          compartir sin fricción.
-        </p>
+const standardArray = [15, 14, 13, 12, 10, 8];
+const pointBuyCost: Record<number, number> = { 8: 0, 9: 1, 10: 2, 11: 3, 12: 4, 13: 5, 14: 7, 15: 9 };
 
-        <div className="hero-actions">
-          <button className="primary-button" onClick={onExplore} type="button">
-            Probar demo
-          </button>
-          <button className="secondary-button" onClick={onFocusSheet} type="button">
-            Ver ficha
-          </button>
-          <span className="inline-status">{datasetState}</span>
-        </div>
+function abilityModifier(score = 10) {
+  return Math.floor((score - 10) / 2);
+}
 
-        <div className="hero-badges">
-          <span>Modelo canónico</span>
-          <span>Export a Foundry</span>
-          <span>Snapshots claros</span>
-        </div>
-      </div>
-    </section>
+function createNumericDrafts(source: BuilderState) {
+  return {
+    str: String(source.str),
+    dex: String(source.dex),
+    con: String(source.con),
+    int: String(source.int),
+    wis: String(source.wis),
+    cha: String(source.cha),
+  };
+}
+
+function uniqueLines(value: string) {
+  return Array.from(new Set(value.split("\n").map((entry) => entry.trim()).filter(Boolean)));
+}
+
+function joinLines(values: string[]) {
+  return Array.from(new Set(values.map((entry) => entry.trim()).filter(Boolean))).join("\n");
+}
+
+type SpellInfo = {
+  id: string;
+  label: string;
+  level: number;
+  summary?: string;
+  school?: string | null;
+  classes?: string[];
+  castingTimeLabel?: string;
+  rangeLabel?: string;
+  durationLabel?: string;
+  componentsLabel?: string;
+};
+
+function mergeSpellInfo(...entries: Array<Partial<SpellInfo> | null | undefined>): SpellInfo | null {
+  const definedEntries = entries.filter(Boolean) as Partial<SpellInfo>[];
+  if (!definedEntries.length) return null;
+
+  return definedEntries.reduce<SpellInfo>(
+    (current, entry) => ({
+      ...current,
+      ...entry,
+      id: entry.id || current.id,
+      label: entry.label || current.label,
+      level: entry.level ?? current.level,
+      school: entry.school || current.school || null,
+      classes: entry.classes?.length ? entry.classes : current.classes ?? [],
+      summary: entry.summary?.trim() ? entry.summary : current.summary ?? "",
+      castingTimeLabel: entry.castingTimeLabel || current.castingTimeLabel || "",
+      rangeLabel: entry.rangeLabel || current.rangeLabel || "",
+      durationLabel: entry.durationLabel || current.durationLabel || "",
+      componentsLabel: entry.componentsLabel || current.componentsLabel || "",
+    }),
+    {
+      id: "",
+      label: "",
+      level: 0,
+      school: null,
+      classes: [],
+      summary: "",
+      castingTimeLabel: "",
+      rangeLabel: "",
+      durationLabel: "",
+      componentsLabel: "",
+    },
   );
 }
 
-function PresetsBar({
-  activePresetId,
-  onLoadPreset,
-}: {
-  activePresetId: string | null;
-  onLoadPreset: (presetId: string) => void;
-}) {
-  return (
-    <section className="presets">
-      <div className="section-head section-head-compact">
-        <span className="eyebrow">Ejemplos listos</span>
-        <h2>Presets para demo</h2>
-      </div>
-
-      <div className="preset-list">
-        {DEMO_PRESETS.map((preset) => (
-          <button
-            key={preset.id}
-            className={`preset-card${activePresetId === preset.id ? " active" : ""}`}
-            onClick={() => onLoadPreset(preset.id)}
-            type="button"
-          >
-            <div className="preset-title">{preset.name}</div>
-            <div className="preset-sub">{preset.subtitle}</div>
-          </button>
-        ))}
-      </div>
-    </section>
+function hasRichSpellInfo(entry: SpellInfo | null) {
+  if (!entry) return false;
+  return Boolean(
+    entry.school ||
+      entry.summary?.trim() ||
+      entry.castingTimeLabel ||
+      entry.rangeLabel ||
+      entry.durationLabel ||
+      entry.componentsLabel ||
+      entry.classes?.length,
   );
 }
 
-function ActivePresetSummary({ presetId }: { presetId: string | null }) {
-  const preset = DEMO_PRESETS.find((entry) => entry.id === presetId);
-
-  if (!preset) {
-    return null;
-  }
-
-  return (
-    <section className="active-preset">
-      <div className="active-preset-copy">
-        <span className="eyebrow">Preset Activo</span>
-        <h2>{preset.name}</h2>
-        <p>
-          {preset.subtitle}. Una build lista para demo, captura y conversación de producto sin
-          depender del borrador anterior.
-        </p>
-      </div>
-      <div className="active-preset-tags">
-        <span className="sheet-tag">Nivel {preset.data.level}</span>
-        <span className="sheet-tag">{preset.data.classId}</span>
-        <span className="sheet-tag">{preset.data.backgroundId}</span>
-      </div>
-    </section>
-  );
-}
-
-function StoryBlock() {
-  return (
-    <section className="story">
-      <div className="story-grid">
-        <div>
-          <h3>Modelo consistente</h3>
-          <p>Toda la información del personaje sigue una estructura canónica única.</p>
-        </div>
-
-        <div>
-          <h3>Integración real</h3>
-          <p>Exportación directa a Foundry lista para usar, sin pasos intermedios.</p>
-        </div>
-
-        <div>
-          <h3>Listo para compartir</h3>
-          <p>Fichas claras, legibles y preparadas para snapshots o mesa.</p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function BetaReadinessSection() {
-  const readiness = [
-    {
-      label: "Stage A",
-      progress: "90%",
-      detail: "Pipeline compartido con preflight, exporter y runtime Foundry ya operativos.",
-    },
-    {
-      label: "Stage B",
-      progress: "90%",
-      detail: "Runtime activo migrado al carril canónico; legacy pasa a compatibilidad y limpieza.",
-    },
-    {
-      label: "Stage C",
-      progress: "45%",
-      detail: "Demo, narrativa de producto y checklist de beta ya visibles, pero todavía falta hardening de release.",
-    },
-  ];
-
-  const checklist = [
-    "Demo web con presets, preflight y export visible para sharing.",
-    "Checklist de beta y estado del proyecto documentados en docs.",
-    "Runtime Foundry alineado con la preview canónica.",
-    "Pendiente: validación manual profunda dentro de Foundry VTT real.",
-  ];
-
-  return (
-    <section className="beta-readiness">
-      <div className="section-head">
-        <span className="eyebrow">Beta Readiness</span>
-        <h2>Estado ejecutivo del proyecto</h2>
-      </div>
-
-      <div className="readiness-grid">
-        {readiness.map((entry) => (
-          <article className="readiness-card" key={entry.label}>
-            <span>{entry.label}</span>
-            <strong>{entry.progress}</strong>
-            <p>{entry.detail}</p>
-          </article>
-        ))}
-      </div>
-
-      <div className="beta-checklist">
-        <div>
-          <span className="eyebrow">Lo que ya esta</span>
-          <h3>Base para una beta compartible</h3>
-        </div>
-        <div className="beta-checklist-list">
-          {checklist.map((entry) => (
-            <div className="beta-check-item" key={entry}>
-              <strong>Listo</strong>
-              <p>{entry}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function BetaScopeSection() {
-  const supported = [
-    "Builder demo con presets, sheet preview y export JSON para Foundry.",
-    "Preflight con blockers, warnings e info antes de exportar.",
-    "Creación de actor Foundry desde la preview canónica compartida.",
-  ];
-
-  const knownWeakSpots = [
-    "Validación manual en Foundry real todavía pendiente como última pasada fuerte.",
-    "Persisten restos legacy y algunos archivos con mojibake/encoding incómodo.",
-    "La beta sigue enfocada en 5e 2014 y en los flujos ya cubiertos por el pipeline compartido.",
-  ];
-
-  return (
-    <section className="beta-scope">
-      <div className="section-head">
-        <span className="eyebrow">Beta Scope</span>
-        <h2>Qué ya puede mostrarse y qué sigue siendo sensible</h2>
-      </div>
-
-      <div className="beta-scope-grid">
-        <article className="scope-card">
-          <span className="eyebrow">Soportado</span>
-          <div className="scope-list">
-            {supported.map((entry) => (
-              <div className="scope-item" key={entry}>
-                <strong>Listo</strong>
-                <p>{entry}</p>
-              </div>
-            ))}
-          </div>
-        </article>
-
-        <article className="scope-card scope-card-risk">
-          <span className="eyebrow">Riesgos honestos</span>
-          <div className="scope-list">
-            {knownWeakSpots.map((entry) => (
-              <div className="scope-item" key={entry}>
-                <strong>Atención</strong>
-                <p>{entry}</p>
-              </div>
-            ))}
-          </div>
-        </article>
-      </div>
-    </section>
-  );
-}
-
-function BetaPackageSection() {
-  const packageItems = [
-    {
-      title: "Release Notes",
-      detail: "Resumen claro de alcance beta, cambios recientes y feedback esperado.",
-    },
-    {
-      title: "Validation Guide",
-      detail: "Pasada manual en Foundry con escenarios concretos y criterio de salida.",
-    },
-    {
-      title: "Capture Guide",
-      detail: "Set mínimo de screenshots y reglas visuales para compartir la demo.",
-    },
-    {
-      title: "Tester Feedback",
-      detail: "Template estructurado para recibir hallazgos de testers sin ruido.",
-    },
-  ];
-
-  return (
-    <section className="beta-package">
-      <div className="section-head">
-        <span className="eyebrow">Beta Package</span>
-        <h2>Materiales listos para compartir y ejecutar</h2>
-      </div>
-
-      <div className="beta-package-grid">
-        {packageItems.map((entry) => (
-          <article className="beta-package-card" key={entry.title}>
-            <span>{entry.title}</span>
-            <p>{entry.detail}</p>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function PreflightCard({
-  blockers,
-  warnings,
-  info,
-  issues,
-}: {
-  blockers: number;
-  warnings: number;
-  info: number;
-  issues: Array<{ code: string; message: string; severity: string; path: string | undefined }>;
-}) {
-  const headline =
-    blockers > 0
-      ? "Export bloqueado hasta corregir hallazgos clave."
-      : warnings > 0
-        ? "Export disponible con advertencias visibles."
-        : "Export limpio para demo y descarga.";
-
-  return (
-    <div className={`preflight-card${blockers > 0 ? " is-blocked" : warnings > 0 ? " is-warning" : " is-clean"}`}>
-      <div className="sheet-section-head">
-        <div>
-          <span className="eyebrow">Preflight</span>
-          <strong>Chequeo previo a Foundry</strong>
-        </div>
-        <span className="preflight-headline">{headline}</span>
-      </div>
-
-      <div className="preflight-summary">
-        <article>
-          <span>Blockers</span>
-          <strong>{blockers}</strong>
-        </article>
-        <article>
-          <span>Warnings</span>
-          <strong>{warnings}</strong>
-        </article>
-        <article>
-          <span>Info</span>
-          <strong>{info}</strong>
-        </article>
-      </div>
-
-      <div className="preflight-list">
-        {issues.length ? (
-          issues.slice(0, 4).map((issue) => (
-            <div className="preflight-issue" key={`${issue.code}-${issue.path ?? issue.message}`}>
-              <span className={`preflight-severity severity-${issue.severity}`}>{issue.severity}</span>
-              <div>
-                <strong>{issue.code}</strong>
-                <p>{issue.message}</p>
-                {issue.path ? <code>{issue.path}</code> : null}
-              </div>
-            </div>
-          ))
-        ) : (
-          <span className="empty-note">No se detectaron blockers ni warnings en esta build.</span>
-        )}
-      </div>
-    </div>
-  );
+function roll4d6DropLowest() {
+  const dice = [...Array(4)].map(() => Math.ceil(Math.random() * 6)).sort((a, b) => b - a) as [number, number, number, number];
+  return { total: dice[0] + dice[1] + dice[2], dice };
 }
 
 export function App() {
   const [stepIndex, setStepIndex] = useState(0);
-  const [showTechnicalView, setShowTechnicalView] = useState(false);
-  const [activePresetId, setActivePresetId] = useState<string | null>("wizard");
-  const [builderOptions, setBuilderOptions] = useState<BuilderOptionsPayload>(
-    fallbackBuilderOptions,
-  );
+  const [builderOptions, setBuilderOptions] = useState<BuilderOptionsPayload>(fallbackBuilderOptions);
   const [datasetState, setDatasetState] = useState("Usando catalogo local");
   const [state, setState] = useState<BuilderState>(() => {
-    if (typeof window === "undefined") {
-      return initialState;
-    }
-
+    if (typeof window === "undefined") return initialState;
     const storedDraft = window.localStorage.getItem(builderDraftStorageKey);
-
-    if (!storedDraft) {
-      return initialState;
-    }
-
+    if (!storedDraft) return initialState;
     try {
       return coerceBuilderState(JSON.parse(storedDraft));
     } catch {
       return initialState;
     }
   });
+  const [numericDrafts, setNumericDrafts] = useState(() => createNumericDrafts(state));
+  const [statMethod, setStatMethod] = useState<StatMethod>("manual");
+  const [arrayPool, setArrayPool] = useState(standardArray);
+  const [selectedArrayValue, setSelectedArrayValue] = useState<number | null>(null);
+  const [pointBuy, setPointBuy] = useState<Record<NumericDraftKey, number>>({
+    str: 8,
+    dex: 8,
+    con: 8,
+    int: 8,
+    wis: 8,
+    cha: 8,
+  });
+  const [rolledValues, setRolledValues] = useState<Array<{ total: number; dice: number[]; assigned?: NumericDraftKey }>>([]);
+  const [selectedRollIndex, setSelectedRollIndex] = useState<number | null>(null);
   const [saveState, setSaveState] = useState("Borrador local activo");
-  const [exportState, setExportState] = useState("Listo para exportar");
-  const [foundryExportState, setFoundryExportState] = useState("Preview Foundry lista");
+  const [copyState, setCopyState] = useState("Listo para exportar");
+  const [activeSpellInfo, setActiveSpellInfo] = useState<SpellInfo | null>(null);
 
   const canonicalSnapshot = buildCanonicalSnapshot(state);
   const foundryExport = buildFoundryExportResult(canonicalSnapshot);
   const foundryPreview = foundryExport.payload;
   const foundryPreflight = foundryExport.preflight;
-  const foundryItemCount = foundryPreview?.items.length ?? 0;
-  const pb = canonicalSnapshot.derived.proficiencyBonus;
-  const ac = canonicalSnapshot.derived.ac;
-  const hp = canonicalSnapshot.derived.hp;
-  const spellDc = canonicalSnapshot.derived.spellcasting?.saveDC ?? 0;
-  const listedSpells = canonicalSnapshot.choices.spells;
-  const listedFeatures = canonicalSnapshot.choices.features;
-  const listedEquipment = canonicalSnapshot.choices.equipment;
-  const classOptions = builderOptions.classes.map((entry) => ({
-    value: entry.id,
-    label: entry.label,
-  }));
-  const raceOptions = builderOptions.races.map((entry) => ({
-    value: entry.id,
-    label: entry.label,
-  }));
-  const backgroundOptions = builderOptions.backgrounds.map((entry) => ({
-    value: entry.id,
-    label: entry.label,
-  }));
-  const featOptions = builderOptions.feats.map((entry) => ({
-    value: entry.id,
-    label: entry.label,
-  }));
-  const weaponOptions = builderOptions.equipment.weapons.map((entry) => ({
-    value: entry.id,
-    label: entry.label,
-  }));
-  const armorOptions = builderOptions.equipment.armor.map((entry) => ({
-    value: entry.id,
-    label: entry.label,
-  }));
-  const gearSuggestions = builderOptions.equipment.gear.slice(0, 10).map((entry) => entry.label);
-  const spellSuggestions = builderOptions.spells.spells
-    .slice(0, 10)
-    .map((entry) => `Nv${entry.level}: ${entry.label}`);
-  const cantripSuggestions = builderOptions.spells.cantrips
-    .slice(0, 10)
-    .map((entry) => entry.label);
-  const featureSuggestions = getFeatureSuggestions(state).slice(0, 8);
-  const selectedCantrips = parseCantripLines(state.cantripsText);
-  const selectedExtraEquipment = parseEquipmentLines(state.extraEquipmentText);
-  const selectedFeatures = parseFeatureLines(state.featuresText);
-  const selectedSpells = parseSpellLines(state.spellsText);
-  const selectedProficiencies = parseProficiencyLines(state.proficienciesText);
-  const selectedLanguages = parseProficiencyLines(state.languagesText);
-  const selectedClassLabel =
-    classOptions.find((entry) => entry.value === state.classId)?.label ?? state.classId;
-  const selectedRaceLabel =
-    raceOptions.find((entry) => entry.value === state.raceId)?.label ?? state.raceId;
-  const selectedBackgroundLabel =
-    backgroundOptions.find((entry) => entry.value === state.backgroundId)?.label ?? state.backgroundId;
-  const selectedFeatLabel =
-    featOptions.find((entry) => entry.value === state.featId)?.label ?? state.featId;
-  const selectedWeaponLabel =
-    weaponOptions.find((entry) => entry.value === state.weaponId)?.label ?? state.weaponId;
-  const selectedArmorLabel =
-    armorOptions.find((entry) => entry.value === state.armorId)?.label ?? state.armorId;
-  const presentationSpells = listedSpells.slice(0, 5);
-  const presentationFeatures = listedFeatures.slice(0, 5);
-  const presentationEquipment = [
-    selectedWeaponLabel,
-    selectedArmorLabel,
-    ...selectedExtraEquipment,
-  ].filter(Boolean);
-  const proficiencySuggestions = [
-    "Arcana",
-    "Investigation",
-    "Perception",
-    "Stealth",
-    "Thieves' Tools",
-    "Herbalism Kit",
-  ];
-  const languageSuggestions = ["Common", "Elvish", "Dwarvish", "Draconic", "Infernal", "Sylvan"];
-  const previewCharacter = {
-    name: state.characterName,
-    race: selectedRaceLabel,
-    className: selectedClassLabel,
-    level: state.level,
-    stats: {
-      str: state.str,
-      dex: state.dex,
-      con: state.con,
-      int: state.int,
-      wis: state.wis,
-      cha: state.cha,
-    },
-    hp,
-    ac,
-    speed: "30 ft",
-    features: presentationFeatures,
-    spells: presentationSpells,
-    onExportJson: copyCanonicalSnapshot,
-    onExportFoundry: downloadFoundryPreview,
+
+  const classOptions = builderOptions.classes;
+  const subclassOptions = builderOptions.subclasses[state.classId] ?? [];
+  const raceOptions = builderOptions.races;
+  const backgroundOptions = builderOptions.backgrounds;
+  const featOptions = builderOptions.feats;
+  const weaponOptions = builderOptions.equipment.weapons;
+  const armorOptions = builderOptions.equipment.armor;
+
+  const selectedClassMetaRemote = builderOptions.classes.find((entry) => entry.id === state.classId);
+  const selectedClassMetaFallback = getClassFallbackMeta(state.classId) ?? {
+    hitDie: 8,
+    spellcastingAbility: null,
+    casterProgression: "none",
+    startingEquipment: [],
+    primaryAbilities: [],
   };
+  const selectedClassMeta = {
+    ...selectedClassMetaFallback,
+    ...(selectedClassMetaRemote ?? {}),
+    hitDie: selectedClassMetaRemote?.hitDie ?? selectedClassMetaFallback.hitDie ?? 8,
+    spellcastingAbility:
+      selectedClassMetaRemote?.spellcastingAbility ?? selectedClassMetaFallback.spellcastingAbility ?? null,
+    casterProgression:
+      selectedClassMetaRemote?.casterProgression ?? selectedClassMetaFallback.casterProgression ?? "none",
+    startingEquipment:
+      selectedClassMetaRemote?.startingEquipment?.length
+        ? selectedClassMetaRemote.startingEquipment
+        : selectedClassMetaFallback.startingEquipment ?? [],
+    primaryAbilities:
+      selectedClassMetaRemote?.primaryAbilities?.length
+        ? selectedClassMetaRemote.primaryAbilities
+        : selectedClassMetaFallback.primaryAbilities ?? [],
+  };
+  const selectedBackgroundMeta = builderOptions.backgrounds.find((entry) => entry.id === state.backgroundId);
+  const selectedBackgroundGrantedFeats = selectedBackgroundMeta?.grantedFeatIds ?? [];
+  const filteredCantrips = builderOptions.spells.cantrips.filter(
+    (entry) => !entry.classes?.length || entry.classes.includes(state.classId),
+  );
+  const filteredSpells = builderOptions.spells.spells.filter(
+    (entry) => !entry.classes?.length || entry.classes.includes(state.classId),
+  );
+  const raceSubraceOptions = getSubracesForRace(state.raceId);
+  const raceLanguageRule = getRaceLanguageRule(state.raceId);
+  const lockedLanguages = raceLanguageRule.fixed;
+  const optionalLanguageChoices = raceLanguageRule.choiceOptions ?? [];
+  const optionalLanguageCount = raceLanguageRule.choiceCount ?? 0;
+  const classSkillChoices = getClassSkillOptions(state.classId);
+  const lockedProficiencies = getBackgroundGrantedProficiencies(state.backgroundId);
+  const classSkillSelectionLimit = getClassSkillPickCount(state.classId);
+  const skillChoices = useMemo(
+    () => Array.from(new Set([...lockedProficiencies, ...classSkillChoices])),
+    [classSkillChoices, lockedProficiencies],
+  );
+  const languageChoices = useMemo(() => Array.from(new Set([...lockedLanguages, ...optionalLanguageChoices])), [lockedLanguages, optionalLanguageChoices]);
+  const gearChoices = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          (selectedClassMeta?.startingEquipment ?? [])
+            .map((itemId) => builderOptions.equipment.gear.find((entry) => entry.id === itemId)?.label)
+            .filter(Boolean) as string[],
+        ),
+      ),
+    [builderOptions.equipment.gear, selectedClassMeta?.startingEquipment],
+  );
+  const featureSuggestions = getFeatureSuggestions(state);
+
+  const selectedProficiencies = uniqueLines(state.proficienciesText);
+  const selectedLanguages = uniqueLines(state.languagesText);
+  const selectedOptionalLanguages = selectedLanguages.filter((entry) => optionalLanguageChoices.includes(entry));
+  const selectedClassSkills = selectedProficiencies.filter(
+    (entry) => classSkillChoices.includes(entry) && !lockedProficiencies.includes(entry),
+  );
+  const selectedCantrips = uniqueLines(state.cantripsText);
+  const selectedSpells = uniqueLines(state.spellsText);
+  const selectedFeatures = uniqueLines(state.featuresText);
+  const selectedEquipment = uniqueLines(state.extraEquipmentText);
+  const apiBaseUrl = import.meta.env.VITE_BERTINIS_API_URL?.trim() || "http://127.0.0.1:3001";
+  const allowedWeaponIds = getClassWeaponOptionIds(state.classId).length
+    ? getClassWeaponOptionIds(state.classId)
+    : weaponOptions.slice(0, 6).map((entry) => entry.id);
+  const allowedArmorIds = getClassArmorOptionIds(state.classId).length
+    ? getClassArmorOptionIds(state.classId)
+    : armorOptions.map((entry) => entry.id);
+  const filteredWeaponOptions = weaponOptions.filter((entry) => allowedWeaponIds.includes(entry.id));
+  const filteredArmorOptions = armorOptions.filter((entry) => allowedArmorIds.includes(entry.id));
+  const selectedWeaponMeta = weaponOptions.find((entry) => entry.id === state.weaponId);
+  const isSpellcaster = Boolean(selectedClassMeta?.spellcastingAbility);
+  const derivedSpellcasting = canonicalSnapshot.derived.spellcasting;
+  const spellProgression = derivedSpellcasting ? getSpellProgressionForClass(state.classId) : "none";
+  const spellcastingAbilityId = derivedSpellcasting?.ability ?? selectedClassMeta?.spellcastingAbility ?? null;
+  const spellcastingAbilityModifier =
+    spellcastingAbilityId && numericDraftKeys.includes(spellcastingAbilityId as NumericDraftKey)
+      ? abilityModifier(state[spellcastingAbilityId as NumericDraftKey])
+      : 0;
+  const spellSelectionProfile = derivedSpellcasting
+    ? getSpellSelectionProfileForClassLevel(state.classId, state.level, spellcastingAbilityModifier)
+    : { mode: "none" as const, cantripLimit: 0, spellLimit: 0 };
+  const spellPickerState = derivedSpellcasting
+    ? buildSpellPickerState({
+        slots: derivedSpellcasting.slots,
+        profile: spellSelectionProfile,
+        cantripOptionCount: filteredCantrips.length,
+        spellOptions: filteredSpells.map((entry) => ({ level: entry.level, label: entry.label })),
+      })
+    : {
+        mode: "none" as const,
+        modeLabel: "spells",
+        sectionTitle: "Spells",
+        maxSpellLevel: 0,
+        spellLimit: 0,
+        availableCantripCount: 0,
+        availableSpellCount: 0,
+        filteredSpellOptions: [],
+      };
+  const spellSelectionMode = spellPickerState.mode;
+  const spellSelectionModeLabel = spellPickerState.modeLabel;
+  const maxSpellLevel = spellPickerState.maxSpellLevel;
+  const filteredSpellsByLevel = filteredSpells.filter((entry) =>
+    spellPickerState.filteredSpellOptions.some((option) => option.level === entry.level && option.label === entry.label),
+  );
+  const cantripSelectionLimit = spellSelectionProfile.cantripLimit;
+  const spellSelectionLimit = spellPickerState.spellLimit;
+  const availableCantripCount = spellPickerState.availableCantripCount;
+  const availableSpellCount = spellPickerState.availableSpellCount;
 
   function updateField<K extends keyof BuilderState>(key: K, value: BuilderState[K]) {
     setState((current) => ({ ...current, [key]: value }));
   }
 
-  function addCantrip(value: string) {
-    updateField("cantripsText", appendUniqueLine(state.cantripsText, value));
+  function toggleLineField(key: keyof Pick<BuilderState, "proficienciesText" | "languagesText" | "cantripsText" | "spellsText" | "featuresText" | "extraEquipmentText">, value: string) {
+    const current = state[key];
+    updateField(key, (current.includes(value) ? removeLine(current, value) : appendUniqueLine(current, value)) as BuilderState[typeof key]);
   }
 
-  function addSpell(value: string) {
-    updateField("spellsText", appendUniqueLine(state.spellsText, value));
-  }
+  async function showSpellInfo(entry: SpellInfo) {
+    const localFallback = mergeSpellInfo(
+      fallbackBuilderOptions.spells.cantrips.find((spell) => spell.id === entry.id),
+      fallbackBuilderOptions.spells.spells.find((spell) => spell.id === entry.id),
+      builderOptions.spells.cantrips.find((spell) => spell.id === entry.id),
+      builderOptions.spells.spells.find((spell) => spell.id === entry.id),
+      entry,
+    );
 
-  function removeCantrip(value: string) {
-    updateField("cantripsText", removeLine(state.cantripsText, value));
-  }
+    setActiveSpellInfo(localFallback);
 
-  function removeSpell(value: string) {
-    updateField("spellsText", removeLine(state.spellsText, value));
-  }
-
-  function addExtraEquipment(value: string) {
-    updateField("extraEquipmentText", appendUniqueLine(state.extraEquipmentText, value));
-  }
-
-  function removeExtraEquipment(value: string) {
-    updateField("extraEquipmentText", removeLine(state.extraEquipmentText, value));
-  }
-
-  function addFeature(value: string) {
-    updateField("featuresText", appendUniqueLine(state.featuresText, value));
-  }
-
-  function removeFeature(value: string) {
-    updateField("featuresText", removeLine(state.featuresText, value));
-  }
-
-  function addProficiency(value: string) {
-    updateField("proficienciesText", appendUniqueLine(state.proficienciesText, value));
-  }
-
-  function removeProficiency(value: string) {
-    updateField("proficienciesText", removeLine(state.proficienciesText, value));
-  }
-
-  function addLanguage(value: string) {
-    updateField("languagesText", appendUniqueLine(state.languagesText, value));
-  }
-
-  function removeLanguage(value: string) {
-    updateField("languagesText", removeLine(state.languagesText, value));
-  }
-
-  function resetDraft() {
-    setState(initialState);
-    setActivePresetId(null);
-    setStepIndex(0);
-    setSaveState("Borrador reiniciado");
-
-    if (typeof window !== "undefined") {
-      window.localStorage.removeItem(builderDraftStorageKey);
-    }
-  }
-
-  function loadPreset(presetId: string) {
-    const preset = DEMO_PRESETS.find((entry) => entry.id === presetId);
-
-    if (!preset) {
-      return;
-    }
-
-    setState((current) => ({
-      ...current,
-      ...preset.data,
-      createdAt: new Date().toISOString(),
-    }));
-    setActivePresetId(preset.id);
-    setStepIndex(0);
-    setSaveState(`Preset cargado: ${preset.name}`);
-    setExportState("Listo para exportar");
-    setFoundryExportState("Preview Foundry lista");
-  }
-
-  async function copyJson(payload: string, onResult: (value: string) => void) {
-    if (typeof window === "undefined" || !window.navigator?.clipboard) {
-      onResult("Clipboard no disponible");
+    if (hasRichSpellInfo(localFallback)) {
       return;
     }
 
     try {
-      await window.navigator.clipboard.writeText(payload);
-      onResult("JSON copiado al portapapeles");
+      const response = await fetch(`${apiBaseUrl}/spells/${encodeURIComponent(entry.id)}`);
+      if (!response.ok) {
+        return;
+      }
+
+      const detail = (await response.json()) as Partial<SpellInfo>;
+      setActiveSpellInfo((current) =>
+        mergeSpellInfo(current, detail),
+      );
     } catch {
-      onResult("No se pudo copiar el JSON");
+      // Keep the best local spell metadata we already resolved.
     }
   }
 
-  function downloadJson(payload: string, fileName: string, onResult: (value: string) => void) {
-    if (typeof window === "undefined" || typeof document === "undefined") {
-      onResult("Descarga no disponible");
-      return;
+  function handleNumericChange(key: NumericDraftKey, rawValue: string) {
+    setNumericDrafts((current) => ({ ...current, [key]: rawValue }));
+    const parsed = Number.parseInt(rawValue, 10);
+    if (!Number.isNaN(parsed)) {
+      updateField(key, Math.max(1, Math.min(30, parsed)) as BuilderState[typeof key]);
     }
+  }
 
-    const blob = new Blob([payload], { type: "application/json" });
+  function syncArrayAssignment(key: NumericDraftKey) {
+    if (selectedArrayValue === null) return;
+    updateField(key, selectedArrayValue as BuilderState[typeof key]);
+    setNumericDrafts((current) => ({ ...current, [key]: String(selectedArrayValue) }));
+    setArrayPool((current) => current.filter((value, index) => index !== current.indexOf(selectedArrayValue)));
+    setSelectedArrayValue(null);
+  }
+
+  function adjustPointBuy(key: NumericDraftKey, delta: number) {
+    const nextValue = pointBuy[key] + delta;
+    if (nextValue < 8 || nextValue > 15) return;
+    const nextPointBuy = { ...pointBuy, [key]: nextValue };
+    const spent = Object.values(nextPointBuy).reduce((acc, value) => acc + (pointBuyCost[value] ?? 0), 0);
+    if (spent > 27) return;
+    setPointBuy(nextPointBuy);
+    updateField(key, nextValue as BuilderState[typeof key]);
+    setNumericDrafts((current) => ({ ...current, [key]: String(nextValue) }));
+  }
+
+  function rerollStats() {
+    if (rolledValues.length > 0) return;
+    setRolledValues([...Array(6)].map(() => roll4d6DropLowest()));
+    setSelectedRollIndex(null);
+  }
+
+  function assignRolledValue(key: NumericDraftKey) {
+    if (selectedRollIndex === null || !rolledValues[selectedRollIndex] || rolledValues[selectedRollIndex]?.assigned) return;
+    const next = [...rolledValues];
+    const previous = next.findIndex((entry) => entry.assigned === key);
+    const previousEntry = previous >= 0 ? next[previous] : undefined;
+    if (previousEntry) delete previousEntry.assigned;
+    const selectedEntry = next[selectedRollIndex];
+    if (!selectedEntry) return;
+    selectedEntry.assigned = key;
+    updateField(key, selectedEntry.total as BuilderState[typeof key]);
+    setNumericDrafts((current) => ({ ...current, [key]: String(selectedEntry.total) }));
+    setRolledValues(next);
+    setSelectedRollIndex(null);
+  }
+
+  async function copyActorJson() {
+    if (!foundryPreview || typeof window === "undefined" || !window.navigator?.clipboard) return;
+    await window.navigator.clipboard.writeText(JSON.stringify(foundryPreview, null, 2));
+    setCopyState("Actor Foundry copiado");
+  }
+
+  function downloadActorJson() {
+    if (!foundryPreview || typeof window === "undefined" || typeof document === "undefined") return;
+    const blob = new Blob([JSON.stringify(foundryPreview, null, 2)], { type: "application/json" });
     const url = window.URL.createObjectURL(blob);
     const anchor = document.createElement("a");
-
     anchor.href = url;
-    anchor.download = fileName;
+    anchor.download = `${(state.characterName || "vault-character").toLowerCase().replace(/\s+/g, "-")}.foundry-actor.json`;
     anchor.click();
-
     window.URL.revokeObjectURL(url);
-    onResult("JSON descargado");
-  }
-
-  async function copyCanonicalSnapshot() {
-    await copyJson(JSON.stringify(canonicalSnapshot, null, 2), setExportState);
-  }
-
-  function downloadCanonicalSnapshot() {
-    const fileNameBase = state.characterName.trim() || "bertinis-vault-character";
-    const fileName = `${fileNameBase.toLowerCase().replace(/\s+/g, "-")}.canonical.json`;
-    downloadJson(JSON.stringify(canonicalSnapshot, null, 2), fileName, setExportState);
-  }
-
-  async function copyFoundryPreview() {
-    if (!foundryPreview) {
-      setFoundryExportState("Export bloqueado por preflight");
-      return;
-    }
-
-    await copyJson(JSON.stringify(foundryPreview, null, 2), setFoundryExportState);
-  }
-
-  function downloadFoundryPreview() {
-    if (!foundryPreview) {
-      setFoundryExportState("Export bloqueado por preflight");
-      return;
-    }
-
-    const fileNameBase = state.characterName.trim() || "bertinis-vault-character";
-    const fileName = `${fileNameBase.toLowerCase().replace(/\s+/g, "-")}.foundry-actor.json`;
-    downloadJson(JSON.stringify(foundryPreview, null, 2), fileName, setFoundryExportState);
+    setCopyState("Actor Foundry descargado");
   }
 
   useEffect(() => {
-    if (typeof window === "undefined") {
+    if (!raceSubraceOptions.length) {
+      if (state.subraceId) updateField("subraceId", "");
       return;
     }
 
+    if (!raceSubraceOptions.some((entry) => entry.id === state.subraceId)) {
+      updateField("subraceId", raceSubraceOptions[0]?.id ?? "");
+    }
+  }, [raceSubraceOptions, state.subraceId]);
+
+  useEffect(() => {
+    const keptOptional = selectedOptionalLanguages.filter((entry) => optionalLanguageChoices.includes(entry)).slice(0, optionalLanguageCount);
+    const nextLanguages = joinLines([...lockedLanguages, ...keptOptional]);
+    if (nextLanguages !== state.languagesText) {
+      updateField("languagesText", nextLanguages);
+    }
+  }, [lockedLanguages, optionalLanguageChoices, optionalLanguageCount, selectedOptionalLanguages, state.languagesText]);
+
+  useEffect(() => {
+    const keptClassSkills = selectedClassSkills
+      .filter((entry) => classSkillChoices.includes(entry))
+      .slice(0, classSkillSelectionLimit);
+    const nextProficiencies = joinLines([...lockedProficiencies, ...keptClassSkills]);
+    if (nextProficiencies !== state.proficienciesText) {
+      updateField("proficienciesText", nextProficiencies);
+    }
+  }, [classSkillChoices, classSkillSelectionLimit, lockedProficiencies, selectedClassSkills, state.proficienciesText]);
+
+  useEffect(() => {
+    const nextFeatId = selectedBackgroundGrantedFeats[0] ?? "";
+    if (selectedBackgroundGrantedFeats.length > 0 && state.featId !== nextFeatId) {
+      updateField("featId", nextFeatId);
+    }
+  }, [selectedBackgroundGrantedFeats, state.featId]);
+
+  useEffect(() => {
+    if (!filteredWeaponOptions.some((entry) => entry.id === state.weaponId)) {
+      updateField("weaponId", filteredWeaponOptions[0]?.id ?? state.weaponId);
+    }
+  }, [filteredWeaponOptions, state.weaponId]);
+
+  useEffect(() => {
+    if (!filteredArmorOptions.some((entry) => entry.id === state.armorId)) {
+      updateField("armorId", filteredArmorOptions[0]?.id ?? state.armorId);
+    }
+  }, [filteredArmorOptions, state.armorId]);
+
+  useEffect(() => {
+    const allowedGearLabels = new Set(gearChoices);
+    const nextEquipment = joinLines(selectedEquipment.filter((entry) => allowedGearLabels.has(entry)));
+    if (nextEquipment !== state.extraEquipmentText) {
+      updateField("extraEquipmentText", nextEquipment);
+    }
+  }, [gearChoices, selectedEquipment, state.extraEquipmentText]);
+
+  useEffect(() => {
+    if (isSpellcaster) return;
+    if (state.cantripsText || state.spellsText) {
+      setState((current) => ({ ...current, cantripsText: "", spellsText: "" }));
+    }
+  }, [isSpellcaster, state.cantripsText, state.spellsText]);
+
+  useEffect(() => {
+    if (!derivedSpellcasting) return;
+
+    const sanitizedSelections = sanitizeSpellSelections({
+      selectedCantrips,
+      selectedSpells,
+      cantripLimit: cantripSelectionLimit,
+      spellLimit: spellSelectionLimit,
+      allowedSpells: filteredSpellsByLevel.map((entry) => ({ level: entry.level, label: entry.label })),
+    });
+
+    const nextCantrips = joinLines(sanitizedSelections.cantrips);
+    const nextSpells = joinLines(sanitizedSelections.spells);
+
+    if (nextCantrips !== state.cantripsText || nextSpells !== state.spellsText) {
+      setState((current) => ({
+        ...current,
+        cantripsText: nextCantrips,
+        spellsText: nextSpells,
+      }));
+    }
+  }, [
+    derivedSpellcasting,
+    cantripSelectionLimit,
+    filteredSpellsByLevel,
+    spellSelectionLimit,
+    selectedCantrips,
+    selectedSpells,
+    state.cantripsText,
+    state.spellsText,
+  ]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
     window.localStorage.setItem(builderDraftStorageKey, JSON.stringify(state));
     setSaveState("Guardado local automatico");
   }, [state]);
 
   useEffect(() => {
     let cancelled = false;
-
     loadBuilderOptions()
       .then((payload) => {
-        if (cancelled) {
-          return;
-        }
-
+        if (cancelled) return;
         setBuilderOptions(payload);
         setDatasetState(`API conectada: ${payload.source.mode}`);
       })
       .catch(() => {
-        if (cancelled) {
-          return;
-        }
-
+        if (cancelled) return;
         setBuilderOptions(fallbackBuilderOptions);
         setDatasetState("Fallback local activo");
       });
-
     return () => {
       cancelled = true;
     };
   }, []);
 
-  return (
-    <main className="app-shell">
-      <HeroSection
-        datasetState={datasetState}
-        onExplore={() => {
-          setStepIndex(0);
-          if (typeof document !== "undefined") {
-            document.getElementById("builder")?.scrollIntoView({ behavior: "smooth" });
-          }
-        }}
-        onFocusSheet={() => {
-          if (typeof document !== "undefined") {
-            document.getElementById("sheet-preview")?.scrollIntoView({ behavior: "smooth" });
-          }
-        }}
-      />
+  const spentPointBuy = Object.values(pointBuy).reduce((acc, value) => acc + (pointBuyCost[value] ?? 0), 0);
 
-      <PresetsBar activePresetId={activePresetId} onLoadPreset={loadPreset} />
-
-      <ActivePresetSummary presetId={activePresetId} />
-
-      <StoryBlock />
-
-      <BetaReadinessSection />
-
-      <BetaScopeSection />
-
-      <BetaPackageSection />
-
-
-      <section className="builder-layout" id="builder">
-        <section className="builder-panel">
-          <div className="section-head">
-            <span className="eyebrow">Builder Flow</span>
-            <h2>Builder interactivo</h2>
-          </div>
-
-          <div className="step-row">
-            {steps.map((step, index) => (
-              <button
-                className={`step-pill${index === stepIndex ? " active" : ""}`}
-                key={step.id}
-                onClick={() => setStepIndex(index)}
-                type="button"
-              >
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                {step.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="builder-toolbar">
-            <span className="save-pill">{saveState}</span>
-            <div className="button-row">
-              <button
-                className="secondary-button"
-                onClick={() => setShowTechnicalView((current) => !current)}
-                type="button"
-              >
-                {showTechnicalView ? "Ocultar vista tecnica" : "Mostrar vista tecnica"}
-              </button>
-              <button className="secondary-button" onClick={resetDraft} type="button">
-                Reiniciar demo
-              </button>
-            </div>
-          </div>
-
-          {stepIndex === 0 ? (
-            <div className="form-grid">
-              <label className="field">
-                <span>Nombre del personaje</span>
-                <input
-                  value={state.characterName}
-                  onChange={(event) => updateField("characterName", event.target.value)}
-                />
-              </label>
-              <label className="field">
-                <span>Jugador</span>
-                <input
-                  value={state.playerName}
-                  onChange={(event) => updateField("playerName", event.target.value)}
-                />
-              </label>
-              <label className="field field-full">
-                <span>Alineamiento</span>
-                <input
-                  value={state.alignment}
-                  onChange={(event) => updateField("alignment", event.target.value)}
-                />
-              </label>
-              <div className="field field-full">
-                <span>Equipo extra seleccionado</span>
-                <div className="selection-card">
-                  <div className="tag-list">
-                    {selectedExtraEquipment.length ? (
-                      selectedExtraEquipment.map((entry) => (
-                        <button
-                          className="sheet-tag removable-tag"
-                          key={entry}
-                          onClick={() => removeExtraEquipment(entry)}
-                          type="button"
-                        >
-                          {entry}
-                          <strong>x</strong>
-                        </button>
-                      ))
-                    ) : (
-                      <span className="empty-note">Todavia no agregaste equipo extra.</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <label className="field field-full">
-                <span>Notas de equipo extra</span>
-                <textarea
-                  rows={3}
-                  value={state.extraEquipmentText}
-                  onChange={(event) => updateField("extraEquipmentText", event.target.value)}
-                />
-              </label>
-              <div className="field field-full">
-                <span>Sugerencias de equipo</span>
-                <div className="tag-list">
-                  {gearSuggestions.slice(0, 6).map((entry) => (
-                    <button
-                      className="sheet-tag"
-                      key={entry}
-                      onClick={() => addExtraEquipment(entry)}
-                      type="button"
-                    >
-                      {entry}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="field field-full">
-                <span>Competencias y tools</span>
-                <div className="selection-card">
-                  <div className="tag-list">
-                    {selectedProficiencies.length ? (
-                      selectedProficiencies.map((entry) => (
-                        <button
-                          className="sheet-tag removable-tag"
-                          key={entry}
-                          onClick={() => removeProficiency(entry)}
-                          type="button"
-                        >
-                          {entry}
-                          <strong>x</strong>
-                        </button>
-                      ))
-                    ) : (
-                      <span className="empty-note">Todavia no agregaste skills o tools.</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <label className="field field-full">
-                <span>Skills y tools</span>
-                <textarea
-                  rows={3}
-                  value={state.proficienciesText}
-                  onChange={(event) => updateField("proficienciesText", event.target.value)}
-                />
-              </label>
-              <div className="field field-full">
-                <span>Sugerencias de competencias</span>
-                <div className="tag-list">
-                  {proficiencySuggestions.map((entry) => (
-                    <button
-                      className="sheet-tag"
-                      key={entry}
-                      onClick={() => addProficiency(entry)}
-                      type="button"
-                    >
-                      {entry}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="field field-full">
-                <span>Lenguajes</span>
-                <div className="selection-card">
-                  <div className="tag-list">
-                    {selectedLanguages.length ? (
-                      selectedLanguages.map((entry) => (
-                        <button
-                          className="sheet-tag removable-tag"
-                          key={entry}
-                          onClick={() => removeLanguage(entry)}
-                          type="button"
-                        >
-                          {entry}
-                          <strong>x</strong>
-                        </button>
-                      ))
-                    ) : (
-                      <span className="empty-note">Todavia no agregaste lenguajes.</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <label className="field field-full">
-                <span>Lista de lenguajes</span>
-                <textarea
-                  rows={2}
-                  value={state.languagesText}
-                  onChange={(event) => updateField("languagesText", event.target.value)}
-                />
-              </label>
-              <div className="field field-full">
-                <span>Sugerencias de lenguajes</span>
-                <div className="tag-list">
-                  {languageSuggestions.map((entry) => (
-                    <button
-                      className="sheet-tag"
-                      key={entry}
-                      onClick={() => addLanguage(entry)}
-                      type="button"
-                    >
-                      {entry}
-                    </button>
-                  ))}
-                </div>
+  function renderStep() {
+    switch (steps[stepIndex]?.id) {
+      case "basic":
+        return (
+          <>
+            <div className="field"><label>Nombre del personaje <span>*</span></label>
+              <input type="text" value={state.characterName} onChange={(event) => updateField("characterName", event.target.value)} /></div>
+            <div className="field"><label>Nombre del jugador <span>*</span></label>
+              <input type="text" value={state.playerName} onChange={(event) => updateField("playerName", event.target.value)} /></div>
+            <div className="field"><label>Nivel inicial <span>*</span></label>
+              <select value={String(state.level)} onChange={(event) => updateField("level", Number(event.target.value))}>
+                {Array.from({ length: 20 }, (_, index) => index + 1).map((level) => (
+                  <option key={level} value={String(level)}>Nivel {level}</option>
+                ))}
+              </select></div>
+            <div className="field"><label>Alineamiento</label>
+              <select value={state.alignment} onChange={(event) => updateField("alignment", event.target.value)}>
+                {["Sin definir", "Legal Bueno", "Neutral Bueno", "Caotico Bueno", "Legal Neutral", "Neutral Verdadero", "Caotico Neutral", "Legal Malvado", "Neutral Malvado", "Caotico Malvado"].map((entry) => (
+                  <option key={entry} value={entry}>{entry}</option>
+                ))}
+              </select></div>
+          </>
+        );
+      case "class":
+        return (
+          <>
+            <div className="field"><label>Clase <span>*</span></label>
+              <div className="options-grid">
+                {classOptions.map((option) => (
+                  <label className={`opt${state.classId === option.id ? " selected" : ""}`} key={option.id}>
+                    <input
+                      checked={state.classId === option.id}
+                      name="cls"
+                      onChange={() => {
+                        updateField("classId", option.id);
+                        updateField("subclassId", (builderOptions.subclasses[option.id] ?? [])[0]?.id ?? "");
+                      }}
+                      type="radio"
+                    />
+                    {option.label}
+                  </label>
+                ))}
               </div>
             </div>
-          ) : null}
-
-          {stepIndex === 1 ? (
-            <div className="form-grid">
-              <label className="field">
-                <span>Raza</span>
-                <select
-                  value={state.raceId}
-                  onChange={(event) => updateField("raceId", event.target.value)}
-                >
-                  {raceOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
+            <div className="field"><label>Subclase</label>
+              <select value={state.subclassId} onChange={(event) => updateField("subclassId", event.target.value)}>
+                {(subclassOptions.length ? subclassOptions : [{ id: "", label: "Sin subclase aun" }]).map((option) => (
+                  <option key={option.id || "none"} value={option.id}>{option.label}</option>
+                ))}
+              </select>
+            </div>
+            <div className="feat-info">
+              Hit Die: <strong>{selectedClassMeta?.hitDie ? `d${selectedClassMeta.hitDie}` : "Pendiente"}</strong> | Spellcaster: <strong>{selectedClassMeta?.spellcastingAbility ? `Si (${selectedClassMeta.spellcastingAbility.toUpperCase()})` : "No"}</strong> | Abilities primarias: <strong>{selectedClassMeta?.primaryAbilities?.join(" / ") || "Flexible"}</strong>
+            </div>
+          </>
+        );
+      case "race":
+        return (
+          <>
+            <div className="field"><label>Raza <span>*</span></label>
+              <div className="options-grid">
+                {raceOptions.map((option) => (
+                  <label className={`opt${state.raceId === option.id ? " selected" : ""}`} key={option.id}>
+                    <input checked={state.raceId === option.id} name="race" onChange={() => updateField("raceId", option.id)} type="radio" />
+                    {option.label}
+                  </label>
+                ))}
+              </div>
+            </div>
+            {raceSubraceOptions.length ? (
+              <div className="field"><label>Subraza</label>
+                <div className="options-grid">
+                  {raceSubraceOptions.map((option) => (
+                    <label className={`opt${state.subraceId === option.id ? " selected" : ""}`} key={option.id}>
+                      <input checked={state.subraceId === option.id} name="subrace" onChange={() => updateField("subraceId", option.id)} type="radio" />
                       {option.label}
-                    </option>
+                    </label>
                   ))}
-                </select>
-              </label>
-              <label className="field">
-                <span>Clase</span>
-                <select
-                  value={state.classId}
-                  onChange={(event) => updateField("classId", event.target.value)}
-                >
-                  {classOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="field field-full">
-                <span>Nivel</span>
-                <input
-                  type="range"
-                  min={1}
-                  max={20}
-                  value={state.level}
-                  onChange={(event) => updateField("level", Number(event.target.value))}
-                />
-                <strong className="range-value">Nivel {state.level}</strong>
-              </label>
+                </div>
+              </div>
+            ) : null}
+            <div className="feat-info">
+              Idiomas fijos: <strong>{lockedLanguages.join(", ")}</strong>{optionalLanguageCount ? <> | Elecciones extra: <strong>{selectedOptionalLanguages.length}</strong> / {optionalLanguageCount}</> : null}
             </div>
-          ) : null}
-
-          {stepIndex === 2 ? (
-            <div className="abilities-builder">
-              {(["str", "dex", "con", "int", "wis", "cha"] as const).map((abilityKey) => (
-                <label className="ability-card" key={abilityKey}>
-                  <span className="ability-key">{abilityKey.toUpperCase()}</span>
-                  <input
-                    type="number"
-                    min={1}
-                    max={30}
-                    value={state[abilityKey]}
-                    onChange={(event) =>
-                      updateField(abilityKey, Number(event.target.value))
-                    }
-                  />
-                  <span className="ability-mod">
-                    {abilityModifier(state[abilityKey]) >= 0 ? "+" : ""}
-                    {abilityModifier(state[abilityKey])}
-                  </span>
-                </label>
+            {optionalLanguageCount ? (
+              <div className="field"><label>Idiomas a elegir por raza</label>
+                <div className="options-grid">
+                  {optionalLanguageChoices.map((entry) => {
+                    const checked = selectedOptionalLanguages.includes(entry);
+                    const disabled = !checked && selectedOptionalLanguages.length >= optionalLanguageCount;
+                    return (
+                      <label className={`opt${checked ? " selected" : ""}${disabled ? " disabled" : ""}`} key={entry}>
+                        <input checked={checked} disabled={disabled} onChange={() => toggleLineField("languagesText", entry)} type="checkbox" />
+                        {entry}
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
+          </>
+        );
+      case "background":
+        return (
+          <>
+            <div className="field"><label>Trasfondo</label>
+              <select value={state.backgroundId} onChange={(event) => updateField("backgroundId", event.target.value)}>
+                {backgroundOptions.map((option) => (
+                  <option key={option.id} value={option.id}>{option.label}</option>
+                ))}
+              </select></div>
+            <div className="bg-feat-auto" style={{ display: "block" }}>
+              <b>Trasfondo</b>: {selectedBackgroundMeta?.label ?? state.backgroundId}
+              <br />
+              <b>Origen</b>: {selectedBackgroundMeta?.source ?? "PHB"}
+              <br />
+              <b>Feat del trasfondo</b>: {selectedBackgroundGrantedFeats.length ? featOptions.find((option) => option.id === selectedBackgroundGrantedFeats[0])?.label ?? selectedBackgroundGrantedFeats[0] : "No otorga feat automatica"}
+              <br />
+              <b>Skills de trasfondo</b>: {(getBackgroundGrantedProficiencies(state.backgroundId).length ? getBackgroundGrantedProficiencies(state.backgroundId) : ["Flexible"]).join(", ")}
+            </div>
+          </>
+        );
+      case "stats":
+        return (
+          <>
+            <div className="dice-method-tabs">
+              {[
+                ["manual", "Manual"],
+                ["array", "Standard Array"],
+                ["pointbuy", "Point Buy"],
+                ["roll", "4d6"],
+              ].map(([id, label]) => (
+                <button className={`tab-btn${statMethod === id ? " active" : ""}`} key={id} onClick={() => setStatMethod(id as StatMethod)} type="button">{label}</button>
               ))}
             </div>
-          ) : null}
-
-          {stepIndex === 3 ? (
-            <div className="form-grid">
-              <label className="field">
-                <span>Background</span>
-                <select
-                  value={state.backgroundId}
-                  onChange={(event) => updateField("backgroundId", event.target.value)}
-                >
-                  {backgroundOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="field">
-                <span>Feat destacada</span>
-                <select
-                  value={state.featId}
-                  onChange={(event) => updateField("featId", event.target.value)}
-                >
-                  {featOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="field">
-                <span>Arma principal</span>
-                <select
-                  value={state.weaponId}
-                  onChange={(event) => updateField("weaponId", event.target.value)}
-                >
-                  {weaponOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="field">
-                <span>Protección</span>
-                <select
-                  value={state.armorId}
-                  onChange={(event) => updateField("armorId", event.target.value)}
-                >
-                  {armorOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <div className="field field-full">
-                <span>Equipo extra seleccionado</span>
-                <div className="selection-card">
-                  <div className="tag-list">
-                    {selectedExtraEquipment.length ? (
-                      selectedExtraEquipment.map((entry) => (
-                        <button
-                          className="sheet-tag removable-tag"
-                          key={entry}
-                          onClick={() => removeExtraEquipment(entry)}
-                          type="button"
-                        >
-                          {entry}
-                          <strong>x</strong>
-                        </button>
-                      ))
-                    ) : (
-                      <span className="empty-note">Todavia no agregaste equipo extra.</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <label className="field field-full">
-                <span>Notas de equipo extra</span>
-                <textarea
-                  rows={3}
-                  value={state.extraEquipmentText}
-                  onChange={(event) => updateField("extraEquipmentText", event.target.value)}
-                />
-              </label>
-              <div className="field field-full">
-                <span>Sugerencias de equipo</span>
-                <div className="tag-list">
-                  {gearSuggestions.slice(0, 6).map((entry) => (
-                    <button
-                      className="sheet-tag"
-                      key={entry}
-                      onClick={() => addExtraEquipment(entry)}
-                      type="button"
-                    >
-                      {entry}
-                    </button>
+            {statMethod === "array" ? (
+              <div className="dice-panel active">
+                <div className="assign-hint">Elegi un valor y despues hac click sobre un atributo.</div>
+                <div className="array-row">
+                  {arrayPool.map((value, index) => (
+                    <button className={`array-chip${selectedArrayValue === value ? " selected" : ""}`} key={`${value}-${index}`} onClick={() => setSelectedArrayValue(value)} type="button">{value}</button>
                   ))}
                 </div>
               </div>
-            </div>
-          ) : null}
-
-          {stepIndex === 4 ? (
-            <div className="form-grid">
-              <div className="field field-full">
-                <span>Cantrips seleccionados</span>
-                <div className="selection-card">
-                  <div className="tag-list">
-                    {selectedCantrips.length ? (
-                      selectedCantrips.map((entry) => (
-                        <button
-                          className="sheet-tag removable-tag"
-                          key={entry}
-                          onClick={() => removeCantrip(entry)}
-                          type="button"
-                        >
-                          {entry}
-                          <strong>x</strong>
-                        </button>
-                      ))
-                    ) : (
-                      <span className="empty-note">Todavia no elegiste cantrips.</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <label className="field field-full">
-                <span>Cantrips</span>
-                <textarea
-                  rows={3}
-                  value={state.cantripsText}
-                  onChange={(event) => updateField("cantripsText", event.target.value)}
-                />
-              </label>
-              <div className="field field-full">
-                <span>Spells seleccionados</span>
-                <div className="selection-card">
-                  <div className="tag-list">
-                    {selectedSpells.length ? (
-                      selectedSpells.map((entry) => (
-                        <button
-                          className="sheet-tag removable-tag"
-                          key={entry}
-                          onClick={() => removeSpell(entry)}
-                          type="button"
-                        >
-                          {entry}
-                          <strong>x</strong>
-                        </button>
-                      ))
-                    ) : (
-                      <span className="empty-note">Todavia no elegiste spells con nivel.</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <label className="field field-full">
-                <span>Spells</span>
-                <textarea
-                  rows={4}
-                  value={state.spellsText}
-                  onChange={(event) => updateField("spellsText", event.target.value)}
-                />
-              </label>
-              <div className="field field-full">
-                <span>Sugerencias rápidas</span>
-                <div className="tag-list">
-                  {cantripSuggestions.slice(0, 4).map((entry) => (
-                    <button
-                      className="sheet-tag"
-                      key={entry}
-                      onClick={() => addCantrip(entry)}
-                      type="button"
-                    >
-                      {entry}
-                    </button>
-                  ))}
-                  {spellSuggestions.slice(0, 4).map((entry) => (
-                    <button
-                      className="sheet-tag"
-                      key={entry}
-                      onClick={() => addSpell(entry)}
-                      type="button"
-                    >
-                      {entry}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <label className="field field-full">
-                <span>Features</span>
-                <textarea
-                  rows={3}
-                  value={state.featuresText}
-                  onChange={(event) => updateField("featuresText", event.target.value)}
-                />
-              </label>
-              <div className="field field-full">
-                <span>Features seleccionadas</span>
-                <div className="selection-card">
-                  <div className="tag-list">
-                    {selectedFeatures.length ? (
-                      selectedFeatures.map((entry) => (
-                        <button
-                          className="sheet-tag removable-tag"
-                          key={entry}
-                          onClick={() => removeFeature(entry)}
-                          type="button"
-                        >
-                          {entry}
-                          <strong>x</strong>
-                        </button>
-                      ))
-                    ) : (
-                      <span className="empty-note">Todavia no agregaste features.</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="field field-full">
-                <span>Sugerencias de features</span>
-                <div className="tag-list">
-                  {featureSuggestions.map((entry) => (
-                    <button
-                      className="sheet-tag"
-                      key={entry}
-                      onClick={() => addFeature(entry)}
-                      type="button"
-                    >
-                      {entry}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ) : null}
-
-          {stepIndex === 5 ? (
-            <div className="form-grid">
-              <label className="field field-full">
-                <span>Trait</span>
-                <textarea
-                  rows={3}
-                  value={state.trait}
-                  onChange={(event) => updateField("trait", event.target.value)}
-                />
-              </label>
-              <label className="field field-full">
-                <span>Ideal</span>
-                <textarea
-                  rows={3}
-                  value={state.ideal}
-                  onChange={(event) => updateField("ideal", event.target.value)}
-                />
-              </label>
-              <label className="field field-full">
-                <span>Bond</span>
-                <textarea
-                  rows={3}
-                  value={state.bond}
-                  onChange={(event) => updateField("bond", event.target.value)}
-                />
-              </label>
-              <label className="field field-full">
-                <span>Flaw</span>
-                <textarea
-                  rows={3}
-                  value={state.flaw}
-                  onChange={(event) => updateField("flaw", event.target.value)}
-                />
-              </label>
-              <label className="field field-full">
-                <span>Notas</span>
-                <textarea
-                  rows={4}
-                  value={state.notes}
-                  onChange={(event) => updateField("notes", event.target.value)}
-                />
-              </label>
-            </div>
-          ) : null}
-        </section>
-
-        <aside className="sheet-preview preview-column" id="sheet-preview">
-          <div className="section-head">
-            <span className="eyebrow">Character Sheet</span>
-            <h2>Vista compartible del personaje</h2>
-          </div>
-
-          <CharacterSheet character={previewCharacter} />
-
-          <div className="preview-support-grid">
-            <div className="preview-support-card">
-              <div className="sheet-section-head">
-                <span className="eyebrow">Resumen</span>
-                <strong>Lectura rapida</strong>
-              </div>
-              <div className="stat-strip">
-                <div>
-                  <span>PB</span>
-                  <strong>+{pb}</strong>
-                </div>
-                <div>
-                  <span>AC</span>
-                  <strong>{ac}</strong>
-                </div>
-                <div>
-                  <span>HP</span>
-                  <strong>{hp}</strong>
-                </div>
-                <div>
-                  <span>Spell DC</span>
-                  <strong>{spellDc || "-"}</strong>
-                </div>
-              </div>
-              <div className="persona-card persona-card-compact">
-                <p>
-                  <strong>Trait:</strong> {state.trait}
-                </p>
-                <p>
-                  <strong>Ideal:</strong> {state.ideal}
-                </p>
-                <p>
-                  <strong>Bond:</strong> {state.bond}
-                </p>
-                <p>
-                  <strong>Flaw:</strong> {state.flaw}
-                </p>
-              </div>
-            </div>
-
-            <div className="preview-support-card">
-              <div className="sheet-section-head">
-                <span className="eyebrow">Build</span>
-                <strong>Origen y loadout</strong>
-              </div>
-              <div className="tag-list">
-                <span className="sheet-tag">{selectedBackgroundLabel}</span>
-                <span className="sheet-tag">{selectedFeatLabel}</span>
-                {presentationEquipment.map((item) => (
-                  <span className="sheet-tag" key={item}>
-                    {item}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div className="preview-support-card preview-support-card-wide">
-              <div className="sheet-section-head">
-                <span className="eyebrow">Training</span>
-                <strong>Skills, tools y lenguajes</strong>
-              </div>
-              <div className="tag-list">
-                {selectedProficiencies.map((entry) => (
-                  <span className="sheet-tag" key={entry}>
-                    {entry}
-                  </span>
-                ))}
-                {selectedLanguages.map((entry) => (
-                  <span className="sheet-tag" key={entry}>
-                    {entry}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div className="preview-support-card preview-support-card-wide">
-              <PreflightCard
-                blockers={foundryPreflight.summary.blockers}
-                warnings={foundryPreflight.summary.warnings}
-                info={foundryPreflight.summary.info}
-                issues={foundryPreflight.issues.map((issue) => ({
-                  code: issue.code,
-                  message: issue.message,
-                  severity: issue.severity,
-                  path: issue.path,
-                }))}
-              />
-            </div>
-
-            <div className="preview-support-card preview-support-card-wide">
-              <div className="canonical-head">
-                <span className="eyebrow">Deliverables</span>
-                <strong>Salida lista para demo</strong>
-              </div>
-              <div className="delivery-grid">
-                <article>
-                  <span>Modelo canonico</span>
-                  <strong>{exportState}</strong>
-                  <p>La demo genera un snapshot estable para persistencia, API y evolucion futura.</p>
-                </article>
-                <article>
-                  <span>Foundry actor</span>
-                  <strong>{foundryExportState}</strong>
-                  <p>
-                    {foundryPreview
-                      ? `El export comparte la misma base y ya produce un actor con ${foundryItemCount} items.`
-                      : "El export Foundry esta pausado hasta resolver los blockers de preflight."}
-                  </p>
-                </article>
-              </div>
-              <div className="button-row">
-                <button className="secondary-button" onClick={copyCanonicalSnapshot} type="button">
-                  Copiar JSON canonico
-                </button>
-                <button
-                  className="secondary-button secondary-button-accent"
-                  onClick={downloadFoundryPreview}
-                  type="button"
-                >
-                  Descargar actor Foundry
-                </button>
-              </div>
-            </div>
-          </div>
-          {showTechnicalView ? (
-              <>
-                <div className="canonical-card">
-                  <div className="canonical-head">
-                    <span className="eyebrow">Canonical Build</span>
-                    <strong>Snapshot</strong>
-                  </div>
-                  <div className="export-toolbar">
-                    <span className="save-pill">{exportState}</span>
-                    <div className="button-row">
-                      <button
-                        className="secondary-button"
-                        onClick={copyCanonicalSnapshot}
-                        type="button"
-                      >
-                        Copiar JSON
-                      </button>
-                      <button
-                        className="secondary-button secondary-button-accent"
-                        onClick={downloadCanonicalSnapshot}
-                        type="button"
-                      >
-                        Descargar JSON
-                      </button>
-                    </div>
-                  </div>
-                  <pre>{JSON.stringify(canonicalSnapshot, null, 2)}</pre>
-                </div>
-
-                <div className="canonical-card foundry-card">
-                  <div className="canonical-head">
-                    <span className="eyebrow">Foundry Preview</span>
-                    <strong>
-                      {foundryPreview
-                        ? `Actor listo (${foundryItemCount} items)`
-                        : "Preview bloqueada por preflight"}
-                    </strong>
-                  </div>
-                  <div className="export-toolbar">
-                    <span className="save-pill">{foundryExportState}</span>
-                    <div className="button-row">
-                      <button
-                        className="secondary-button"
-                        onClick={copyFoundryPreview}
-                        type="button"
-                      >
-                        Copiar actor
-                      </button>
-                      <button
-                        className="secondary-button secondary-button-accent"
-                        onClick={downloadFoundryPreview}
-                        type="button"
-                      >
-                        Descargar actor
-                      </button>
-                    </div>
-                  </div>
-                  <pre>{JSON.stringify(foundryPreview ?? foundryPreflight, null, 2)}</pre>
-                </div>
-              </>
             ) : null}
-        </aside>
+            {statMethod === "pointbuy" ? (
+              <div className="dice-panel active">
+                <div className="pb-total">Puntos disponibles: <b>{27 - spentPointBuy}</b> / 27</div>
+              </div>
+            ) : null}
+            {statMethod === "roll" ? (
+              <div className="dice-panel active">
+                <button className="btn-reroll" disabled={rolledValues.length > 0} onClick={rerollStats} type="button">Tirar 4d6 x6</button>
+                {rolledValues.length > 0 ? <div className="assign-hint">Esta tirada se puede usar una sola vez. Asigna esos seis resultados a tus atributos.</div> : null}
+                <div className="roll-results">
+                  {rolledValues.map((entry, index) => (
+                    <button className={`roll-box${entry.assigned ? " used" : ""}`} key={`${entry.total}-${index}`} onClick={() => setSelectedRollIndex(index)} type="button">
+                      <div className="rb-stat">{entry.assigned?.toUpperCase() ?? "—"}</div>
+                      <div className="rb-val">{entry.total}</div>
+                      <div className="rb-dice">{entry.dice.join(", ")}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+            <div className="stats-grid">
+              {numericDraftKeys.map((key) => (
+                <div className="stat-field" key={key}>
+                  <label>{key.toUpperCase()}</label>
+                  {statMethod === "pointbuy" ? (
+                    <div className="pb-controls">
+                      <button className="pb-btn" onClick={() => adjustPointBuy(key, -1)} type="button">-</button>
+                      <div className="pb-val">{pointBuy[key]}</div>
+                      <button className="pb-btn" onClick={() => adjustPointBuy(key, 1)} type="button">+</button>
+                    </div>
+                  ) : (
+                    <input
+                      inputMode={statMethod === "manual" ? "numeric" : "none"}
+                      onBlur={() => setNumericDrafts((current) => ({ ...current, [key]: String(state[key]) }))}
+                      onChange={statMethod === "manual" ? (event) => handleNumericChange(key, event.target.value) : undefined}
+                      onClick={() => {
+                        if (statMethod === "array") syncArrayAssignment(key);
+                        if (statMethod === "roll") assignRolledValue(key);
+                      }}
+                      readOnly={statMethod !== "manual"}
+                      type={statMethod === "manual" ? "number" : "text"}
+                      value={numericDrafts[key]}
+                    />
+                  )}
+                  <div className="stat-mod">{`${abilityModifier(state[key]) >= 0 ? "+" : ""}${abilityModifier(state[key])}`}</div>
+                </div>
+              ))}
+            </div>
+          </>
+        );
+      case "training":
+        return (
+          <>
+            <div className="feat-info">
+              Competencias de trasfondo aplicadas: <strong>{lockedProficiencies.join(", ") || "Ninguna"}</strong> | Picks de clase: <strong>{selectedClassSkills.length}</strong> / {classSkillSelectionLimit}
+            </div>
+            <div className="field"><label>Skills de clase</label>
+              <div className="options-grid">
+                {skillChoices.map((entry) => {
+                  const locked = lockedProficiencies.includes(entry);
+                  const checked = selectedProficiencies.includes(entry);
+                  const disabled = locked || (!checked && selectedClassSkills.length >= classSkillSelectionLimit);
+                  return (
+                  <label className={`opt${checked ? " selected" : ""}${disabled ? " disabled" : ""}`} key={entry}>
+                    <input checked={checked} disabled={disabled} onChange={() => toggleLineField("proficienciesText", entry)} type="checkbox" />
+                    {entry}
+                  </label>
+                );})}
+              </div>
+            </div>
+            <div className="field"><label>Idiomas resultantes</label>
+              <div className="options-grid">
+                {languageChoices.map((entry) => (
+                  <label className={`opt${selectedLanguages.includes(entry) ? " selected" : ""}`} key={entry}>
+                    <input checked={selectedLanguages.includes(entry)} disabled type="checkbox" />
+                    {entry}
+                  </label>
+                ))}
+              </div>
+            </div>
+          </>
+        );
+      case "equipment":
+        return (
+          <>
+            <div className="field"><label>Arma principal</label>
+              <select value={state.weaponId} onChange={(event) => updateField("weaponId", event.target.value)}>
+                {filteredWeaponOptions.map((entry) => (
+                  <option key={entry.id} value={entry.id}>{entry.label}</option>
+                ))}
+              </select>
+            </div>
+            {selectedWeaponMeta ? (
+              <div className="bg-feat-auto" style={{ display: "block" }}>
+                <b>{selectedWeaponMeta.label}</b>
+                <br />
+                <b>Daño</b>: {selectedWeaponMeta.damage ?? "Sin dato"}
+                <br />
+                <b>Tipo de daño</b>: {selectedWeaponMeta.damageType ?? "Sin dato"}
+                <br />
+                <b>Tipo de ataque</b>: {selectedWeaponMeta.attackType ?? "Sin dato"}
+              </div>
+            ) : null}
+            <div className="field"><label>Armadura / Proteccion</label>
+              <div className="options-grid">
+                {filteredArmorOptions.map((entry) => (
+                  <label className={`opt${state.armorId === entry.id ? " selected" : ""}`} key={entry.id}>
+                    <input checked={state.armorId === entry.id} onChange={() => updateField("armorId", entry.id)} type="radio" />
+                    {entry.label}
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div className="field"><label>Equipo inicial sugerido</label>
+              <div className="options-grid">
+                {gearChoices.map((entry) => (
+                  <label className={`opt${selectedEquipment.includes(entry) ? " selected" : ""}`} key={entry}>
+                    <input checked={selectedEquipment.includes(entry)} onChange={() => toggleLineField("extraEquipmentText", entry)} type="checkbox" />
+                    {entry}
+                  </label>
+                ))}
+              </div>
+            </div>
+          </>
+        );
+      case "magic":
+        return (
+          <>
+            <div className="feat-info">
+              Spellcaster: <strong>{derivedSpellcasting ? `Si (${derivedSpellcasting.ability.toUpperCase()})` : "No"}</strong> | Progresion: <strong>{spellProgression}</strong> | Spell DC: <strong>{derivedSpellcasting?.saveDC ?? "-"}</strong>{derivedSpellcasting ? <> | Ataque de conjuro: <strong>{derivedSpellcasting.attackBonus >= 0 ? `+${derivedSpellcasting.attackBonus}` : derivedSpellcasting.attackBonus}</strong> | Nivel maximo de spell: <strong>{maxSpellLevel || 0}</strong></> : null}
+            </div>
+            {derivedSpellcasting ? <div className="bg-feat-auto" style={{ display: "block" }}>
+              <b>Opciones / seleccion</b>: cantrips {selectedCantrips.length} / {availableCantripCount} | {spellSelectionModeLabel} {selectedSpells.length} / {availableSpellCount}
+            </div> : null}
+            {activeSpellInfo ? <div className="bg-feat-auto" style={{ display: "block" }}>
+              <b>{activeSpellInfo.label}</b> {activeSpellInfo.level ? `(Nv${activeSpellInfo.level})` : "(Cantrip)"}
+              <br />
+              <b>Escuela</b>: {activeSpellInfo.school ?? "Sin dato"}
+              <br />
+              <b>Lanzamiento</b>: {activeSpellInfo.castingTimeLabel || "Sin dato"}
+              <br />
+              <b>Alcance</b>: {activeSpellInfo.rangeLabel || "Sin dato"}
+              <br />
+              <b>Duracion</b>: {activeSpellInfo.durationLabel || "Sin dato"}
+              <br />
+              <b>Componentes</b>: {activeSpellInfo.componentsLabel || "Sin dato"}
+              <br />
+              <b>Clases</b>: {activeSpellInfo.classes?.join(", ") || "Sin dato"}
+              <br />
+              <b>Descripcion</b>: {activeSpellInfo.summary?.trim() ? activeSpellInfo.summary : "Sin descripcion"}
+            </div> : null}
+            {derivedSpellcasting && availableCantripCount > 0 ? <div className="field"><label>Cantrips</label>
+              <div className="options-grid">
+                {filteredCantrips.map((entry) => {
+                  const checked = selectedCantrips.includes(entry.label);
+                  const disabled = !checked && selectedCantrips.length >= availableCantripCount;
+                  return (
+                  <label className={`opt${checked ? " selected" : ""}${disabled ? " disabled" : ""}`} key={entry.id} onClick={() => void showSpellInfo(entry)}>
+                    <input checked={checked} disabled={disabled} onChange={() => toggleLineField("cantripsText", entry.label)} type="checkbox" />
+                    {entry.label}
+                  </label>
+                );})}
+              </div>
+            </div> : null}
+            {derivedSpellcasting && maxSpellLevel > 0 && availableSpellCount > 0 ? <div className="field"><label>{spellPickerState.sectionTitle}</label>
+              <div className="options-grid">
+                {filteredSpellsByLevel.map((entry) => {
+                  const label = formatSpellChoiceLabel({ level: entry.level, label: entry.label });
+                  const checked = selectedSpells.includes(label);
+                  const disabled = !checked && selectedSpells.length >= availableSpellCount;
+                  return (
+                    <label className={`opt${checked ? " selected" : ""}${disabled ? " disabled" : ""}`} key={entry.id} onClick={() => void showSpellInfo(entry)}>
+                      <input checked={checked} disabled={disabled} onChange={() => toggleLineField("spellsText", label)} type="checkbox" />
+                      {entry.label} {entry.level ? `(Nv${entry.level})` : ""}
+                    </label>
+                  );
+                })}
+              </div>
+            </div> : null}
+            <div className="field"><label>Features sugeridas</label>
+              <div className="options-grid">
+                {[...new Set(featureSuggestions)].slice(0, 12).map((entry) => (
+                  <label className={`opt${selectedFeatures.includes(entry) ? " selected" : ""}`} key={entry}>
+                    <input checked={selectedFeatures.includes(entry)} onChange={() => toggleLineField("featuresText", entry)} type="checkbox" />
+                    {entry}
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div className="field"><label>Rasgo</label><input type="text" value={state.trait} onChange={(event) => updateField("trait", event.target.value)} /></div>
+            <div className="field"><label>Ideal</label><input type="text" value={state.ideal} onChange={(event) => updateField("ideal", event.target.value)} /></div>
+            <div className="field"><label>Vinculo</label><input type="text" value={state.bond} onChange={(event) => updateField("bond", event.target.value)} /></div>
+            <div className="field"><label>Defecto</label><input type="text" value={state.flaw} onChange={(event) => updateField("flaw", event.target.value)} /></div>
+          </>
+        );
+      case "review":
+        return (
+          <>
+            <div className="result-header">Resultado</div>
+            <div className="result-box">
+              <strong>{state.characterName || "Sin nombre"}</strong>
+              {selectedClassMeta?.label ?? state.classId} {state.subclassId ? `· ${subclassOptions.find((entry) => entry.id === state.subclassId)?.label ?? state.subclassId}` : ""} | {raceOptions.find((entry) => entry.id === state.raceId)?.label ?? state.raceId} | Nivel {state.level}
+              <br />
+              AC {canonicalSnapshot.derived.ac} | HP {canonicalSnapshot.derived.hp} | PB +{canonicalSnapshot.derived.proficiencyBonus}
+              <br />
+              Skills: {selectedProficiencies.join(", ") || "Ninguna"}
+              <br />
+              Idiomas: {selectedLanguages.join(", ") || "Ninguno"}
+              <br />
+              Equipo: {[state.weaponId, state.armorId, ...selectedEquipment].join(", ")}
+              <br />
+              Spells: {[...selectedCantrips, ...selectedSpells].join(", ") || "Ninguno"}
+            </div>
+            <div className="nav">
+              <button className="btn btn-next" onClick={copyActorJson} type="button">COPIAR ACTOR</button>
+              <button className="btn btn-next" onClick={downloadActorJson} type="button">DESCARGAR JSON</button>
+            </div>
+            <div className="result-box">
+              <strong>Estado</strong>
+              {copyState} | Dataset: {datasetState} | Preflight: {foundryPreflight.summary.blockers > 0 ? "Blocked" : "Clean/Warning"}
+            </div>
+            <div className="copy-area">{JSON.stringify(foundryPreview ?? foundryPreflight, null, 2)}</div>
+          </>
+        );
+      default:
+        return null;
+    }
+  }
+
+  return (
+    <div className="vault-page">
+      <header>
+        <div className="title-rule"><div className="diamond"></div></div>
+        <h1>VAULT<em>CREACION DE PERSONAJE</em></h1>
+        <p className="tagline">D&D 5e 2014 · builder funcional para exportar a Foundry</p>
+        <div className="title-rule"><div className="diamond"></div></div>
+      </header>
+
+      <div className="progress">
+        {steps.map((_, index) => (
+          <div className={`step-dot${index === stepIndex ? " active" : index < stepIndex ? " done" : ""}`} key={index} />
+        ))}
+      </div>
+
+      <section className="section active">
+        <div className="section-header">
+          <div className="section-num">{`PASO ${String(stepIndex + 1).padStart(2, "0")} / 09`}</div>
+          <div className="section-title">{steps[stepIndex]?.title}</div>
+          <div className="section-desc">{steps[stepIndex]?.desc}</div>
+        </div>
+
+        {renderStep()}
+
+        <div className="nav">
+          {stepIndex > 0 ? (
+            <button className="btn btn-back" onClick={() => setStepIndex((current) => Math.max(0, current - 1))} type="button">← ATRAS</button>
+          ) : null}
+          {stepIndex < steps.length - 1 ? (
+            <button className="btn btn-next" onClick={() => setStepIndex((current) => Math.min(steps.length - 1, current + 1))} type="button">SIGUIENTE →</button>
+          ) : null}
+        </div>
       </section>
 
-    </main>
+      <footer>{saveState}</footer>
+    </div>
   );
 }
-
-

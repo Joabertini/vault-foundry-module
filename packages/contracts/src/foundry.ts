@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const foundryActorPayloadSchema = z.object({
+  _id: z.string().trim().min(1).optional(),
   name: z.string().trim().min(1),
   type: z.literal("character"),
   img: z.string().trim().min(1),
@@ -10,6 +11,7 @@ export const foundryActorPayloadSchema = z.object({
   flags: z.record(z.string(), z.unknown()).default({}),
   prototypeToken: z.record(z.string(), z.unknown()).optional(),
   folder: z.unknown().optional(),
+  sort: z.number().optional(),
   ownership: z.record(z.string(), z.unknown()).optional(),
   _stats: z.record(z.string(), z.unknown()).optional(),
 });

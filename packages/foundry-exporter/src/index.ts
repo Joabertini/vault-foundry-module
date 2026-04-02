@@ -300,26 +300,26 @@ function makeAbility(value: number, modifier: number, saveProficient: boolean) {
 function buildFoundrySpellSlots(character: CharacterBuild) {
   const derivedSlots = character.derived.spellcasting?.slots ?? {};
   const normalized: {
-    spell1: { value: number };
-    spell2: { value: number };
-    spell3: { value: number };
-    spell4: { value: number };
-    spell5: { value: number };
-    spell6: { value: number };
-    spell7: { value: number };
-    spell8: { value: number };
-    spell9: { value: number };
+    spell1: { value: number; override: null };
+    spell2: { value: number; override: null };
+    spell3: { value: number; override: null };
+    spell4: { value: number; override: null };
+    spell5: { value: number; override: null };
+    spell6: { value: number; override: null };
+    spell7: { value: number; override: null };
+    spell8: { value: number; override: null };
+    spell9: { value: number; override: null };
     pact: { value: number; level: number | null; override: null; max: null };
   } = {
-    spell1: { value: derivedSlots.spell1 ?? 0 },
-    spell2: { value: derivedSlots.spell2 ?? 0 },
-    spell3: { value: derivedSlots.spell3 ?? 0 },
-    spell4: { value: derivedSlots.spell4 ?? 0 },
-    spell5: { value: derivedSlots.spell5 ?? 0 },
-    spell6: { value: derivedSlots.spell6 ?? 0 },
-    spell7: { value: derivedSlots.spell7 ?? 0 },
-    spell8: { value: derivedSlots.spell8 ?? 0 },
-    spell9: { value: derivedSlots.spell9 ?? 0 },
+    spell1: { value: derivedSlots.spell1 ?? 0, override: null },
+    spell2: { value: derivedSlots.spell2 ?? 0, override: null },
+    spell3: { value: derivedSlots.spell3 ?? 0, override: null },
+    spell4: { value: derivedSlots.spell4 ?? 0, override: null },
+    spell5: { value: derivedSlots.spell5 ?? 0, override: null },
+    spell6: { value: derivedSlots.spell6 ?? 0, override: null },
+    spell7: { value: derivedSlots.spell7 ?? 0, override: null },
+    spell8: { value: derivedSlots.spell8 ?? 0, override: null },
+    spell9: { value: derivedSlots.spell9 ?? 0, override: null },
     pact: { value: 0, level: null, override: null, max: null },
   };
 
@@ -1029,6 +1029,7 @@ function buildItems(character: CharacterBuild): FoundryItem[] {
 
 function buildFoundryActorPayloadUnchecked(character: CharacterBuild): FoundryActorPayload {
   const payload: FoundryActorPayload = {
+    _id: makeId(),
     name: character.identity.characterName,
     type: "character",
     img: "systems/dnd5e/icons/svg/actors/character.svg",
@@ -1047,26 +1048,37 @@ function buildFoundryActorPayloadUnchecked(character: CharacterBuild): FoundryAc
       tools: buildTools(character),
       attributes: {
         ac: {
-          calc: "flat",
-          flat: character.derived.ac,
+          calc: "default",
+          flat: null,
+          formula: "",
         },
         hp: {
           value: character.derived.hp,
+          min: 0,
           max: character.derived.hp,
-          temp: null,
+          temp: 0,
           tempmax: 0,
           bonuses: {},
         },
         spellcasting: character.derived.spellcasting?.ability ?? "",
-        init: { ability: "", roll: { min: null, max: null, mode: 0 }, bonus: "" },
-        movement: { units: null, hover: false, ignoredDifficultTerrain: [] },
+        init: { ability: "", roll: { min: null, max: null, mode: 0 }, bonus: 0 },
+        movement: {
+          walk: 30,
+          fly: 0,
+          swim: 0,
+          climb: 0,
+          burrow: 0,
+          units: "ft",
+          hover: false,
+          ignoredDifficultTerrain: [],
+        },
         attunement: { max: 3 },
         senses: {
           darkvision: null,
           blindsight: null,
           tremorsense: null,
           truesight: null,
-          units: null,
+          units: "ft",
           special: "",
         },
         exhaustion: 0,
@@ -1092,6 +1104,7 @@ function buildFoundryActorPayloadUnchecked(character: CharacterBuild): FoundryAc
         race: character.ancestry.raceId,
         background: character.background.backgroundId,
         originalClass: character.classing.classes[0]?.classId ?? "",
+        xp: { value: 0 },
         trait: character.identity.biography?.trait ?? "",
         appearance: "",
         ideal: character.identity.biography?.ideal ?? "",
@@ -1123,6 +1136,7 @@ function buildFoundryActorPayloadUnchecked(character: CharacterBuild): FoundryAc
     },
     prototypeToken: makeToken(character.identity.characterName),
     folder: null,
+    sort: 0,
     ownership: { default: 0 },
     _stats: makeStats(),
   };

@@ -17,13 +17,16 @@ function makeCharacterBuild() {
 test("buildFoundryActorPayload maps canonical build into a richer Foundry actor", () => {
   const payload = buildFoundryActorPayload(makeCharacterBuild());
 
+  assert.equal(typeof payload._id, "string");
   assert.equal(payload.name, "Seraphina Vale");
-  assert.equal(payload.system.attributes.ac.calc, "flat");
-  assert.equal(payload.system.attributes.ac.flat, 15);
+  assert.equal(payload.system.attributes.ac.calc, "default");
+  assert.equal(payload.system.attributes.ac.flat, null);
   assert.equal(payload.system.attributes.hp.value, 14);
-  assert.equal(payload.system.attributes.hp.temp, null);
+  assert.equal(payload.system.attributes.hp.temp, 0);
+  assert.equal(payload.system.attributes.hp.min, 0);
   assert.equal(payload.system.abilities.str.max, null);
   assert.deepEqual(payload.system.abilities.str.check.roll, { min: null, max: null, mode: 0 });
+  assert.equal(payload.system.spells.spell1.override, null);
   assert.equal(payload.system.traits.languages.value.includes("elvish"), true);
   assert.equal(payload.system.tools.thief.prof, 1);
 
@@ -223,7 +226,8 @@ test("buildFoundryActorPayload keeps prepared caster exports coherent for cleric
   const payload = buildFoundryActorPayload(build);
 
   assert.equal(payload.system.attributes.hp.value, 33);
-  assert.equal(payload.system.attributes.ac.flat, 18);
+  assert.equal(payload.system.attributes.ac.flat, null);
+  assert.equal(payload.system.attributes.ac.calc, "default");
   assert.equal(payload.system.attributes.spellcasting, "wis");
   assert.equal(payload.system.traits.languages.value.includes("celestial"), true);
   assert.equal(payload.items.some((item) => item.name === "Spirit Guardians" && item.type === "spell"), true);
