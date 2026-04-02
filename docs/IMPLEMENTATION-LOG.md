@@ -1741,3 +1741,82 @@ Impacto:
 - la demo ya comunica no solo el producto, sino tambien el material de release disponible;
 - mejora el valor de sharing para colaboradores, testers y stakeholders;
 - conecta mejor la limpieza tecnica previa con una superficie mas lista para uso real.
+
+### Reestructuracion fuerte del frontend compartible
+
+Se hizo una pasada de producto sobre `apps/web` para que la demo deje de sentirse como una acumulacion de iteraciones y pase a leerse como una superficie mas cerrada y compartible.
+
+Ahora incluye:
+
+- `apps/web/src/App.tsx` reordenado alrededor de:
+  - hero de producto
+  - builder overview
+  - builder por pasos
+  - sheet preview
+  - deliverables y vista tecnica
+- nuevo `apps/web/src/components/AppSections.tsx` para separar secciones de superficie y reducir el peso del archivo principal;
+- `apps/web/src/components/CharacterSheet.tsx` rehecha para una lectura mas clara y una presentacion mas fuerte;
+- `apps/web/src/styles.css` reemplazado por una capa visual mas consistente y sin acumulacion de overrides viejos;
+- `apps/web/README.md` actualizado para reflejar la nueva estructura y expectativas de validacion.
+
+Validacion ejecutada:
+
+- `corepack pnpm web:typecheck`
+- `corepack pnpm web:build`
+
+Impacto:
+
+- la home ya presenta mejor el valor del producto antes de entrar al detalle tecnico;
+- el builder y la sheet quedaron mejor alineados visualmente;
+- el frontend tiene una base mas mantenible para futuros pases de polish o captura de demo.
+
+### Pipeline transicional unificado para Foundry
+
+Se hizo una pasada puntual sobre la migracion legacy para sacar duplicacion entre entrypoints del runtime Foundry.
+
+Ahora incluye:
+
+- nuevo `scripts/foundry-pipeline.js` como ruta unica para:
+  - derivar stats desde el form legacy;
+  - construir `CharacterBuild`;
+  - correr preflight;
+  - producir el payload final de actor con flags canonicos;
+- `scripts/vault-app.js` ahora usa esa misma ruta al crear actores;
+- `scripts/character-builder.js` queda como wrapper fino en lugar de recalcular todo por su cuenta.
+
+Validacion prevista:
+
+- `node --check scripts/foundry-pipeline.js`
+- `node --check scripts/character-builder.js`
+- `node --check scripts/vault-app.js`
+
+Impacto:
+
+- baja el drift entre el creador Foundry activo y el wrapper legacy;
+- evita que el actor final dependa de dos implementaciones paralelas del mismo pipeline canonico;
+- mejora de forma real la seccion de migracion porque la ultima milla transicional ahora tiene una sola ruta de armado.
+
+### Congelamiento del camino a MVP y handoff para el siguiente DEV
+
+Se hizo una pasada de orientacion para que el repo deje de apuntar a prioridades antiguas y el siguiente DEV entre directo al trabajo correcto para MVP.
+
+Ahora incluye:
+
+- `README.md` actualizado para declarar el foco MVP actual en vez de seguir priorizando slices historicos;
+- handoff explicito para el siguiente DEV en el README raiz;
+- `docs/PROJECT-STATUS.md` reordenado para poner la validacion manual de Foundry antes de mas expansion o cleanup;
+- `docs/MVP-STEP-BY-STEP.md` ajustado para reflejar que el cuello de botella actual es confianza operativa, no falta de arquitectura.
+
+Validacion ejecutada en esta pasada:
+
+- `corepack pnpm verify:env`
+- `corepack pnpm web:typecheck`
+- `corepack pnpm web:build`
+- `corepack pnpm --filter @bertinis-vault/api build`
+- `corepack pnpm foundry:verify`
+
+Impacto:
+
+- el repo ahora comunica mejor que el siguiente paso real hacia MVP es probar en Foundry y endurecer contra evidencia;
+- reduce el riesgo de que el siguiente DEV reabra rediseños o vuelva a dispersar prioridades;
+- deja una entrada mas clara para cerrar MVP antes de pasar a post-beta hardening.

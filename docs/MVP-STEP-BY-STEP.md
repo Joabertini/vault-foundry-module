@@ -161,23 +161,22 @@ Before calling the MVP ready, confirm:
 
 This is the exact working order I recommend for the next implementation slices:
 
-1. Environment scaffolding.
-2. Spell dataset expansion.
-3. Spell rule tightening.
-4. Rule extraction from `App.tsx`.
-5. Foundry validation matrix.
-6. Export regression hardening.
-7. Legacy cleanup.
+1. Live Foundry manual validation.
+2. Convert findings into automated regression coverage.
+3. Spell dataset expansion.
+4. Spell rule tightening.
+5. Rule extraction from `App.tsx`.
+6. Legacy cleanup.
 
 ## First Active Priority
 
-Continue with export regression hardening:
+Continue with MVP confidence hardening:
 
-1. keep representative exporter tests aligned to real MVP character shapes;
-2. resolve payload labels through shared catalogs so Foundry items do not leak raw ids;
-3. keep [docs/FOUNDRY-VALIDATION-MATRIX.md](./FOUNDRY-VALIDATION-MATRIX.md) current with the automated regression surface;
-4. run and record manual Foundry validation for the five MVP shapes when the current exporter slice stabilizes;
-5. return to the larger `apps/web/src/App.tsx` rule-consumption extraction after the clean exporter and validation slices are merged.
+1. execute and record manual Foundry validation for the MVP shapes using the current generated fixture packet;
+2. keep representative exporter tests aligned to real MVP character shapes;
+3. resolve every Foundry-side mismatch through shared packages or thinner adapters instead of new legacy forks;
+4. keep [docs/FOUNDRY-VALIDATION-MATRIX.md](./FOUNDRY-VALIDATION-MATRIX.md) current with the automated regression surface;
+5. return to the larger `apps/web/src/App.tsx` rule-consumption extraction only after the import path is proven in live usage.
 
 Current status inside this priority:
 
@@ -193,5 +192,11 @@ Current status inside this priority:
 - `docs/FOUNDRY-VALIDATION-BASELINE.md` now tells the next operator which warnings are intentional and which fixtures should remain clean;
 - shared pact-magic progression now aligns with the canonical warlock validation fixture, so the main MVP caster fixtures are clean again;
 - `docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md` now exists as the repo-native handoff/report template for the human pass.
+- on 2026-04-01, the repo state was also re-verified with:
+  - `corepack pnpm verify:env`
+  - `corepack pnpm web:typecheck`
+  - `corepack pnpm web:build`
+  - `corepack pnpm --filter @bertinis-vault/api build`
+  - `corepack pnpm foundry:verify`
 
 This is the active execution priority now.

@@ -31,56 +31,39 @@ Verification entrypoints:
 
 - `corepack pnpm verify:env`
 - `corepack pnpm --filter @bertinis-vault/domain test`
+- `corepack pnpm web:typecheck`
+- `corepack pnpm web:build`
+- `corepack pnpm --filter @bertinis-vault/api build`
 - `corepack pnpm foundry:verify`
 - `.github/workflows/verify.yml` mirrors those checks on `pull_request` and `push` to `main`
 
-## Priority Order Of Execution
+## MVP Product Focus
 
-If you are the next person coding in this repo, follow this order:
+The MVP is no longer blocked by missing architecture.
+It is now blocked by confidence and operational proof.
 
-1. Environment scaffolding.
-2. Spell dataset expansion.
-3. Spell rule tightening.
-4. Rule extraction out of `apps/web/src/App.tsx`.
-5. Foundry validation matrix.
-6. Export regression hardening.
-7. Legacy cleanup and encoding normalization.
+The product should now be treated as:
 
-This order is the shortest path to a real MVP because it starts by making the repo runnable and testable, then improves the data/rules users feel most, and only after that spends time on deeper cleanup.
+- `apps/web` is the active builder surface;
+- `apps/api` is the local dataset/BFF support layer;
+- `packages/*` are the source of truth for contracts, rules, normalized data, and export;
+- the root Foundry module is the import target to validate against, not the long-term place to re-centralize rules.
 
-## Current Active Priority
+What currently defines MVP:
 
-The current active priority is now **Export regression hardening**.
+1. a user can complete a normal 2014 5e build in the web app;
+2. the build exports through the shared pipeline without silent drift;
+3. the payload imports into Foundry for common cases;
+4. blockers and warnings are visible before import;
+5. another developer can run and verify the repo without oral handholding.
 
-The environment scaffolding slice is already in place:
+What is explicitly outside MVP for now:
 
-- `apps/api/.env.example`
-- `apps/web/.env.example`
-- root `dev` script
-- root `verify:env` script
-- [docs/ENVIRONMENT-GUIDE.md](./docs/ENVIRONMENT-GUIDE.md)
-- [docs/MVP-STEP-BY-STEP.md](./docs/MVP-STEP-BY-STEP.md)
-
-What is already done inside the current spell slice:
-
-1. shared spell class ownership now lives in `packages/data-engine/src/spells.ts`;
-2. API and web fallback paths now read shared spell metadata instead of separate hardcoded class maps;
-3. shared domain now owns cantrip limits plus leveled spell-selection caps by class and level;
-4. wizard now uses a spellbook-style selection model in shared domain logic;
-5. ranger, paladin, artificer, and warlock fallback coverage has been widened to make normal MVP builds feel less empty.
-6. race language rules and subrace option ownership are beginning to move out of `apps/web/src/App.tsx` into shared data.
-7. class skill options, class skill pick limits, and background granted proficiencies are beginning to move out of `apps/web/src/App.tsx` into shared data.
-8. class weapon and armor availability filters are beginning to move out of `apps/web/src/App.tsx` into shared data.
-9. class fallback metadata for hit die, spellcasting, progression, equipment, and primary abilities is beginning to move out of `apps/web/src/App.tsx` into shared data.
-10. Foundry exporter regression coverage now includes representative prepared-caster, pact-caster, and background-feat cases.
-11. Foundry exporter feat items now resolve catalog labels for both background-granted feats and chosen feats, so import payloads stop leaking raw feat ids like `tough`.
-
-What remains inside this priority:
-
-1. keep expanding breadth for core level bands where normal builds still feel thin;
-2. wire the web builder fully onto the new shared spell-selection profile helpers, labels, and max-level helpers;
-3. keep moving non-spell maps like race languages and subraces into shared packages so later UI cleanup is safer;
-4. tighten prepared vs known vs spellbook behavior for edge cases and higher-level flows once the UI reads the shared model end to end.
+- exhaustive 5e data completeness;
+- advanced persistence/accounts;
+- edit-existing-actor workflows;
+- premium polish passes beyond what is needed to demo and validate;
+- 2024 rules support.
 
 ## Start Here If You Are Coding Next
 
@@ -92,55 +75,48 @@ corepack pnpm verify:env
 corepack pnpm dev
 ```
 
-After that, the active implementation priority is:
+Then run the current MVP safety checks:
 
-1. expand the spell dataset;
-2. keep local and hybrid spell lists aligned;
-3. tighten spell-selection rules before doing broader UI cleanup.
+```bash
+corepack pnpm web:typecheck
+corepack pnpm web:build
+corepack pnpm --filter @bertinis-vault/api build
+corepack pnpm foundry:verify
+```
 
-Current status of that priority:
+## Next DEV Handoff
 
-- shared spell class ownership now lives in `packages/data-engine/src/spells.ts`;
-- the fallback spell catalog is materially larger than before;
-- the weakest fallback lists now have better MVP coverage, especially `ranger`, `paladin`, `artificer`, and `warlock`;
-- shared domain now exposes cantrip limits, spell-selection modes, labels, section titles, max-level derivation, selection sanitizing, picker-state assembly, and spell-selection profiles for class and level;
-- shared data-engine now exposes race language rules and subrace option catalogs for reuse outside the web file;
-- shared data-engine now exposes class skill options, class skill pick counts, and background proficiency grants for reuse outside the web file;
-- shared data-engine now exposes class weapon and armor availability filters for reuse outside the web file;
-- shared data-engine now exposes class fallback metadata for reuse outside the web file;
-- Foundry validation now has a concrete five-build matrix and broader exporter regression coverage;
-- API and web fallback paths now read shared spell class metadata instead of separate hardcoded maps;
-- the web builder now applies a first shared spell-selection cap by class and level instead of allowing every valid leveled spell by default.
+This section is intentionally direct.
+If you are continuing this repo, do these things in this order.
 
-Next follow-up inside the same priority:
+1. Do not redesign the product surface again before validating it in real Foundry.
+2. Run the live pass in [docs/FOUNDRY-MANUAL-VALIDATION.md](./docs/FOUNDRY-MANUAL-VALIDATION.md).
+3. Record results in [docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md](./docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md).
+4. Convert every real Foundry failure into fixture coverage or regression tests.
+5. Only after that, continue shrinking legacy bridges and increasing spell/data breadth.
 
-1. keep expanding spell breadth, especially wizard, cleric, and druid coverage;
-2. move `apps/web/src/App.tsx` from its local spell labels, section title, max-level derivation, filtered options, selection filtering, picker counts, and spell-cap rules onto the shared domain helper outputs;
-3. move race languages and subrace consumption in `apps/web/src/App.tsx` onto shared data-engine helpers;
-4. move class skills, background proficiencies, and pick-count consumption in `apps/web/src/App.tsx` onto shared data-engine helpers;
-5. move class weapon and armor filtering in `apps/web/src/App.tsx` onto shared data-engine helpers;
-6. move class fallback metadata in `apps/web/src/App.tsx` onto shared data-engine helpers;
-7. keep extending Foundry exporter regression coverage around real MVP build shapes;
-8. refine prepared vs known behavior further for edge cases and higher-level flows.
+What was already verified in this repo state:
 
-Current export hardening status:
+- `corepack pnpm verify:env`
+- `corepack pnpm web:typecheck`
+- `corepack pnpm web:build`
+- `corepack pnpm --filter @bertinis-vault/api build`
+- `corepack pnpm foundry:verify`
 
-- `packages/foundry-exporter/test/index.test.mjs` now covers prepared cleric, pact warlock, wizard spellbook-adjacent exports, background-granted feat, duplicate, mismatch, and equipment-shape cases.
-- `packages/foundry-exporter/src/index.ts` now resolves feat ids through the shared feat catalog before building Foundry feat items and defensively deduplicates duplicate spell items.
-- `packages/foundry-exporter/test/fixtures.mjs` now contains reusable MVP validation builds for martial, prepared caster, pact caster, background feat, wizard spellbook, warning-only, and blocked cases.
-- `corepack pnpm foundry:fixtures` now exports reviewable payloads into `docs/foundry-validation-fixtures/` for the manual Foundry pass.
-- `corepack pnpm foundry:verify` now checks that clean fixtures stay clean and that the intentionally noisy fixtures keep the expected issue codes.
-- `docs/foundry-validation-fixtures/README.md` and `docs/foundry-validation-fixtures/WORKING-REPORT.md` now give the operator a prebuilt human-readable packet instead of raw JSON only.
-- that generated packet now surfaces automatic issue codes per fixture, so known warnings and blockers are visible before anyone opens the raw payload JSON.
-- the pact-warlock fixture is now clean after fixing shared pact slot progression in domain rules.
-- `docs/FOUNDRY-VALIDATION-BASELINE.md` now explains which warnings are intentional test coverage and which fixtures should now stay clean.
-- [docs/FOUNDRY-VALIDATION-MATRIX.md](./docs/FOUNDRY-VALIDATION-MATRIX.md) is the handoff doc for the current Foundry validation slice.
+What changed materially before this handoff:
 
-Next follow-up after this push:
+- the web app was restructured into a more shareable product surface instead of a single oversized file;
+- the active builder remains the dark 9-step wizard baseline;
+- the Foundry pipeline was unified so the runtime and compatibility wrapper drift less;
+- shared export fixtures and baseline verification are in place;
+- web and API builds are passing in the current state.
 
-1. run `corepack pnpm foundry:fixtures`, then execute the live Foundry pass using [docs/FOUNDRY-MANUAL-VALIDATION.md](./docs/FOUNDRY-MANUAL-VALIDATION.md);
-2. record the outcomes in [docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md](./docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md);
-3. return to the large `apps/web/src/App.tsx` shared-rule integration once it can be isolated cleanly.
+What not to do next:
+
+1. do not move business rules back into root `scripts/` unless Foundry-local behavior truly requires it;
+2. do not reopen broad visual redesign work before the manual Foundry pass is complete;
+3. do not treat spell-catalog expansion as a substitute for real import validation;
+4. do not tag a release until manual validation and the report are updated.
 
 ## Current Builder Baseline
 
