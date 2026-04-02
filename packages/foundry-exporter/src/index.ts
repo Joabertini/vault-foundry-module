@@ -31,11 +31,25 @@ import {
 type FoundryItem = Record<string, unknown>;
 type FoundryAbilityData = {
   value: number;
-  mod: number;
   proficient: 0 | 1;
+  max: number | null;
   bonuses: {
     check: string;
     save: string;
+  };
+  check: {
+    roll: {
+      min: null;
+      max: null;
+      mode: 0;
+    };
+  };
+  save: {
+    roll: {
+      min: null;
+      max: null;
+      mode: 0;
+    };
   };
 };
 type FoundryAbilities = Record<AbilityId, FoundryAbilityData>;
@@ -275,10 +289,56 @@ function buildFoundryAbilities(character: CharacterBuild): FoundryAbilities {
 function makeAbility(value: number, modifier: number, saveProficient: boolean) {
   return {
     value,
-    mod: modifier,
     proficient: (saveProficient ? 1 : 0) as 0 | 1,
+    max: null,
     bonuses: { check: "", save: "" },
+    check: { roll: { min: null, max: null, mode: 0 as 0 } },
+    save: { roll: { min: null, max: null, mode: 0 as 0 } },
   };
+}
+
+function buildFoundrySpellSlots(character: CharacterBuild) {
+  const derivedSlots = character.derived.spellcasting?.slots ?? {};
+  const normalized: {
+    spell1: { value: number };
+    spell2: { value: number };
+    spell3: { value: number };
+    spell4: { value: number };
+    spell5: { value: number };
+    spell6: { value: number };
+    spell7: { value: number };
+    spell8: { value: number };
+    spell9: { value: number };
+    pact: { value: number; level: number | null; override: null; max: null };
+  } = {
+    spell1: { value: derivedSlots.spell1 ?? 0 },
+    spell2: { value: derivedSlots.spell2 ?? 0 },
+    spell3: { value: derivedSlots.spell3 ?? 0 },
+    spell4: { value: derivedSlots.spell4 ?? 0 },
+    spell5: { value: derivedSlots.spell5 ?? 0 },
+    spell6: { value: derivedSlots.spell6 ?? 0 },
+    spell7: { value: derivedSlots.spell7 ?? 0 },
+    spell8: { value: derivedSlots.spell8 ?? 0 },
+    spell9: { value: derivedSlots.spell9 ?? 0 },
+    pact: { value: 0, level: null, override: null, max: null },
+  };
+
+  const primaryClassId = normalizeClassId(character.classing.classes[0]?.classId ?? "");
+  if (getSpellProgressionForClass(primaryClassId) === "pact") {
+    const pactSlotEntry = Object.entries(derivedSlots).find(([, value]) => (value ?? 0) > 0);
+    if (pactSlotEntry) {
+      const [slotKey, value] = pactSlotEntry;
+      const pactLevel = Number.parseInt(slotKey.replace("spell", ""), 10);
+      normalized.pact = {
+        value: value ?? 0,
+        level: Number.isNaN(pactLevel) ? null : pactLevel,
+        override: null,
+        max: null,
+      };
+    }
+  }
+
+  return normalized;
 }
 
 function makeSkill(ability: string) {
@@ -987,11 +1047,15 @@ function buildFoundryActorPayloadUnchecked(character: CharacterBuild): FoundryAc
       tools: buildTools(character),
       attributes: {
         ac: {
+          calc: "flat",
           flat: character.derived.ac,
         },
         hp: {
           value: character.derived.hp,
           max: character.derived.hp,
+          temp: null,
+          tempmax: 0,
+          bonuses: {},
         },
         spellcasting: character.derived.spellcasting?.ability ?? "",
         init: { ability: "", roll: { min: null, max: null, mode: 0 }, bonus: "" },
@@ -1034,7 +1098,7 @@ function buildFoundryActorPayloadUnchecked(character: CharacterBuild): FoundryAc
         bond: character.identity.biography?.bond ?? "",
         flaw: character.identity.biography?.flaw ?? "",
       },
-      spells: character.derived.spellcasting?.slots ?? {},
+      spells: buildFoundrySpellSlots(character),
       traits: buildTraitData(character),
       resources: {
         primary: { value: 0, max: 0, sr: false, lr: false, label: "" },

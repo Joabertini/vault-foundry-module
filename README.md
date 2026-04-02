@@ -116,6 +116,8 @@ What changed materially before this handoff:
 - `corepack pnpm mvp:verify` now also regenerates `docs/MVP-RELEASE-STATUS.md` as the single automated readiness snapshot;
 - the GitHub release workflow now installs dependencies, runs `corepack pnpm mvp:verify`, updates release manifests, and attaches the ZIP from the correct path before publishing;
 - the GitHub release workflow now also runs `corepack pnpm release:ready`, so a tag cannot publish while manual validation/signoff docs are still pending;
+- the exporter now emits a more Foundry-13-friendly actor shape for `abilities`, `ac`, `hp`, and `spells`, which directly targets the JSON import failure reported against builder-generated actors;
+- the spell data path now preserves richer upstream metadata and the local spell catalog includes more concrete MVP spell details, so common spells no longer collapse to `Sin dato` as often in the web builder;
 - the generated Foundry validation packet now includes expected live outcomes per fixture so the operator can validate faster in Foundry;
 - web and API builds are passing in the current state.
 

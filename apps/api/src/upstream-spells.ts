@@ -7,6 +7,13 @@ type SpellDatasetItem = {
   id: string;
   label: string;
   level: number;
+  classes: string[];
+  school: string | null;
+  summary: string;
+  castingTimeLabel: string;
+  rangeLabel: string;
+  durationLabel: string;
+  componentsLabel: string;
 };
 
 function pickArrayPayload(value: unknown): unknown[] {
@@ -46,6 +53,60 @@ function parseLevel(value: unknown): number {
   return 1;
 }
 
+function pickString(value: unknown) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function joinComponents(record: Record<string, unknown>) {
+  const directArray = Array.isArray(record.components)
+    ? record.components
+    : Array.isArray(record.component)
+      ? record.component
+      : null;
+
+  if (directArray) {
+    return directArray
+      .map((entry) => (typeof entry === "string" ? entry.trim() : ""))
+      .filter(Boolean)
+      .join(", ");
+  }
+
+  const flags = [
+    record.v ? "V" : "",
+    record.s ? "S" : "",
+    record.m ? "M" : "",
+  ].filter(Boolean);
+
+  return flags.join(", ");
+}
+
+function parseClasses(record: Record<string, unknown>) {
+  const directArray = Array.isArray(record.classes)
+    ? record.classes
+    : Array.isArray(record.classList)
+      ? record.classList
+      : null;
+
+  if (!directArray) {
+    return [];
+  }
+
+  return directArray
+    .map((entry) => {
+      if (typeof entry === "string") {
+        return entry.trim().toLowerCase();
+      }
+
+      if (entry && typeof entry === "object") {
+        const candidate = entry as Record<string, unknown>;
+        return pickString(candidate.id ?? candidate.name ?? candidate.class ?? "").toLowerCase();
+      }
+
+      return "";
+    })
+    .filter(Boolean);
+}
+
 export function normalizeUpstreamSpellsPayload(payload: unknown) {
   const items = pickArrayPayload(payload)
     .map((entry) => {
@@ -64,9 +125,18 @@ export function normalizeUpstreamSpellsPayload(payload: unknown) {
         id: resolveSpellId(label),
         label,
         level: parseLevel(record.level ?? record.spellLevel),
+        classes: parseClasses(record),
+        school: pickString(record.school ?? record.schoolCode) || null,
+        summary: pickString(record.summary ?? record.entries ?? record.description ?? record.desc),
+        castingTimeLabel: pickString(
+          record.castingTimeLabel ?? record.castingTime ?? record.time ?? record.activation,
+        ),
+        rangeLabel: pickString(record.rangeLabel ?? record.range),
+        durationLabel: pickString(record.durationLabel ?? record.duration),
+        componentsLabel: joinComponents(record),
       };
     })
-    .filter((entry): entry is SpellDatasetItem => Boolean(entry));
+    .filter((entry): entry is SpellDatasetItem => entry !== undefined);
 
   return {
     source: {
@@ -88,6 +158,13 @@ export function buildHybridSpellsDataset(
       id: entry.id,
       label: entry.label,
       level: entry.level,
+      classes: entry.classes ?? [],
+      school: entry.school ?? null,
+      summary: entry.summary ?? "",
+      castingTimeLabel: entry.castingTime?.label ?? "",
+      rangeLabel: entry.range?.label ?? "",
+      durationLabel: entry.duration?.label ?? "",
+      componentsLabel: entry.components?.join(", ") ?? "",
     });
   }
 
@@ -97,6 +174,13 @@ export function buildHybridSpellsDataset(
       id: entry.id,
       label: entry.label || current?.label || entry.id,
       level: entry.level ?? current?.level ?? 1,
+      classes: entry.classes?.length ? entry.classes : current?.classes ?? [],
+      school: entry.school || current?.school || null,
+      summary: entry.summary || current?.summary || "",
+      castingTimeLabel: entry.castingTimeLabel || current?.castingTimeLabel || "",
+      rangeLabel: entry.rangeLabel || current?.rangeLabel || "",
+      durationLabel: entry.durationLabel || current?.durationLabel || "",
+      componentsLabel: entry.componentsLabel || current?.componentsLabel || "",
     });
   }
 

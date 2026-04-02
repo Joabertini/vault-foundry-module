@@ -294,6 +294,43 @@ test("GET /datasets/spells in hybrid mode falls back cleanly when upstream fails
   }
 });
 
+test("GET /datasets/spells in upstream mode preserves richer spell metadata when available", async () => {
+  const { server, baseUrl, fiveToolsClient } = await startServerWithHooks();
+
+  fiveToolsClient.get = async () => ({
+    spells: [
+      {
+        name: "Magic Missile",
+        level: 1,
+        school: "evo",
+        summary: "Three glowing darts of magical force.",
+        castingTime: "1 action",
+        range: "120 feet",
+        duration: "Instantaneous",
+        components: ["V", "S"],
+        classes: ["wizard", "sorcerer"],
+      },
+    ],
+  });
+
+  try {
+    const response = await fetch(`${baseUrl}/datasets/spells?source=upstream`);
+    const payload = await response.json();
+    const magicMissile = payload.spells.find((entry) => entry.id === "magic-missile");
+
+    assert.equal(response.status, 200);
+    assert.equal(magicMissile.school, "evo");
+    assert.equal(magicMissile.summary, "Three glowing darts of magical force.");
+    assert.equal(magicMissile.castingTimeLabel, "1 action");
+    assert.equal(magicMissile.rangeLabel, "120 feet");
+    assert.equal(magicMissile.durationLabel, "Instantaneous");
+    assert.equal(magicMissile.componentsLabel, "V, S");
+    assert.deepEqual(magicMissile.classes, ["wizard", "sorcerer"]);
+  } finally {
+    server.close();
+  }
+});
+
 test("GET /datasets/classes in upstream mode reports upstream failures as 502", async () => {
   const { server, baseUrl, fiveToolsClient } = await startServerWithHooks();
 

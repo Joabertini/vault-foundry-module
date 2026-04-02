@@ -1883,3 +1883,37 @@ Impacto:
 - un tag ya no puede salir si la validacion manual sigue sin correr o si el signoff sigue incompleto;
 - fuerza un cierre mas limpio de estos ultimos 3 dias: primero evidencia humana, despues publicacion;
 - deja mensajes de fallo accionables en vez de depender de leer varios docs manualmente.
+
+### Fix directo para import de actor Foundry y detalles de spells
+
+Se hizo una pasada sobre los dos problemas mas cercanos al producto:
+
+- actor JSON generado por Vault demasiado legacy para Foundry 13/dnd5e 5.x;
+- detalles de spells cayendo en `Sin dato` aunque exista fuente upstream o catalogo local.
+
+Ahora incluye:
+
+- `packages/foundry-exporter/src/index.ts` exportando:
+  - `system.abilities` con `max`, `check.roll` y `save.roll`;
+  - `system.attributes.ac` con `calc` + `flat`;
+  - `system.attributes.hp` con `temp`, `tempmax` y `bonuses`;
+  - `system.spells` con objetos `{ value }` y bloque `pact` en vez de numeros planos;
+- regresiones nuevas/actualizadas en `packages/foundry-exporter/test/index.test.mjs` para esa forma de actor;
+- `apps/api/src/upstream-spells.ts` preservando mas metadata cuando el upstream la entrega;
+- regresion nueva en `apps/api/test/server.test.mjs` para metadata rica de spells;
+- `packages/data-engine/src/spells.ts` enriquecido con detalles concretos para spells MVP visibles y frecuentes como `Magic Missile`, `Shield`, `Mage Hand`, `Eldritch Blast`, `Misty Step`, `Fireball`, `Counterspell` y otros del flujo actual.
+
+Validacion ejecutada:
+
+- `corepack pnpm --filter @bertinis-vault/data-engine build`
+- `corepack pnpm web:verify`
+- `corepack pnpm --filter @bertinis-vault/api test`
+- `corepack pnpm --filter @bertinis-vault/foundry-exporter test`
+- `corepack pnpm mvp:verify`
+
+Impacto:
+
+- baja materialmente la brecha entre el actor exportado por Vault y el actor que Foundry genera nativamente;
+- mejora la chance de que el JSON builder-importable deje de romper por forma de `system.*`;
+- reduce el `Sin dato` en la UI para varios spells MVP incluso sin depender por completo del upstream;
+- deja una mejor base para la siguiente comparacion directa contra el JSON real que reporto el usuario.
