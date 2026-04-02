@@ -26,6 +26,7 @@ Operational docs for the current repo:
 - [docs/FOUNDRY-VALIDATION-MATRIX.md](./docs/FOUNDRY-VALIDATION-MATRIX.md)
 - [docs/PROJECT-COMPLETION-CHECKLIST.md](./docs/PROJECT-COMPLETION-CHECKLIST.md)
 - [docs/MVP-STEP-BY-STEP.md](./docs/MVP-STEP-BY-STEP.md)
+- [docs/MVP-RELEASE-STATUS.md](./docs/MVP-RELEASE-STATUS.md)
 
 Verification entrypoints:
 
@@ -111,6 +112,7 @@ What changed materially before this handoff:
 - the API now explicitly allows its legacy default upstream dataset paths, so `source=hybrid` and `source=upstream` do not fail by default just because of path filtering;
 - CI verification now also runs the web verification gate and API tests instead of relying only on manual local checks;
 - the repo now exposes `corepack pnpm mvp:verify` as the one-command safety gate for the last 3-day MVP push;
+- `corepack pnpm mvp:verify` now also regenerates `docs/MVP-RELEASE-STATUS.md` as the single automated readiness snapshot;
 - the generated Foundry validation packet now includes expected live outcomes per fixture so the operator can validate faster in Foundry;
 - web and API builds are passing in the current state.
 

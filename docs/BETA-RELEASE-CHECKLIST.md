@@ -21,9 +21,8 @@ Ship a beta that is credible for sharing, demoing, and controlled early feedback
 
 ## Validation
 
-- run shared package builds;
-- run shared package tests;
-- run web typecheck and web build;
+- run `corepack pnpm mvp:verify`;
+- review `docs/MVP-RELEASE-STATUS.md`;
 - manually validate at least:
   - one martial build
   - one caster build

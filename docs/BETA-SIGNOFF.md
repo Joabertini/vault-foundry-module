@@ -6,6 +6,7 @@ Mark the final execution items required before calling the project beta-ready fr
 
 ## Signoff Items
 
+- [ ] `docs/MVP-RELEASE-STATUS.md` reviewed after running `corepack pnpm mvp:verify`
 - [ ] Foundry manual validation executed using `docs/FOUNDRY-MANUAL-VALIDATION.md`
 - [ ] demo capture pass executed using `docs/DEMO-CAPTURE-GUIDE.md`
 - [ ] release notes reviewed
