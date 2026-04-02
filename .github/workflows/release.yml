@@ -29,6 +29,9 @@ jobs:
       - name: Run MVP Verification Gate
         run: corepack pnpm mvp:verify
 
+      - name: Check Manual Release Readiness
+        run: corepack pnpm release:ready
+
       - name: Get version from tag
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT

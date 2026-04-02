@@ -1865,3 +1865,21 @@ Impacto:
 - baja mucho el riesgo de publicar un tag que no haya pasado el gate automatizado real del MVP;
 - evita una falla silenciosa por adjuntar el archivo ZIP desde una ruta incorrecta;
 - deja el camino de release mas alineado con la urgencia actual: validar primero, publicar despues.
+
+### Release readiness ahora tambien exige evidencia humana
+
+Se agrego un ultimo gate para que el repo no pueda publicar un tag solamente con verificacion automatizada.
+
+Ahora incluye:
+
+- nuevo `corepack pnpm release:ready`;
+- nuevo `scripts/check-release-readiness.mjs`;
+- `docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md` con estados `pending` parseables;
+- `docs/BETA-SIGNOFF.md` con `signoff status` y `decision` parseables;
+- workflow de release ejecutando `corepack pnpm release:ready` despues de `corepack pnpm mvp:verify`.
+
+Impacto:
+
+- un tag ya no puede salir si la validacion manual sigue sin correr o si el signoff sigue incompleto;
+- fuerza un cierre mas limpio de estos ultimos 3 dias: primero evidencia humana, despues publicacion;
+- deja mensajes de fallo accionables en vez de depender de leer varios docs manualmente.

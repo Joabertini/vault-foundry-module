@@ -14,6 +14,7 @@
     "foundry:fixtures": "corepack pnpm --filter @bertinis-vault/foundry-exporter build && node ./scripts/export-foundry-validation-fixtures.mjs",
     "foundry:verify": "corepack pnpm foundry:fixtures && node ./scripts/verify-foundry-validation-baseline.mjs",
     "mvp:verify": "corepack pnpm verify:env && corepack pnpm web:verify && corepack pnpm --filter @bertinis-vault/api test && corepack pnpm --filter @bertinis-vault/domain test && corepack pnpm foundry:verify && node ./scripts/build-mvp-release-status.mjs",
+    "release:ready": "node ./scripts/check-release-readiness.mjs",
     "verify:env": "node ./scripts/verify-env.mjs",
     "build": "corepack pnpm -r build",
     "typecheck": "corepack pnpm -r typecheck",

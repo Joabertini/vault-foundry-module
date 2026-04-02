@@ -21,9 +21,11 @@ Mark the final execution items required before calling the project beta-ready fr
 
 ## Signoff Record
 
+- signoff status: pending
 - date:
 - operator:
 - Foundry version:
 - dnd5e version:
 - commit used:
+- decision: pending
 - notes:

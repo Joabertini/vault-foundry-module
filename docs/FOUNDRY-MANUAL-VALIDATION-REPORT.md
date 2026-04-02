@@ -2,6 +2,7 @@
 
 ## Run Info
 
+- Status: pending
 - Date:
 - Operator:
 - Foundry version:
@@ -27,49 +28,49 @@ Fixture summary:
 ### 1. Martial with armor and shield
 
 - Fixture: `martial-fighter-5`
-- Result:
+- Result: pending
 - Notes:
 - Screenshot paths:
 
 ### 2. Prepared caster
 
 - Fixture: `prepared-cleric-5`
-- Result:
+- Result: pending
 - Notes:
 - Screenshot paths:
 
 ### 3. Pact caster
 
 - Fixture: `pact-warlock-5`
-- Result:
+- Result: pending
 - Notes:
 - Screenshot paths:
 
 ### 4. Background feat case
 
 - Fixture: `background-feat`
-- Result:
+- Result: pending
 - Notes:
 - Screenshot paths:
 
 ### 5. Wizard spellbook case
 
 - Fixture: `wizard-spellbook-5`
-- Result:
+- Result: pending
 - Notes:
 - Screenshot paths:
 
 ### 6. Warning-only case
 
 - Fixture: `warning-only`
-- Result:
+- Result: pending
 - Notes:
 - Screenshot paths:
 
 ### 7. Blocked case
 
 - Fixture: `blocked-invalid-class`
-- Result:
+- Result: pending
 - Notes:
 - Screenshot paths:
 
@@ -79,4 +80,4 @@ Fixture summary:
 - Warning-only builds that still imported:
 - Blocked builds that stopped correctly:
 - Follow-up fixes needed:
-- Release recommendation:
+- Release recommendation: pending
