@@ -1,6 +1,6 @@
 # Foundry Validation Packet
 
-Generated at: `2026-04-01T01:47:48.385Z`
+Generated at: `2026-04-02T02:55:16.202Z`
 
 ## Fixture Summary
 
@@ -16,6 +16,19 @@ Generated at: `2026-04-01T01:47:48.385Z`
 
 ## Manual Validation Workflow
 
-1. Run `corepack pnpm foundry:fixtures` to refresh the packet.
-2. Open `docs/FOUNDRY-MANUAL-VALIDATION.md` for the live Foundry checklist.
-3. Record human results in `docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md` or the generated working copy below.
+1. Run `corepack pnpm mvp:verify` before opening Foundry if you want the full MVP gate.
+2. Run `corepack pnpm foundry:fixtures` to refresh the packet if you only changed export/preflight logic.
+3. Open `docs/FOUNDRY-MANUAL-VALIDATION.md` for the live Foundry checklist.
+4. Record human results in `docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md` or the generated working copy below.
+
+## Operator Checklist
+
+| Fixture | Expected live result | Auto issues |
+| --- | --- | --- |
+| `martial-fighter-5` | create actor cleanly without blockers or warnings | - |
+| `prepared-cleric-5` | create actor cleanly without blockers or warnings | - |
+| `pact-warlock-5` | create actor cleanly without blockers or warnings | - |
+| `background-feat` | create actor cleanly without blockers or warnings | - |
+| `wizard-spellbook-5` | create actor cleanly without blockers or warnings | - |
+| `warning-only` | allow actor creation with visible warning feedback | `SPELL_ID_LABEL_MISMATCH`, `SPELL_LEVEL_MISMATCH`, `EQUIPMENT_CATEGORY_MISMATCH` |
+| `blocked-invalid-class` | block actor creation with visible blocker feedback | `UNKNOWN_CLASS_ID`, `UNEXPECTED_DERIVED_SPELLCASTING` |

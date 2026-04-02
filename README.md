@@ -35,6 +35,7 @@ Verification entrypoints:
 - `corepack pnpm web:build`
 - `corepack pnpm --filter @bertinis-vault/api build`
 - `corepack pnpm foundry:verify`
+- `corepack pnpm mvp:verify`
 - `.github/workflows/verify.yml` mirrors those checks on `pull_request` and `push` to `main`
 
 ## MVP Product Focus
@@ -78,10 +79,7 @@ corepack pnpm dev
 Then run the current MVP safety checks:
 
 ```bash
-corepack pnpm web:typecheck
-corepack pnpm web:build
-corepack pnpm --filter @bertinis-vault/api build
-corepack pnpm foundry:verify
+corepack pnpm mvp:verify
 ```
 
 ## Next DEV Handoff
@@ -112,6 +110,8 @@ What changed materially before this handoff:
 - API regression coverage now includes cache behavior, hybrid fallback, and upstream failure responses;
 - the API now explicitly allows its legacy default upstream dataset paths, so `source=hybrid` and `source=upstream` do not fail by default just because of path filtering;
 - CI verification now also runs the web verification gate and API tests instead of relying only on manual local checks;
+- the repo now exposes `corepack pnpm mvp:verify` as the one-command safety gate for the last 3-day MVP push;
+- the generated Foundry validation packet now includes expected live outcomes per fixture so the operator can validate faster in Foundry;
 - web and API builds are passing in the current state.
 
 What not to do next:

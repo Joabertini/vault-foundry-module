@@ -6,6 +6,7 @@ Run a final human validation pass inside live Foundry VTT before calling the pro
 
 ## Setup
 
+- run `corepack pnpm mvp:verify` from the repo root before starting the live pass;
 - open a clean world with the expected `dnd5e` system version;
 - enable the Bertini's Vault module;
 - generate and verify the current validation fixtures with `corepack pnpm foundry:verify`;
@@ -23,6 +24,14 @@ Use these repo artifacts during the pass:
 - `docs/foundry-validation-fixtures/*.json`
 - `docs/FOUNDRY-VALIDATION-BASELINE.md`
 - `docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md`
+
+## Fast Operator Rule
+
+Treat the generated packet as the live expectation source:
+
+- if a fixture is marked clean, it should create an actor without visible blockers or warnings;
+- if a fixture is marked warning-only, it should still create the actor and show understandable warnings;
+- if a fixture is marked blocked, it must not create the actor.
 
 ## Core Scenarios
 

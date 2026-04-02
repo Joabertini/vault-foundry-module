@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-01T01:47:48.385Z",
+  "generatedAt": "2026-04-02T02:55:16.202Z",
   "fixtures": [
     {
       "id": "martial-fighter-5",
@@ -7,6 +7,7 @@
       "ok": true,
       "blockers": 0,
       "warnings": 0,
+      "expectedLiveResult": "create actor cleanly without blockers or warnings",
       "issueCodes": [],
       "issueMessages": [],
       "output": "docs/foundry-validation-fixtures/martial-fighter-5.json"
@@ -17,6 +18,7 @@
       "ok": true,
       "blockers": 0,
       "warnings": 0,
+      "expectedLiveResult": "create actor cleanly without blockers or warnings",
       "issueCodes": [],
       "issueMessages": [],
       "output": "docs/foundry-validation-fixtures/prepared-cleric-5.json"
@@ -27,6 +29,7 @@
       "ok": true,
       "blockers": 0,
       "warnings": 0,
+      "expectedLiveResult": "create actor cleanly without blockers or warnings",
       "issueCodes": [],
       "issueMessages": [],
       "output": "docs/foundry-validation-fixtures/pact-warlock-5.json"
@@ -37,6 +40,7 @@
       "ok": true,
       "blockers": 0,
       "warnings": 0,
+      "expectedLiveResult": "create actor cleanly without blockers or warnings",
       "issueCodes": [],
       "issueMessages": [],
       "output": "docs/foundry-validation-fixtures/background-feat.json"
@@ -47,6 +51,7 @@
       "ok": true,
       "blockers": 0,
       "warnings": 0,
+      "expectedLiveResult": "create actor cleanly without blockers or warnings",
       "issueCodes": [],
       "issueMessages": [],
       "output": "docs/foundry-validation-fixtures/wizard-spellbook-5.json"
@@ -57,6 +62,7 @@
       "ok": true,
       "blockers": 0,
       "warnings": 3,
+      "expectedLiveResult": "allow actor creation with visible warning feedback",
       "issueCodes": [
         "SPELL_ID_LABEL_MISMATCH",
         "SPELL_LEVEL_MISMATCH",
@@ -75,6 +81,7 @@
       "ok": false,
       "blockers": 1,
       "warnings": 1,
+      "expectedLiveResult": "block actor creation with visible blocker feedback",
       "issueCodes": [
         "UNKNOWN_CLASS_ID",
         "UNEXPECTED_DERIVED_SPELLCASTING"

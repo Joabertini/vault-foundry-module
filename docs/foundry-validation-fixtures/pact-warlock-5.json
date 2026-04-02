@@ -3,7 +3,7 @@
   "label": "Pact caster warlock",
   "preflight": {
     "ok": true,
-    "generatedAt": "2026-04-01T01:47:48.378Z",
+    "generatedAt": "2026-04-02T02:55:16.191Z",
     "target": {
       "rulesVersion": "5e-2014",
       "sourceProfile": "vault-v1",
@@ -539,7 +539,7 @@
     },
     "items": [
       {
-        "_id": "uzhLep1utBWfUzei",
+        "_id": "IGTxDVkKeZ7UIdZ4",
         "name": "warlock",
         "type": "class",
         "img": "systems/dnd5e/icons/svg/items/class.svg",
@@ -599,7 +599,7 @@
         }
       },
       {
-        "_id": "hgcTJbipgXBL7O5Z",
+        "_id": "QR2yEbmoeMTV4h9V",
         "name": "Pact Magic",
         "type": "feat",
         "img": "icons/svg/item-bag.svg",
@@ -657,7 +657,7 @@
         }
       },
       {
-        "_id": "0IpmhJ0eDeA0s7y8",
+        "_id": "a15HSIe1KhvEJnvW",
         "name": "Eldritch Blast",
         "type": "spell",
         "img": "icons/svg/book.svg",
@@ -814,7 +814,7 @@
         }
       },
       {
-        "_id": "SnMtvIIOGsCSUPe0",
+        "_id": "HTLYS5VARRsaoLxC",
         "name": "Hunger of Hadar",
         "type": "spell",
         "img": "icons/svg/book.svg",
@@ -971,7 +971,7 @@
         }
       },
       {
-        "_id": "C7K1JIqWTFwtSAY3",
+        "_id": "PDXT04ok8T1Zhf1f",
         "name": "dagger",
         "type": "weapon",
         "img": "icons/svg/sword.svg",
@@ -1164,7 +1164,7 @@
         }
       },
       {
-        "_id": "kU5ZdawaBgWohGKc",
+        "_id": "Y3ya5wOq314UXPVz",
         "name": "Leather Armor",
         "type": "equipment",
         "img": "icons/svg/shield.svg",
@@ -1230,7 +1230,7 @@
         }
       },
       {
-        "_id": "5nT9P0eaXt8UI5pO",
+        "_id": "561GeNLJd4INf6yM",
         "name": "Arcane Focus",
         "type": "loot",
         "img": "icons/svg/item-bag.svg",

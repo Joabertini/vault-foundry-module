@@ -15,6 +15,18 @@ await mkdir(outputDir, { recursive: true });
 
 const summary = [];
 
+function expectedLiveResultForFixture(fixtureId, ok, warnings) {
+  if (!ok) {
+    return "block actor creation with visible blocker feedback";
+  }
+
+  if (warnings > 0) {
+    return "allow actor creation with visible warning feedback";
+  }
+
+  return "create actor cleanly without blockers or warnings";
+}
+
 for (const fixture of manualValidationFixtures) {
   const character = fixture.build();
   const preflight = buildPreflightResult(character, {
@@ -50,6 +62,11 @@ for (const fixture of manualValidationFixtures) {
     ok: preflight.ok,
     blockers: preflight.summary.blockers,
     warnings: preflight.summary.warnings,
+    expectedLiveResult: expectedLiveResultForFixture(
+      fixture.id,
+      preflight.ok,
+      preflight.summary.warnings,
+    ),
     issueCodes: preflight.issues.map((issue) => issue.code),
     issueMessages: preflight.issues.map((issue) => issue.message),
     output: path.relative(repoRoot, outputPath).replace(/\\/g, "/"),
@@ -79,9 +96,18 @@ const packetLines = [
   "",
   "## Manual Validation Workflow",
   "",
-  "1. Run `corepack pnpm foundry:fixtures` to refresh the packet.",
-  "2. Open `docs/FOUNDRY-MANUAL-VALIDATION.md` for the live Foundry checklist.",
-  "3. Record human results in `docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md` or the generated working copy below.",
+  "1. Run `corepack pnpm mvp:verify` before opening Foundry if you want the full MVP gate.",
+  "2. Run `corepack pnpm foundry:fixtures` to refresh the packet if you only changed export/preflight logic.",
+  "3. Open `docs/FOUNDRY-MANUAL-VALIDATION.md` for the live Foundry checklist.",
+  "4. Record human results in `docs/FOUNDRY-MANUAL-VALIDATION-REPORT.md` or the generated working copy below.",
+  "",
+  "## Operator Checklist",
+  "",
+  "| Fixture | Expected live result | Auto issues |",
+  "| --- | --- | --- |",
+  ...summary.map((fixture) =>
+    `| \`${fixture.id}\` | ${fixture.expectedLiveResult} | ${fixture.issueCodes.length ? fixture.issueCodes.map((code) => `\`${code}\``).join(", ") : "-" } |`,
+  ),
 ];
 
 await writeFile(path.join(outputDir, "README.md"), `${packetLines.join("\n")}\n`, "utf8");
@@ -95,10 +121,10 @@ const reportLines = [
   "",
   "## Automatic Baseline",
   "",
-  "| Fixture | Label | Preflight | Blockers | Warnings | Issues | Output |",
-  "| --- | --- | --- | ---: | ---: | --- | --- |",
+  "| Fixture | Label | Preflight | Expected live result | Blockers | Warnings | Issues | Output |",
+  "| --- | --- | --- | --- | ---: | ---: | --- | --- |",
   ...summary.map((fixture) =>
-    `| \`${fixture.id}\` | ${fixture.label} | ${fixture.ok ? "ok" : "blocked"} | ${fixture.blockers} | ${fixture.warnings} | ${fixture.issueCodes.length ? fixture.issueCodes.map((code) => `\`${code}\``).join(", ") : "-" } | \`${fixture.output}\` |`,
+    `| \`${fixture.id}\` | ${fixture.label} | ${fixture.ok ? "ok" : "blocked"} | ${fixture.expectedLiveResult} | ${fixture.blockers} | ${fixture.warnings} | ${fixture.issueCodes.length ? fixture.issueCodes.map((code) => `\`${code}\``).join(", ") : "-" } | \`${fixture.output}\` |`,
   ),
   "",
   "## Manual Notes",
@@ -108,6 +134,7 @@ const reportLines = [
     "",
     `- Fixture: \`${fixture.id}\``,
     `- Automatic baseline: ${fixture.ok ? "ok" : "blocked"}; blockers=${fixture.blockers}; warnings=${fixture.warnings}`,
+    `- Expected live result: ${fixture.expectedLiveResult}`,
     `- Automatic issues: ${fixture.issueCodes.length ? fixture.issueCodes.join(", ") : "none"}`,
     "- Live Foundry result:",
     "- Notes:",

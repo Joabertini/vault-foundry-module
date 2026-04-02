@@ -13,12 +13,14 @@
 Command used:
 
 ```bash
-corepack pnpm foundry:fixtures
+corepack pnpm mvp:verify
 ```
 
 Fixture summary:
 
 - `docs/foundry-validation-fixtures/summary.json`
+- `docs/foundry-validation-fixtures/README.md`
+- `docs/foundry-validation-fixtures/WORKING-REPORT.md`
 
 ## Scenario Results
 
@@ -77,3 +79,4 @@ Fixture summary:
 - Warning-only builds that still imported:
 - Blocked builds that stopped correctly:
 - Follow-up fixes needed:
+- Release recommendation:
