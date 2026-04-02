@@ -23,6 +23,7 @@ Ship a beta that is credible for sharing, demoing, and controlled early feedback
 
 - run `corepack pnpm mvp:verify`;
 - review `docs/MVP-RELEASE-STATUS.md`;
+- confirm the tag-based GitHub release workflow will publish only after `corepack pnpm mvp:verify` passes;
 - manually validate at least:
   - one martial build
   - one caster build

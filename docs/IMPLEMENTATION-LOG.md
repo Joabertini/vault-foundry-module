@@ -1848,3 +1848,20 @@ Impacto:
 - baja el riesgo de llegar a la demo/validacion manual con el API rompiendo solo cuando se usa `source=hybrid` o `source=upstream`;
 - sube el piso del CI para que web y API queden cubiertos en cada push/PR;
 - da una base bastante mejor para usar los 3 dias restantes en validacion real y no en descubrir regresiones evitables.
+
+### Gate de release endurecido para no publicar un tag roto
+
+Se hizo una pasada puntual sobre `.github/workflows/release.yml` para que publicar una release deje de depender de memoria humana o de un workflow demasiado liviano.
+
+Ahora incluye:
+
+- instalacion de dependencias con `pnpm` antes de empaquetar;
+- ejecucion de `corepack pnpm mvp:verify` dentro del workflow de release;
+- actualizacion de `module.json` y `package.json` con la version del tag;
+- correccion de la ruta del ZIP adjunto en `softprops/action-gh-release`.
+
+Impacto:
+
+- baja mucho el riesgo de publicar un tag que no haya pasado el gate automatizado real del MVP;
+- evita una falla silenciosa por adjuntar el archivo ZIP desde una ruta incorrecta;
+- deja el camino de release mas alineado con la urgencia actual: validar primero, publicar despues.

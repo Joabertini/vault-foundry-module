@@ -113,6 +113,7 @@ What changed materially before this handoff:
 - CI verification now also runs the web verification gate and API tests instead of relying only on manual local checks;
 - the repo now exposes `corepack pnpm mvp:verify` as the one-command safety gate for the last 3-day MVP push;
 - `corepack pnpm mvp:verify` now also regenerates `docs/MVP-RELEASE-STATUS.md` as the single automated readiness snapshot;
+- the GitHub release workflow now installs dependencies, runs `corepack pnpm mvp:verify`, updates release manifests, and attaches the ZIP from the correct path before publishing;
 - the generated Foundry validation packet now includes expected live outcomes per fixture so the operator can validate faster in Foundry;
 - web and API builds are passing in the current state.
 

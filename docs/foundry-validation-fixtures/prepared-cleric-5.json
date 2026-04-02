@@ -3,7 +3,7 @@
   "label": "Prepared caster cleric",
   "preflight": {
     "ok": true,
-    "generatedAt": "2026-04-02T02:55:16.186Z",
+    "generatedAt": "2026-04-02T03:03:14.730Z",
     "target": {
       "rulesVersion": "5e-2014",
       "sourceProfile": "vault-v1",
@@ -518,7 +518,7 @@
     },
     "items": [
       {
-        "_id": "6Mohor2C8c8q0uZH",
+        "_id": "rYWmyMWnu7Poa8UB",
         "name": "cleric",
         "type": "class",
         "img": "systems/dnd5e/icons/svg/items/class.svg",
@@ -578,7 +578,7 @@
         }
       },
       {
-        "_id": "UYyej66N7eMtI6Eg",
+        "_id": "ZY6kQnhlhU7tWTms",
         "name": "Channel Divinity",
         "type": "feat",
         "img": "icons/svg/item-bag.svg",
@@ -636,7 +636,7 @@
         }
       },
       {
-        "_id": "nnxSVyrcNWV7qpUo",
+        "_id": "vgsxSTHZzezjJqFA",
         "name": "Sacred Flame",
         "type": "spell",
         "img": "icons/svg/book.svg",
@@ -793,7 +793,7 @@
         }
       },
       {
-        "_id": "A7fC4pqB3ZHX51J7",
+        "_id": "MoacK57GDisAkqDr",
         "name": "Spirit Guardians",
         "type": "spell",
         "img": "icons/svg/book.svg",
@@ -950,7 +950,7 @@
         }
       },
       {
-        "_id": "RSzL8SMi2lq3YdOq",
+        "_id": "AwS1i10jez1RBLBH",
         "name": "mace",
         "type": "weapon",
         "img": "icons/svg/sword.svg",
@@ -1143,7 +1143,7 @@
         }
       },
       {
-        "_id": "qLoacn8p4VkrkvfZ",
+        "_id": "9UB2EWaqErfMeOQi",
         "name": "Shield",
         "type": "equipment",
         "img": "icons/svg/shield.svg",
@@ -1209,7 +1209,7 @@
         }
       },
       {
-        "_id": "aKGnUTMOfUvhqUNu",
+        "_id": "wcnoSs62VIkszhXy",
         "name": "Chain Mail",
         "type": "equipment",
         "img": "icons/svg/shield.svg",
@@ -1275,7 +1275,7 @@
         }
       },
       {
-        "_id": "uju5T9ug4IZgHHAi",
+        "_id": "LWCwGB5TyqICo4f1",
         "name": "Holy Symbol",
         "type": "loot",
         "img": "icons/svg/item-bag.svg",
