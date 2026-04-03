@@ -10,12 +10,11 @@ import {
   FEATS_NO_PREREQ, ALL_FEATS, PB_COST, PB_MAX_POINTS,
   PB_MIN, PB_MAX
 } from './data.js';
-import { createCanonicalCharacterBuild } from './model-bridge.js';
-import { buildFoundryActorPreview } from './foundry-export-bridge.js';
+import { buildActorCreateData } from './foundry-pipeline.js';
 import {
-  buildFoundryPreflightPreview,
   formatPreflightIssues,
 } from './preflight-bridge.js';
+import { resolveActorCreateData } from './uuid-resolver.js';
 
 const TOTAL_STEPS = 9;
 
@@ -512,8 +511,13 @@ export class VaultCreatorApp extends Application {
     this._saveStepData(html);
     this._setCreationStatus(html, 'Validando build canonica...');
 
-    const canonicalBuild = createCanonicalCharacterBuild(this._formData, {});
-    const preflight = buildFoundryPreflightPreview(canonicalBuild);
+    const {
+      canonicalBuild,
+      canonicalFoundryPreview,
+      canonicalPreflight,
+      ...actorCreateDataBase
+    } = buildActorCreateData(this._formData);
+    const preflight = canonicalPreflight;
 
     if (!preflight.ok) {
       const blockerSummary = formatPreflightIssues(preflight);
@@ -549,17 +553,14 @@ export class VaultCreatorApp extends Application {
       this._setCreationStatus(html, actorFolder
         ? `Creando actor en Foundry dentro de "${actorFolder.name}"...`
         : 'Creando actor en Foundry...');
-      const canonicalPreview = buildFoundryActorPreview(canonicalBuild);
-      const actorCreateData = {
-        ...canonicalPreview,
+      const actorCreateDataWithFlags = {
+        ...actorCreateDataBase,
         flags: foundry.utils.mergeObject(
-          canonicalPreview.flags || {},
+          actorCreateDataBase.flags || {},
           {
             'bertinis-vault': {
-              createdBy: this._formData.playerName,
-              version: '0.1.0',
               canonicalBuild,
-              canonicalFoundryPreview: canonicalPreview,
+              canonicalFoundryPreview,
               canonicalPreflight: preflight,
             },
           },
@@ -567,10 +568,14 @@ export class VaultCreatorApp extends Application {
         ),
       };
 
+      this._setCreationStatus(html, 'Resolviendo compendios del sistema dnd5e...');
+      const { actorCreateData, resolution } = await resolveActorCreateData(actorCreateDataWithFlags);
+
       if (actorFolder) {
         actorCreateData.folder = actorFolder.id;
       }
 
+      this._setCreationStatus(html, 'Creando actor final en Foundry...');
       this._createdActor = await Actor.create(actorCreateData);
 
       // Show success
@@ -588,6 +593,14 @@ export class VaultCreatorApp extends Application {
       ui.notifications.info(
         `${game.i18n.localize('VAULT.Success')}: ${this._createdActor.name}`
       );
+
+      if (resolution.resolvedSpellItems.length || resolution.unresolvedSpellItems.length) {
+        const resolvedCount = resolution.resolvedSpellItems.length;
+        const unresolvedCount = resolution.unresolvedSpellItems.length;
+        ui.notifications.info(
+          `Vault resolver: ${resolvedCount} spells resueltos desde compendios, ${unresolvedCount} quedaron inline.`,
+        );
+      }
 
       if (game.settings.get('bertinis-vault', 'openSheetOnCreate')) {
         this._createdActor.sheet.render(true);
