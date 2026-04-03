@@ -8,10 +8,11 @@
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node -e \"console.log('No tests yet for @bertinis-vault/web')\""
+    "test": "tsc -p tsconfig.json --noEmit && vite build"
   },
   "dependencies": {
     "@bertinis-vault/contracts": "workspace:*",
+    "@bertinis-vault/data-engine": "workspace:*",
     "@bertinis-vault/domain": "workspace:*",
     "@bertinis-vault/foundry-exporter": "workspace:*",
     "react": "^19.0.0",

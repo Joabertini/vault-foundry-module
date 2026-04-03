@@ -122,6 +122,7 @@ What changed materially before this handoff:
 - the spell data path now preserves richer upstream metadata and the local spell catalog includes more concrete MVP spell details, so common spells no longer collapse to `Sin dato` as often in the web builder;
 - the focused handoff for the current import/export bug now lives in [docs/FOUNDRY-IMPORT-HANDOFF.md](./docs/FOUNDRY-IMPORT-HANDOFF.md);
 - Phase 1 from the Claude architecture guide is now started in the Foundry runtime: `scripts/uuid-resolver.js` strips create-time metadata, resolves `race` / `background` / `originalClass` against dnd5e compendiums, upgrades `class` items from `dnd5e.classes` when possible, and upgrades spell items from compendium documents when a match exists before `Actor.create()`;
+- CI note for the next DEV: the GitHub `Verify Workspace` job requires `apps/web/package.json` and `pnpm-lock.yaml` to stay in sync. A local-only manifest change here will fail `corepack pnpm install --frozen-lockfile` immediately in Actions.
 - the generated Foundry validation packet now includes expected live outcomes per fixture so the operator can validate faster in Foundry;
 - web and API builds are passing in the current state.
 
