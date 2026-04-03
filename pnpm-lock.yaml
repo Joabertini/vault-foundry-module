@@ -26,6 +26,9 @@ importers:
       '@bertinis-vault/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@bertinis-vault/data-engine':
+        specifier: workspace:*
+        version: link:../../packages/data-engine
       '@bertinis-vault/domain':
         specifier: workspace:*
         version: link:../../packages/domain
