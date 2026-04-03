@@ -1,5 +1,23 @@
 # Bertini's Vault - Implementation Log
 
+## 2026-04-03
+
+### JSON export/import deep-dive and native filename alignment
+
+A full JSON pipeline audit was performed against native Foundry exports and all current `rambo` variants.
+
+Delivered:
+
+- `docs/FOUNDRY-JSON-PIPELINE-ANALYSIS.md` with:
+  - end-to-end architecture of the export path;
+  - structural gap analysis per file (`rambo 1/2/3/4` vs `alpaca`);
+  - reasoning about filename relevance;
+  - applied fixes and remaining risk.
+- exporter shape corrected back toward native actor data for dnd5e import compatibility;
+- spell item shape tightened to avoid non-native fields;
+- web download filename normalized to Foundry-style pattern:
+  - `fvtt-Actor-<slug>-<id>.json`.
+
 ## 2026-04-02
 
 ### Slice urgente sobre spell metadata e import JSON

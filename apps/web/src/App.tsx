@@ -75,6 +75,23 @@ function joinLines(values: string[]) {
   return Array.from(new Set(values.map((entry) => entry.trim()).filter(Boolean))).join("\n");
 }
 
+function slugForFoundryFile(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+function randomFoundryId(length = 16) {
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  return Array.from({ length }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join("");
+}
+
 type SpellInfo = {
   id: string;
   label: string;
@@ -402,7 +419,9 @@ export function App() {
     const url = window.URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = `${(state.characterName || "vault-character").toLowerCase().replace(/\s+/g, "-")}.foundry-actor.json`;
+    const actorSlug = slugForFoundryFile(state.characterName || "vault-character");
+    const foundryLikeFileName = `fvtt-Actor-${actorSlug}-${randomFoundryId()}.json`;
+    anchor.download = foundryLikeFileName;
     anchor.click();
     window.URL.revokeObjectURL(url);
     setCopyState("Actor Foundry descargado");

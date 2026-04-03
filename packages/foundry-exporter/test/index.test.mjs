@@ -17,16 +17,14 @@ function makeCharacterBuild() {
 test("buildFoundryActorPayload maps canonical build into a richer Foundry actor", () => {
   const payload = buildFoundryActorPayload(makeCharacterBuild());
 
-  assert.equal(typeof payload._id, "string");
   assert.equal(payload.name, "Seraphina Vale");
   assert.equal(payload.system.attributes.ac.calc, "default");
   assert.equal(payload.system.attributes.ac.flat, null);
   assert.equal(payload.system.attributes.hp.value, 14);
-  assert.equal(payload.system.attributes.hp.temp, 0);
-  assert.equal(payload.system.attributes.hp.min, 0);
+  assert.equal(payload.system.attributes.hp.temp, null);
   assert.equal(payload.system.abilities.str.max, null);
   assert.deepEqual(payload.system.abilities.str.check.roll, { min: null, max: null, mode: 0 });
-  assert.equal(payload.system.spells.spell1.override, null);
+  assert.equal(payload.system.spells.spell1.value, 4);
   assert.equal(payload.system.traits.languages.value.includes("elvish"), true);
   assert.equal(payload.system.tools.thief.prof, 1);
 
@@ -243,7 +241,6 @@ test("buildFoundryActorPayload keeps pact caster exports coherent for warlocks",
   assert.equal(payload.system.attributes.spellcasting, "cha");
   assert.equal(payload.system.spells.spell3.value, 2);
   assert.equal(payload.system.spells.pact.value, 2);
-  assert.equal(payload.system.spells.pact.level, 3);
   assert.equal(hungerOfHadar?.system?.level, 3);
   assert.equal(payload.items.some((item) => item.name === "Pact Magic" && item.type === "feat"), true);
 });
