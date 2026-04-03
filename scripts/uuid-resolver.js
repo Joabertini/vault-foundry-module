@@ -22,6 +22,29 @@ function duplicateWithoutMeta(documentData) {
   return clone;
 }
 
+function mergeResolvedClassItem(originalItem, resolvedData) {
+  const nextItem = foundry.utils.deepClone(resolvedData);
+  const originalSystem = originalItem.system || {};
+  const nextSystem = nextItem.system || {};
+
+  nextItem.system = foundry.utils.mergeObject(
+    nextSystem,
+    {
+      levels: originalSystem.levels ?? nextSystem.levels ?? 1,
+      hd: originalSystem.hd ?? nextSystem.hd,
+      spellcasting: foundry.utils.mergeObject(
+        nextSystem.spellcasting || {},
+        originalSystem.spellcasting || {},
+        { inplace: false, recursive: true },
+      ),
+      primaryAbility: originalSystem.primaryAbility ?? nextSystem.primaryAbility,
+    },
+    { inplace: false, recursive: true },
+  );
+
+  return nextItem;
+}
+
 async function getPackIndex(pack) {
   try {
     return await pack.getIndex({ fields: ["name", "system.identifier"] });
@@ -104,6 +127,8 @@ export async function resolveActorCreateData(actorCreateData) {
     race: null,
     background: null,
     originalClass: null,
+    resolvedClassItems: [],
+    unresolvedClassItems: [],
     resolvedSpellItems: [],
     unresolvedSpellItems: [],
   };
@@ -132,6 +157,25 @@ export async function resolveActorCreateData(actorCreateData) {
 
   const nextItems = [];
   for (const item of sanitized.items || []) {
+    if (item.type === "class") {
+      const lookupValue = item.system?.identifier || item.name;
+      const resolved = await resolveFromPack("dnd5e.classes", lookupValue);
+
+      if (resolved) {
+        nextItems.push(mergeResolvedClassItem(item, resolved.data));
+        resolution.resolvedClassItems.push({
+          requested: item.name,
+          resolvedName: resolved.name,
+          packId: resolved.packId,
+          uuid: resolved.uuid,
+        });
+      } else {
+        nextItems.push(item);
+        resolution.unresolvedClassItems.push(item.name);
+      }
+      continue;
+    }
+
     if (item.type !== "spell") {
       nextItems.push(item);
       continue;

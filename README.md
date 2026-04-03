@@ -121,7 +121,7 @@ What changed materially before this handoff:
 - the exporter now also emits root `_id` / `sort`, default AC recalculation fields, richer HP and movement fields, and spell-slot overrides aligned more closely with native Foundry exports;
 - the spell data path now preserves richer upstream metadata and the local spell catalog includes more concrete MVP spell details, so common spells no longer collapse to `Sin dato` as often in the web builder;
 - the focused handoff for the current import/export bug now lives in [docs/FOUNDRY-IMPORT-HANDOFF.md](./docs/FOUNDRY-IMPORT-HANDOFF.md);
-- Phase 1 from the Claude architecture guide is now started in the Foundry runtime: `scripts/uuid-resolver.js` strips create-time metadata, resolves `race` / `background` / `originalClass` against dnd5e compendiums, and upgrades spell items from compendium documents when a match exists before `Actor.create()`;
+- Phase 1 from the Claude architecture guide is now started in the Foundry runtime: `scripts/uuid-resolver.js` strips create-time metadata, resolves `race` / `background` / `originalClass` against dnd5e compendiums, upgrades `class` items from `dnd5e.classes` when possible, and upgrades spell items from compendium documents when a match exists before `Actor.create()`;
 - the generated Foundry validation packet now includes expected live outcomes per fixture so the operator can validate faster in Foundry;
 - web and API builds are passing in the current state.
 

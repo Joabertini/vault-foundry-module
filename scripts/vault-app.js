@@ -594,11 +594,18 @@ export class VaultCreatorApp extends Application {
         `${game.i18n.localize('VAULT.Success')}: ${this._createdActor.name}`
       );
 
-      if (resolution.resolvedSpellItems.length || resolution.unresolvedSpellItems.length) {
+      if (
+        resolution.resolvedClassItems.length ||
+        resolution.unresolvedClassItems.length ||
+        resolution.resolvedSpellItems.length ||
+        resolution.unresolvedSpellItems.length
+      ) {
+        const resolvedClassCount = resolution.resolvedClassItems.length;
+        const unresolvedClassCount = resolution.unresolvedClassItems.length;
         const resolvedCount = resolution.resolvedSpellItems.length;
         const unresolvedCount = resolution.unresolvedSpellItems.length;
         ui.notifications.info(
-          `Vault resolver: ${resolvedCount} spells resueltos desde compendios, ${unresolvedCount} quedaron inline.`,
+          `Vault resolver: ${resolvedClassCount} classes y ${resolvedCount} spells resueltos desde compendios; ${unresolvedClassCount} classes y ${unresolvedCount} spells quedaron inline.`,
         );
       }
 
