@@ -359,11 +359,22 @@ textarea.fi{resize:vertical;min-height:80px}
     <div class="es">
       <div class="ei2">⚗️</div>
       <div class="et">Exportar para Foundry VTT</div>
-      <div class="ed">Formato vault-char-v1 · Compatible con Bertini's Vault Importer</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;text-align:left;">
+        <div style="background:rgba(74,124,89,.08);border:1px solid rgba(74,124,89,.3);border-radius:6px;padding:14px;">
+          <div style="font-family:var(--fd);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#a5d6a7;margin-bottom:6px;">⚡ Foundry Directo</div>
+          <div style="font-size:12px;color:var(--mist);margin-bottom:10px;">Actor listo para importar en Foundry VTT. Arrastrá el JSON al directorio de actores o usá File → Import Data.</div>
+          <button class="btn bx" style="width:100%;padding:10px;" onclick="exportFoundry()">⬇ &nbsp; fvtt-actor-[nombre].json</button>
+        </div>
+        <div style="background:rgba(60,52,42,.4);border:1px solid var(--border);border-radius:6px;padding:14px;">
+          <div style="font-family:var(--fd);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:6px;">📦 Vault Format v1</div>
+          <div style="font-size:12px;color:var(--mist);margin-bottom:10px;">Formato nativo del vault. Para usar con el módulo importer de Bertini's Vault (en desarrollo).</div>
+          <button class="btn bg" style="width:100%;padding:10px;" onclick="exportJ()">⬇ &nbsp; vault-char-[nombre].json</button>
+        </div>
+      </div>
       <div class="jp" id="jp">{ cargando... }</div>
       <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-        <button class="btn bx" onclick="exportJ()">⬇ &nbsp; Descargar vault-char.json</button>
-        <button class="btn bg" onclick="copyJ()">📋 &nbsp; Copiar JSON</button>
+        <button class="btn bg" onclick="copyFoundry()">📋 &nbsp; Copiar JSON Foundry</button>
+        <button class="btn bg" onclick="copyJ()">📋 &nbsp; Copiar JSON Vault</button>
       </div>
       <div id="ef" class="hidden" style="margin-top:12px;"></div>
     </div>
@@ -888,6 +899,236 @@ function showFB(cls,msg){
 }
 async function logExp(){
   try{await sbFetch('export_logs','POST',{session_id:SID,character_id:dbId||null,vault_version:'1',char_name:C.name||'Sin nombre',class_slug:C.cls?.id||null,race_slug:C.race?.id||null,class_level:C.lvl});}catch(e){}
+}
+// ══ FOUNDRY NATIVE ACTOR BUILDER ══════════════════════════════════════
+function buildFoundryActor(){
+  const cl=C.cls,race=C.race,bg=C.bg;
+  const pb=LD[C.lvl-1].pb;
+  const name=C.name||'Sin nombre';
+
+  // Abilities — schema dnd5e 5.2.x completo (sin mod, con check/save roll objects)
+  const abilities={};
+  AK.forEach(k=>{
+    abilities[k]={
+      value:C.ab[k],
+      proficient:C.savingThrows?.includes(k)?1:0,
+      max:null,
+      bonuses:{check:'',save:''},
+      check:{roll:{min:null,max:null,mode:0}},
+      save:{roll:{min:null,max:null,mode:0}}
+    };
+  });
+  // Marcar saving throws de la clase
+  if(cl?.st){cl.st.forEach(k=>{if(abilities[k])abilities[k].proficient=1;});}
+
+  // Skills — value:1 para proficientes, 0 para el resto
+  const skills={};
+  const SK_DEF={acrobatics:'dex','animal-handling':'wis',arcana:'int',athletics:'str',deception:'cha',history:'int',insight:'wis',intimidation:'cha',investigation:'int',medicine:'wis',nature:'int',perception:'wis',performance:'cha',persuasion:'cha',religion:'int','sleight-of-hand':'dex',stealth:'dex',survival:'wis'};
+  Object.keys(SK_DEF).forEach(id=>{
+    skills[id]={ability:SK_DEF[id],value:C.skills.includes(id)?1:0,bonuses:{check:'',passive:''},roll:{min:null,max:null,mode:0}};
+  });
+
+  // Items — clase, conjuros, equipo
+  const items=[];
+
+  // Item: clase
+  if(cl){
+    items.push({
+      name:cl.name,
+      type:'class',
+      img:'icons/svg/book.svg',
+      system:{
+        identifier:cl.id,
+        levels:C.lvl,
+        hitDice:'d'+cl.hd,
+        hitDiceUsed:0,
+        description:{value:'',chat:'',unidentified:''},
+        source:{custom:cl.name}
+      },
+      flags:{},effects:[],
+      _stats:{compendiumSource:null,duplicateSource:null,exportSource:null,coreVersion:'13.351',systemId:'dnd5e',systemVersion:'5.2.5',createdTime:null,modifiedTime:null,lastModifiedBy:null},
+      folder:null,sort:0,ownership:{default:0}
+    });
+  }
+
+  // Items: conjuros
+  const SCHOOL_FULL={evoc:'evocation',abju:'abjuration',conj:'conjuration',divi:'divination',ench:'enchantment',illu:'illusion',necro:'necromancy',trans:'transmutation'};
+  C.spells.forEach((sid,idx)=>{
+    const sp=SPELLS.find(s=>s.id===sid);if(!sp)return;
+    items.push({
+      name:sp.name,
+      type:'spell',
+      img:'icons/svg/lightning.svg',
+      system:{
+        description:{value:sp.d||'',chat:'',unidentified:''},
+        source:{custom:''},
+        activation:{type:'action',cost:1,condition:''},
+        duration:{value:null,units:''},
+        target:{value:null,width:null,units:'',type:'',prompt:true},
+        range:{value:null,long:null,units:''},
+        uses:{value:null,max:'',per:null,recovery:'',prompt:true},
+        level:sp.l,
+        school:SCHOOL_FULL[sp.sc]||sp.sc,
+        components:{vocal:true,somatic:true,material:false,ritual:false,concentration:false},
+        materials:{value:'',consumed:false,cost:0,supply:0},
+        preparation:{mode:'prepared',prepared:true},
+        scaling:{mode:'none',formula:''}
+      },
+      flags:{},effects:[],
+      _stats:{compendiumSource:null,duplicateSource:null,exportSource:null,coreVersion:'13.351',systemId:'dnd5e',systemVersion:'5.2.5',createdTime:null,modifiedTime:null,lastModifiedBy:null},
+      folder:null,sort:idx*100,ownership:{default:0}
+    });
+  });
+
+  // Items: equipo
+  C.equip.forEach((eq,idx)=>{
+    items.push({
+      name:eq,
+      type:'equipment',
+      img:'icons/svg/item-bag.svg',
+      system:{
+        description:{value:'',chat:'',unidentified:''},
+        source:{custom:''},
+        quantity:1,weight:{value:0,units:'lb'},
+        price:{value:0,denomination:'gp'},
+        attunement:{value:0},
+        equipped:true,
+        rarity:'',
+        identified:true
+      },
+      flags:{},effects:[],
+      _stats:{compendiumSource:null,duplicateSource:null,exportSource:null,coreVersion:'13.351',systemId:'dnd5e',systemVersion:'5.2.5',createdTime:null,modifiedTime:null,lastModifiedBy:null},
+      folder:null,sort:idx*100,ownership:{default:0}
+    });
+  });
+
+  // Actor payload completo — schema dnd5e 5.2.x
+  return{
+    name,
+    type:'character',
+    img:'systems/dnd5e/icons/svg/actors/character.svg',
+    system:{
+      abilities,
+      skills,
+      tools:{},
+      attributes:{
+        ac:{flat:null,calc:'default',formula:''},
+        hp:{value:C.hp.max,max:C.hp.max,temp:null,tempmax:0,bonuses:{}},
+        init:{ability:'dex',bonus:''},
+        movement:{burrow:0,climb:0,fly:0,swim:0,walk:30,units:'ft',hover:false},
+        attunement:{max:3},
+        senses:{darkvision:0,blindsight:0,tremorsense:0,truesight:0,units:'ft',special:''},
+        spellcasting:cl?.sp||'',
+        exhaustion:0,
+        concentration:{ability:'con'},
+        loyalty:{value:null},
+        death:{success:0,failure:0},
+        inspiration:false
+      },
+      details:{
+        biography:{value:`<p>${C.bio||''}</p>`,public:''},
+        alignment:C.align||'',
+        race:race?.name||'',
+        background:bg?.name||'',
+        originalClass:cl?.name||'',
+        xp:{value:0},
+        appearance:C.appearance||'',
+        trait:C.trait||'',
+        ideal:C.ideal||'',
+        bond:C.bond||'',
+        flaw:C.flaw||'',
+        eyes:'',hair:'',height:'',weight:'',age:'',gender:'',skin:'',faith:''
+      },
+      traits:{
+        size:'med',
+        di:{value:[],bypasses:[],custom:''},
+        dr:{value:[],bypasses:[],custom:''},
+        dv:{value:[],bypasses:[],custom:''},
+        ci:{value:[],custom:''},
+        languages:{value:['common'],custom:''}
+      },
+      currency:{pp:0,gp:0,ep:0,sp:0,cp:0},
+      skills,
+      spells:{
+        spell1:{value:0,override:null},spell2:{value:0,override:null},spell3:{value:0,override:null},
+        spell4:{value:0,override:null},spell5:{value:0,override:null},spell6:{value:0,override:null},
+        spell7:{value:0,override:null},spell8:{value:0,override:null},spell9:{value:0,override:null},
+        pact:{value:0,override:null},
+      },
+      bonuses:{
+        mwak:{attack:'',damage:''},rwak:{attack:'',damage:''},
+        msak:{attack:'',damage:''},rsak:{attack:'',damage:''},
+        abilities:{check:'',save:'',skill:''},spell:{dc:''}
+      },
+      resources:{primary:{value:0,max:0,sr:false,lr:false,label:''},secondary:{value:0,max:0,sr:false,lr:false,label:''},tertiary:{value:0,max:0,sr:false,lr:false,label:''}},
+      favorites:[],
+      bastion:{}
+    },
+    items,
+    effects:[],
+    flags:{},
+    prototypeToken:{
+      name,
+      displayName:0,
+      actorLink:true,
+      width:1,height:1,
+      texture:{src:'systems/dnd5e/icons/svg/actors/character.svg',anchorX:.5,anchorY:.5,offsetX:0,offsetY:0,fit:'contain',scaleX:1,scaleY:1,rotation:0,tint:'#ffffff',alphaThreshold:.75},
+      lockRotation:false,rotation:0,alpha:1,
+      disposition:-1,displayBars:0,
+      bar1:{attribute:'attributes.hp'},bar2:{attribute:null},
+      light:{alpha:.5,angle:360,bright:0,coloration:1,dim:0,attenuation:.5,luminosity:.5,saturation:0,contrast:0,shadows:0,animation:{type:null,speed:5,intensity:5,reverse:false},darkness:{min:0,max:1}},
+      sight:{enabled:false,range:0,angle:360,visionMode:'basic',color:null,attenuation:.1,brightness:0,saturation:0,contrast:0},
+      detectionModes:[],occludable:{radius:0},
+      ring:{enabled:false,colors:{ring:null,background:null},effects:0,subject:{scale:1,texture:null}},
+      turnMarker:{enabled:false},movementAction:'move',
+      flags:{},randomImg:false,appendNumber:false,prependAdjective:false
+    },
+    folder:null,
+    ownership:{default:0},
+    _stats:{
+      compendiumSource:null,duplicateSource:null,exportSource:null,
+      coreVersion:'13.351',systemId:'dnd5e',systemVersion:'5.2.5',
+      createdTime:null,modifiedTime:null,lastModifiedBy:null
+    }
+  };
+}
+
+function dlJSON(obj,filename){
+  const j=JSON.stringify(obj,null,2);
+  const safe=filename.replace(/[^a-z0-9]/gi,'_').toLowerCase();
+  try{
+    const a=document.createElement('a');
+    a.href='data:application/json;charset=utf-8,'+encodeURIComponent(j);
+    a.download=safe+'.json';a.style.display='none';
+    document.body.appendChild(a);a.click();
+    setTimeout(()=>document.body.removeChild(a),100);
+    return true;
+  }catch(e){}
+  try{
+    const b=new Blob([j],{type:'application/json'});
+    const u=URL.createObjectURL(b);
+    const a=document.createElement('a');
+    a.href=u;a.download=safe+'.json';a.style.display='none';
+    document.body.appendChild(a);a.click();
+    setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(u);},200);
+    return true;
+  }catch(e2){}
+  const w=window.open('','_blank');
+  if(w){w.document.write('<pre style="font-family:monospace;font-size:12px;white-space:pre-wrap">'+j.replace(/</g,'&lt;')+'</pre>');w.document.title=safe+'.json';}
+  return false;
+}
+
+function exportFoundry(){
+  const actor=buildFoundryActor();
+  const safe=(C.name||'personaje').replace(/[^a-z0-9]/gi,'_').toLowerCase();
+  const ok=dlJSON(actor,'fvtt-Actor-'+safe);
+  showFB('als',ok?'✓ Descargando fvtt-Actor-'+safe+'.json':'✓ JSON abierto en nueva pestaña');
+  logExp();
+}
+function copyFoundry(){
+  const j=JSON.stringify(buildFoundryActor(),null,2);
+  if(navigator.clipboard?.writeText){navigator.clipboard.writeText(j).then(()=>showFB('als','✓ JSON Foundry copiado')).catch(()=>fbCopy(j));}
+  else fbCopy(j);
 }
 function resetAll(){if(confirm('¿Nuevo personaje? Se perderán cambios sin guardar.')){dbId=null;location.reload();}}
 
