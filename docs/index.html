@@ -901,195 +901,251 @@ async function logExp(){
   try{await sbFetch('export_logs','POST',{session_id:SID,character_id:dbId||null,vault_version:'1',char_name:C.name||'Sin nombre',class_slug:C.cls?.id||null,race_slug:C.race?.id||null,class_level:C.lvl});}catch(e){}
 }
 // ══ FOUNDRY NATIVE ACTOR BUILDER ══════════════════════════════════════
+// Skill long-id → Foundry 3-letter abbreviation
+const SKILL_TO_FVTT={acrobatics:'acr','animal-handling':'ani',arcana:'arc',athletics:'ath',deception:'dec',history:'his',insight:'ins',intimidation:'itm',investigation:'inv',medicine:'med',nature:'nat',perception:'prc',performance:'prf',persuasion:'per',religion:'rel','sleight-of-hand':'slt',stealth:'ste',survival:'sur'};
+const FVTT_SKILL_ABILITY={acr:'dex',ani:'wis',arc:'int',ath:'str',dec:'cha',his:'int',ins:'wis',itm:'cha',inv:'int',med:'wis',nat:'int',prc:'wis',prf:'cha',per:'cha',rel:'int',slt:'dex',ste:'dex',sur:'wis'};
+
+function _fid(){const a='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';return Array.from({length:16},()=>a[Math.floor(Math.random()*a.length)]).join('');}
+function _fslug(v){return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9\s/-]/g,'').trim().replace(/[\s/]+/g,'-');}
+function _fstats(){return{compendiumSource:null,duplicateSource:null,exportSource:null,coreVersion:'13.351',systemId:'dnd5e',systemVersion:'5.2.5',createdTime:null,modifiedTime:null,lastModifiedBy:null};}
+
 function buildFoundryActor(){
   const cl=C.cls,race=C.race,bg=C.bg;
   const pb=LD[C.lvl-1].pb;
   const name=C.name||'Sin nombre';
 
-  // Abilities — schema dnd5e 5.2.x completo (sin mod, con check/save roll objects)
+  // Abilities — schema dnd5e 5.2.5
   const abilities={};
   AK.forEach(k=>{
     abilities[k]={
       value:C.ab[k],
-      proficient:C.savingThrows?.includes(k)?1:0,
+      proficient:(cl?.st||[]).includes(k)?1:0,
       max:null,
       bonuses:{check:'',save:''},
       check:{roll:{min:null,max:null,mode:0}},
       save:{roll:{min:null,max:null,mode:0}}
     };
   });
-  // Marcar saving throws de la clase
-  if(cl?.st){cl.st.forEach(k=>{if(abilities[k])abilities[k].proficient=1;});}
 
-  // Skills — value:1 para proficientes, 0 para el resto
+  // Skills — Foundry uses 3-letter abbreviation keys, value:1=proficient
   const skills={};
-  const SK_DEF={acrobatics:'dex','animal-handling':'wis',arcana:'int',athletics:'str',deception:'cha',history:'int',insight:'wis',intimidation:'cha',investigation:'int',medicine:'wis',nature:'int',perception:'wis',performance:'cha',persuasion:'cha',religion:'int','sleight-of-hand':'dex',stealth:'dex',survival:'wis'};
-  Object.keys(SK_DEF).forEach(id=>{
-    skills[id]={ability:SK_DEF[id],value:C.skills.includes(id)?1:0,bonuses:{check:'',passive:''},roll:{min:null,max:null,mode:0}};
+  const profSkillAbbrevs=new Set(C.skills.map(id=>SKILL_TO_FVTT[id]).filter(Boolean));
+  // Add background skills
+  if(bg){const bgSk=BGS.find(b=>b.id===bg.id);if(bgSk)bgSk.skills.forEach(id=>{const a=SKILL_TO_FVTT[id];if(a)profSkillAbbrevs.add(a);});}
+  Object.keys(FVTT_SKILL_ABILITY).forEach(abbr=>{
+    skills[abbr]={ability:FVTT_SKILL_ABILITY[abbr],roll:{min:null,max:null,mode:0},value:profSkillAbbrevs.has(abbr)?1:0,bonuses:{check:'',passive:''}};
   });
 
-  // Items — clase, conjuros, equipo
+  // Tools
+  const tools={};
+
+  // Spell slots
+  const spellSlots={spell1:{value:0},spell2:{value:0},spell3:{value:0},spell4:{value:0},spell5:{value:0},spell6:{value:0},spell7:{value:0},spell8:{value:0},spell9:{value:0},pact:{value:0}};
+  const FULL_SLOTS={1:[2],2:[3],3:[4,2],4:[4,3],5:[4,3,2],6:[4,3,3],7:[4,3,3,1],8:[4,3,3,2],9:[4,3,3,3,1],10:[4,3,3,3,2],11:[4,3,3,3,2,1],12:[4,3,3,3,2,1],13:[4,3,3,3,2,1,1],14:[4,3,3,3,2,1,1],15:[4,3,3,3,2,1,1,1],16:[4,3,3,3,2,1,1,1],17:[4,3,3,3,2,1,1,1,1],18:[4,3,3,3,3,1,1,1,1],19:[4,3,3,3,3,2,1,1,1],20:[4,3,3,3,3,2,2,1,1]};
+  if(cl?.sp){
+    const prog=cl.id==='warlock'?'pact':(cl.id==='paladin'||cl.id==='ranger')?'half':'full';
+    if(prog==='pact'){
+      const pactSlots=Math.min(2+Math.floor((C.lvl-1)/4),4);
+      const pactLevel=Math.min(Math.ceil(C.lvl/2),5);
+      spellSlots['spell'+pactLevel]={value:pactSlots};
+      spellSlots.pact={value:pactSlots};
+    }else{
+      const effLvl=prog==='half'?Math.max(1,Math.floor(C.lvl/2)):C.lvl;
+      const table=FULL_SLOTS[effLvl]||[];
+      table.forEach((count,i)=>{spellSlots['spell'+(i+1)]={value:count};});
+    }
+  }
+
+  // Items
   const items=[];
 
-  // Item: clase
+  // Class item
   if(cl){
+    const spAbility=cl.sp||'';
+    const progression=cl.id==='warlock'?'pact':(cl.id==='paladin'||cl.id==='ranger')?'half':cl.sp?'full':'none';
     items.push({
-      name:cl.name,
-      type:'class',
-      img:'icons/svg/book.svg',
+      _id:_fid(),name:cl.name,type:'class',
+      img:'systems/dnd5e/icons/svg/items/class.svg',
       system:{
         identifier:cl.id,
+        description:{value:`<p>${cl.name}${C.scls?' - '+C.scls.name:''}</p>`,chat:''},
+        source:{custom:'',book:"PHB'14",page:'',license:'',rules:'2014',revision:1},
         levels:C.lvl,
-        hitDice:'d'+cl.hd,
-        hitDiceUsed:0,
-        description:{value:'',chat:'',unidentified:''},
-        source:{custom:cl.name}
+        hd:{denomination:'d'+cl.hd,spent:0,additional:''},
+        spellcasting:{progression,ability:spAbility,preparation:{}},
+        primaryAbility:{value:[spAbility||'str'],all:false},
+        wealth:'',advancement:[],startingEquipment:[],properties:[]
       },
-      flags:{},effects:[],
-      _stats:{compendiumSource:null,duplicateSource:null,exportSource:null,coreVersion:null,systemId:'dnd5e',systemVersion:null,createdTime:null,modifiedTime:null,lastModifiedBy:null},
-      folder:null,sort:0,ownership:{default:0}
+      flags:{},effects:[],_stats:_fstats(),folder:null,sort:0,ownership:{default:0}
     });
   }
 
-  // Items: conjuros
-  const SCHOOL_FULL={evoc:'evocation',abju:'abjuration',conj:'conjuration',divi:'divination',ench:'enchantment',illu:'illusion',necro:'necromancy',trans:'transmutation'};
+  // Spell items — dnd5e 5.2.x schema with activities
+  const SCHOOL_MAP={evoc:'evo',abju:'abj',conj:'con',divi:'div',ench:'enc',illu:'ill',necro:'nec',trans:'trs'};
   C.spells.forEach((sid,idx)=>{
     const sp=SPELLS.find(s=>s.id===sid);if(!sp)return;
+    const actId='dnd5eactivity000';
     items.push({
-      name:sp.name,
-      type:'spell',
-      img:'icons/svg/lightning.svg',
+      _id:_fid(),name:sp.name,type:'spell',
+      img:'icons/svg/book.svg',
       system:{
-        description:{value:sp.d||'',chat:'',unidentified:''},
-        source:{custom:''},
-        activation:{type:'action',cost:1,condition:''},
-        duration:{value:null,units:''},
-        target:{value:null,width:null,units:'',type:'',prompt:true},
-        range:{value:null,long:null,units:''},
-        uses:{value:null,max:'',per:null,recovery:'',prompt:true},
+        source:{custom:'',book:'',page:'',license:'',rules:'2014',revision:1},
+        description:{value:sp.d||'',chat:''},
         level:sp.l,
-        school:SCHOOL_FULL[sp.sc]||sp.sc,
-        components:{vocal:true,somatic:true,material:false,ritual:false,concentration:false},
+        school:SCHOOL_MAP[sp.sc]||'evo',
+        properties:['vocal','somatic'],
+        ability:cl?.sp||'int',
         materials:{value:'',consumed:false,cost:0,supply:0},
-        preparation:{mode:'prepared',prepared:true},
-        scaling:{mode:'none',formula:''}
+        target:{template:{contiguous:false,units:'ft'},affects:{count:'1',type:'creature',choice:false}},
+        range:{value:null,units:'ft'},
+        activation:{type:'action',value:1,condition:''},
+        duration:{value:'',units:'inst'},
+        uses:{max:'',recovery:[],spent:0},
+        method:'spell',
+        prepared:sp.l===0?2:1,
+        activities:{
+          [actId]:{
+            _id:actId,type:'utility',
+            activation:{type:'action',value:null,override:false},
+            consumption:{targets:[],scaling:{allowed:false,max:''},spellSlot:true},
+            description:{chatFlavor:''},
+            duration:{units:'inst',concentration:false,override:false},
+            effects:[],
+            range:{override:false,units:'ft'},
+            target:{prompt:true,template:{contiguous:false,units:'ft'},affects:{choice:false},override:false},
+            uses:{spent:0,recovery:[]},
+            sort:0,flags:{}
+          }
+        },
+        identifier:_fslug(sp.name)
       },
-      flags:{},effects:[],
-      _stats:{compendiumSource:null,duplicateSource:null,exportSource:null,coreVersion:null,systemId:'dnd5e',systemVersion:null,createdTime:null,modifiedTime:null,lastModifiedBy:null},
-      folder:null,sort:idx*100,ownership:{default:0}
+      flags:{},effects:[],_stats:_fstats(),folder:null,sort:0,ownership:{default:0}
     });
   });
 
-  // Items: equipo
-  C.equip.forEach((eq,idx)=>{
+  // Equipment items — loot type (Foundry can derive weapon/armor from compendium)
+  C.equip.forEach((eq)=>{
     items.push({
-      name:eq,
-      type:'equipment',
+      _id:_fid(),name:eq,type:'loot',
       img:'icons/svg/item-bag.svg',
       system:{
-        description:{value:'',chat:'',unidentified:''},
-        source:{custom:''},
+        source:{custom:'',book:'',page:'',license:'',rules:'2014',revision:1},
+        description:{value:'',chat:''},
         quantity:1,weight:{value:0,units:'lb'},
         price:{value:0,denomination:'gp'},
-        attunement:{value:0},
-        equipped:true,
-        rarity:'',
-        identified:true
+        rarity:'common',identified:true,container:null,
+        identifier:_fslug(eq)
       },
-      flags:{},effects:[],
-      _stats:{compendiumSource:null,duplicateSource:null,exportSource:null,coreVersion:null,systemId:'dnd5e',systemVersion:null,createdTime:null,modifiedTime:null,lastModifiedBy:null},
-      folder:null,sort:idx*100,ownership:{default:0}
+      flags:{},effects:[],_stats:_fstats(),folder:null,sort:0,ownership:{default:0}
     });
   });
 
-  // Actor payload completo — schema dnd5e 5.2.x
+  // Background feat item
+  if(bg?.feat){
+    items.push({
+      _id:_fid(),name:bg.feat,type:'feat',
+      img:'icons/svg/item-bag.svg',
+      system:{
+        source:{custom:'',book:'',page:'',license:'',rules:'2014',revision:1},
+        description:{value:'',chat:''},
+        requirements:'',
+        uses:{max:'',recovery:[],spent:0},
+        type:{value:'background',subtype:''},
+        properties:[],advancement:[],activities:{},
+        identifier:_fslug(bg.feat),
+        crewed:false,enchant:{},
+        prerequisites:{items:[],repeatable:false}
+      },
+      flags:{},effects:[],_stats:_fstats(),folder:null,sort:0,ownership:{default:0}
+    });
+  }
+
+  // Actor payload — dnd5e 5.2.5 schema matching real Foundry export
   return{
     name,
     type:'character',
     img:'systems/dnd5e/icons/svg/actors/character.svg',
     system:{
-      abilities,
-      skills,
-      tools:{},
-      attributes:{
-        ac:{flat:null,calc:'default',formula:''},
-        hp:{value:C.hp.max,max:C.hp.max,temp:null,tempmax:0,bonuses:{}},
-        init:{ability:'dex',bonus:''},
-        movement:{burrow:0,climb:0,fly:0,swim:0,walk:30,units:'ft',hover:false},
-        attunement:{max:3},
-        senses:{darkvision:0,blindsight:0,tremorsense:0,truesight:0,units:'ft',special:''},
-        spellcasting:cl?.sp||'',
-        exhaustion:0,
-        concentration:{ability:'con'},
-        loyalty:{value:null},
-        death:{success:0,failure:0},
-        inspiration:false
-      },
-      details:{
-        biography:{value:`<p>${C.bio||''}</p>`,public:''},
-        alignment:C.align||'',
-        race:race?.name||'',
-        background:bg?.name||'',
-        originalClass:cl?.name||'',
-        xp:{value:0},
-        appearance:C.appearance||'',
-        trait:C.trait||'',
-        ideal:C.ideal||'',
-        bond:C.bond||'',
-        flaw:C.flaw||'',
-        eyes:'',hair:'',height:'',weight:'',age:'',gender:'',skin:'',faith:''
-      },
-      traits:{
-        size:'med',
-        di:{value:[],bypasses:[],custom:''},
-        dr:{value:[],bypasses:[],custom:''},
-        dv:{value:[],bypasses:[],custom:''},
-        ci:{value:[],custom:''},
-        languages:{value:['common'],custom:''}
-      },
       currency:{pp:0,gp:0,ep:0,sp:0,cp:0},
-      skills,
-      spells:{
-        spell1:{value:0,override:null},spell2:{value:0,override:null},spell3:{value:0,override:null},
-        spell4:{value:0,override:null},spell5:{value:0,override:null},spell6:{value:0,override:null},
-        spell7:{value:0,override:null},spell8:{value:0,override:null},spell9:{value:0,override:null},
-        pact:{value:0,override:null},
-      },
+      abilities,
       bonuses:{
         mwak:{attack:'',damage:''},rwak:{attack:'',damage:''},
         msak:{attack:'',damage:''},rsak:{attack:'',damage:''},
         abilities:{check:'',save:'',skill:''},spell:{dc:''}
       },
-      resources:{primary:{value:0,max:0,sr:false,lr:false,label:''},secondary:{value:0,max:0,sr:false,lr:false,label:''},tertiary:{value:0,max:0,sr:false,lr:false,label:''}},
-      favorites:[],
-      bastion:{}
+      skills,
+      tools,
+      spells:spellSlots,
+      attributes:{
+        ac:{calc:'default',flat:null},
+        init:{ability:'',roll:{min:null,max:null,mode:0},bonus:''},
+        movement:{units:null,hover:false,ignoredDifficultTerrain:[],walk:'30',burrow:'',climb:'',fly:'',swim:'',bonus:'',special:''},
+        attunement:{max:3},
+        senses:{darkvision:null,blindsight:null,tremorsense:null,truesight:null,units:null,special:''},
+        spellcasting:cl?.sp||'',
+        exhaustion:0,
+        concentration:{ability:'',roll:{min:null,max:null,mode:0},bonuses:{save:''},limit:1},
+        loyalty:{},
+        hp:{max:null,temp:null,tempmax:0,value:C.hp.max,bonuses:{}},
+        death:{roll:{min:null,max:null,mode:0},success:0,failure:0,bonuses:{save:''}},
+        inspiration:false
+      },
+      bastion:{name:'',description:''},
+      details:{
+        biography:{value:C.bio?`<p>${C.bio}</p>`:'',public:''},
+        alignment:C.align||'',
+        ideal:C.ideal||'',
+        bond:C.bond||'',
+        flaw:C.flaw||'',
+        race:race?.id||null,
+        background:bg?.id||null,
+        originalClass:cl?.id||'',
+        xp:{value:0},
+        appearance:'',
+        trait:C.trait||'',
+        eyes:'',height:'',faith:'',hair:'',weight:'',gender:'',skin:'',age:''
+      },
+      traits:{
+        size:'med',
+        di:{value:[],custom:'',bypasses:[]},
+        dr:{value:[],custom:'',bypasses:[]},
+        dv:{value:[],custom:'',bypasses:[]},
+        dm:{amount:{},bypasses:[]},
+        ci:{value:[],custom:''},
+        languages:{value:[],custom:'',communication:{}},
+        weaponProf:{value:[],custom:'',mastery:{value:[],bonus:[]}},
+        armorProf:{value:[],custom:''}
+      },
+      resources:{
+        primary:{value:0,max:0,sr:false,lr:false,label:''},
+        secondary:{value:0,max:0,sr:false,lr:false,label:''},
+        tertiary:{value:0,max:0,sr:false,lr:false,label:''}
+      },
+      favorites:[]
+    },
+    prototypeToken:{
+      name,displayName:0,actorLink:true,width:1,height:1,
+      texture:{src:'systems/dnd5e/icons/svg/actors/character.svg',anchorX:0.5,anchorY:0.5,offsetX:0,offsetY:0,fit:'contain',scaleX:1,scaleY:1,rotation:0,tint:'#ffffff',alphaThreshold:0.75},
+      lockRotation:false,rotation:0,alpha:1,disposition:1,displayBars:0,
+      bar1:{attribute:'attributes.hp'},bar2:{attribute:null},
+      light:{negative:false,priority:0,alpha:0.5,angle:360,bright:0,color:null,coloration:1,dim:0,attenuation:0.5,luminosity:0.5,saturation:0,contrast:0,shadows:0,animation:{type:null,speed:5,intensity:5,reverse:false},darkness:{min:0,max:1}},
+      sight:{enabled:true,range:0,angle:360,visionMode:'basic',color:null,attenuation:0.1,brightness:0,saturation:0,contrast:0},
+      detectionModes:[],occludable:{radius:0},
+      ring:{enabled:false,colors:{ring:null,background:null},effects:1,subject:{scale:1,texture:null}},
+      turnMarker:{mode:1,animation:null,src:null,disposition:false},
+      movementAction:null,flags:{},randomImg:false,appendNumber:false,prependAdjective:false
     },
     items,
     effects:[],
-    flags:{},
-    prototypeToken:{
-      name,
-      displayName:0,
-      actorLink:true,
-      width:1,height:1,
-      texture:{src:'systems/dnd5e/icons/svg/actors/character.svg',anchorX:.5,anchorY:.5,offsetX:0,offsetY:0,fit:'contain',scaleX:1,scaleY:1,rotation:0,tint:'#ffffff',alphaThreshold:.75},
-      lockRotation:false,rotation:0,alpha:1,
-      disposition:-1,displayBars:0,
-      bar1:{attribute:'attributes.hp'},bar2:{attribute:null},
-      light:{alpha:.5,angle:360,bright:0,coloration:1,dim:0,attenuation:.5,luminosity:.5,saturation:0,contrast:0,shadows:0,animation:{type:null,speed:5,intensity:5,reverse:false},darkness:{min:0,max:1}},
-      sight:{enabled:false,range:0,angle:360,visionMode:'basic',color:null,attenuation:.1,brightness:0,saturation:0,contrast:0},
-      detectionModes:[],occludable:{radius:0},
-      ring:{enabled:false,colors:{ring:null,background:null},effects:0,subject:{scale:1,texture:null}},
-      turnMarker:{enabled:false},movementAction:'move',
-      flags:{},randomImg:false,appendNumber:false,prependAdjective:false
-    },
     folder:null,
-    ownership:{default:0},
+    flags:{},
     _stats:{
-      compendiumSource:null,duplicateSource:null,exportSource:null,
-      coreVersion:null,systemId:'dnd5e',systemVersion:null,
+      compendiumSource:null,duplicateSource:null,
+      exportSource:{worldId:'vault-character',uuid:'',coreVersion:'13.351',systemId:'dnd5e',systemVersion:'5.2.5'},
+      coreVersion:'13.351',systemId:'dnd5e',systemVersion:'5.2.5',
       createdTime:null,modifiedTime:null,lastModifiedBy:null
-    }
+    },
+    ownership:{default:0}
   };
 }
 
