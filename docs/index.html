@@ -845,7 +845,7 @@ function rReview(){
 }
 
 function buildJSON(){
-  return{vaultVersion:"1",builderVersion:"0.2.0",exportedAt:new Date().toISOString(),character:{name:C.name||'Sin nombre',race:{slug:C.race?.id||null,name:C.race?.name||null,subrace:C.sub?.id||null},class:{slug:C.cls?.id||null,name:C.cls?.name||null,level:C.lvl,subclass:C.scls?.id||null},background:{slug:C.bg?.id||null,name:C.bg?.name||null},alignment:C.align||'',abilities:{...C.ab},hp:{value:C.hp.max,max:C.hp.max,temp:null,tempmax:0,bonuses:{}},xp:{value:0},proficiencyBonus:LD[C.lvl-1].pb,skills:C.skills,spells:C.spells.map(id=>({slug:id,name:SPELLS.find(s=>s.id===id)?.name||id})),equipment:C.equip,personality:{trait:C.trait||'',ideal:C.ideal||'',bond:C.bond||'',flaw:C.flaw||'',biography:C.bio||'',appearance:'',eyes:'',hair:'',height:'',weight:'',age:'',gender:'',skin:'',faith:''}}};
+  return{vaultVersion:"1",builderVersion:"0.3.0",exportedAt:new Date().toISOString(),character:{name:C.name||'Sin nombre',race:{slug:C.race?.id||null,name:C.race?.name||null,subrace:C.sub?.id||null},class:{slug:C.cls?.id||null,name:C.cls?.name||null,level:C.lvl,subclass:C.scls?.id||null},background:{slug:C.bg?.id||null,name:C.bg?.name||null},alignment:C.align||'',abilities:{...C.ab},hp:{value:C.hp.max,max:C.hp.max,temp:null,tempmax:0,bonuses:{}},xp:{value:0},proficiencyBonus:LD[C.lvl-1].pb,skills:C.skills,spells:C.spells.map(id=>({slug:id,name:SPELLS.find(s=>s.id===id)?.name||id})),equipment:C.equip,personality:{trait:C.trait||'',ideal:C.ideal||'',bond:C.bond||'',flaw:C.flaw||'',biography:C.bio||'',appearance:'',eyes:'',hair:'',height:'',weight:'',age:'',gender:'',skin:'',faith:''}}};
 }
 
 function upJP(){
@@ -946,7 +946,7 @@ function buildFoundryActor(){
         source:{custom:cl.name}
       },
       flags:{},effects:[],
-      _stats:{compendiumSource:null,duplicateSource:null,exportSource:null,coreVersion:'13.351',systemId:'dnd5e',systemVersion:'5.2.5',createdTime:null,modifiedTime:null,lastModifiedBy:null},
+      _stats:{compendiumSource:null,duplicateSource:null,exportSource:null,coreVersion:null,systemId:'dnd5e',systemVersion:null,createdTime:null,modifiedTime:null,lastModifiedBy:null},
       folder:null,sort:0,ownership:{default:0}
     });
   }
@@ -975,7 +975,7 @@ function buildFoundryActor(){
         scaling:{mode:'none',formula:''}
       },
       flags:{},effects:[],
-      _stats:{compendiumSource:null,duplicateSource:null,exportSource:null,coreVersion:'13.351',systemId:'dnd5e',systemVersion:'5.2.5',createdTime:null,modifiedTime:null,lastModifiedBy:null},
+      _stats:{compendiumSource:null,duplicateSource:null,exportSource:null,coreVersion:null,systemId:'dnd5e',systemVersion:null,createdTime:null,modifiedTime:null,lastModifiedBy:null},
       folder:null,sort:idx*100,ownership:{default:0}
     });
   });
@@ -997,7 +997,7 @@ function buildFoundryActor(){
         identified:true
       },
       flags:{},effects:[],
-      _stats:{compendiumSource:null,duplicateSource:null,exportSource:null,coreVersion:'13.351',systemId:'dnd5e',systemVersion:'5.2.5',createdTime:null,modifiedTime:null,lastModifiedBy:null},
+      _stats:{compendiumSource:null,duplicateSource:null,exportSource:null,coreVersion:null,systemId:'dnd5e',systemVersion:null,createdTime:null,modifiedTime:null,lastModifiedBy:null},
       folder:null,sort:idx*100,ownership:{default:0}
     });
   });
@@ -1087,7 +1087,7 @@ function buildFoundryActor(){
     ownership:{default:0},
     _stats:{
       compendiumSource:null,duplicateSource:null,exportSource:null,
-      coreVersion:'13.351',systemId:'dnd5e',systemVersion:'5.2.5',
+      coreVersion:null,systemId:'dnd5e',systemVersion:null,
       createdTime:null,modifiedTime:null,lastModifiedBy:null
     }
   };
