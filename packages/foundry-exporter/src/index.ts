@@ -28,31 +28,9 @@ import {
   resolveToolEntry as resolveToolEntryShared,
 } from "@bertinis-vault/domain";
 
+import blankTemplate from "./blank-actor-template.json";
+
 type FoundryItem = Record<string, unknown>;
-type FoundryAbilityData = {
-  value: number;
-  proficient: 0 | 1;
-  max: number | null;
-  bonuses: {
-    check: string;
-    save: string;
-  };
-  check: {
-    roll: {
-      min: null;
-      max: null;
-      mode: 0;
-    };
-  };
-  save: {
-    roll: {
-      min: null;
-      max: null;
-      mode: 0;
-    };
-  };
-};
-type FoundryAbilities = Record<AbilityId, FoundryAbilityData>;
 type DerivedSpellEntry = {
   name: string;
   level: number;
@@ -72,6 +50,17 @@ export type FoundryExportResult = {
   preflight: PreflightResult;
   payload?: FoundryActorPayload;
 };
+
+// ---------------------------------------------------------------------------
+// Deep clone utility
+// ---------------------------------------------------------------------------
+function deepClone<T>(obj: T): T {
+  return JSON.parse(JSON.stringify(obj));
+}
+
+// ---------------------------------------------------------------------------
+// Lookup tables
+// ---------------------------------------------------------------------------
 
 const CLASS_PROFS_BY_ID: Record<string, { armor: string[]; weapons: string[] }> = {
   barbarian: { armor: ["light", "medium", "shields"], weapons: ["simple", "martial"] },
@@ -124,102 +113,6 @@ const BACKGROUND_SKILL_PROFS_BY_ID: Record<string, string[]> = {
   urchin: ["slt", "ste"],
 };
 
-const SKILL_ALIAS_TO_ID: Record<string, string> = {
-  acrobatics: "acr",
-  acrobacia: "acr",
-  "animal handling": "ani",
-  "manejo de animales": "ani",
-  arcana: "arc",
-  athletics: "ath",
-  atletismo: "ath",
-  deception: "dec",
-  engaño: "dec",
-  engano: "dec",
-  history: "his",
-  historia: "his",
-  insight: "ins",
-  intuicion: "ins",
-  intuición: "ins",
-  intimidation: "itm",
-  intimidacion: "itm",
-  intimidación: "itm",
-  investigation: "inv",
-  investigacion: "inv",
-  investigación: "inv",
-  medicine: "med",
-  medicina: "med",
-  nature: "nat",
-  naturaleza: "nat",
-  perception: "prc",
-  percepcion: "prc",
-  percepción: "prc",
-  performance: "prf",
-  interpretacion: "prf",
-  interpretación: "prf",
-  persuasion: "per",
-  persuasione: "per",
-  religion: "rel",
-  religione: "rel",
-  "sleight of hand": "slt",
-  "juego de manos": "slt",
-  stealth: "ste",
-  sigilo: "ste",
-  survival: "sur",
-  supervivencia: "sur",
-};
-
-const LANGUAGE_ALIAS_TO_ID: Record<string, string> = {
-  common: "common",
-  comun: "common",
-  "enano": "dwarvish",
-  dwarvish: "dwarvish",
-  dwarf: "dwarvish",
-  elvish: "elvish",
-  elfico: "elvish",
-  elficoo: "elvish",
-  gnomish: "gnomish",
-  gnomo: "gnomish",
-  halfling: "halfling",
-  mediano: "halfling",
-  giant: "giant",
-  gigante: "giant",
-  goblin: "goblin",
-  draconic: "draconic",
-  draconico: "draconic",
-  infernal: "infernal",
-  abyssal: "abyssal",
-  celestial: "celestial",
-  primordial: "primordial",
-  sylvan: "sylvan",
-  orc: "orc",
-  orcish: "orc",
-  undercommon: "undercommon",
-  "deep speech": "deep",
-};
-
-const TOOL_ALIAS_TO_ID: Record<string, { id: string; ability: string; label: string }> = {
-  "thieves tools": { id: "thief", ability: "dex", label: "Thieves' Tools" },
-  "herramientas de ladron": { id: "thief", ability: "dex", label: "Thieves' Tools" },
-  "herbalism kit": { id: "herb", ability: "wis", label: "Herbalism Kit" },
-  "kit de herboristeria": { id: "herb", ability: "wis", label: "Herbalism Kit" },
-  "disguise kit": { id: "disg", ability: "cha", label: "Disguise Kit" },
-  "kit de disfraz": { id: "disg", ability: "cha", label: "Disguise Kit" },
-  "forgery kit": { id: "forg", ability: "dex", label: "Forgery Kit" },
-  "kit de falsificacion": { id: "forg", ability: "dex", label: "Forgery Kit" },
-  "navigator's tools": { id: "navg", ability: "wis", label: "Navigator's Tools" },
-  "herramientas de navegacion": { id: "navg", ability: "wis", label: "Navigator's Tools" },
-  "gaming set": { id: "game", ability: "int", label: "Gaming Set" },
-  "vehicle land": { id: "land", ability: "dex", label: "Land Vehicles" },
-  "vehiculos terrestres": { id: "land", ability: "dex", label: "Land Vehicles" },
-  "vehicle water": { id: "water", ability: "dex", label: "Water Vehicles" },
-  "vehiculos acuaticos": { id: "water", ability: "dex", label: "Water Vehicles" },
-  "musical instrument": { id: "music", ability: "cha", label: "Musical Instrument" },
-  "instrumento musical": { id: "music", ability: "cha", label: "Musical Instrument" },
-  "artisan's tools": { id: "art", ability: "int", label: "Artisan's Tools" },
-  "artisan tools": { id: "art", ability: "int", label: "Artisan's Tools" },
-  "herramientas de artesano": { id: "art", ability: "int", label: "Artisan's Tools" },
-};
-
 const BACKGROUND_LANGUAGE_PROFS_BY_ID: Record<string, string[]> = {
   acolyte: ["common"],
   "guild-artisan": ["common"],
@@ -241,6 +134,10 @@ const BACKGROUND_TOOL_PROFS_BY_ID: Record<string, string[]> = {
   soldier: ["Gaming Set", "Vehicle Land"],
   urchin: ["Disguise Kit", "Thieves' Tools"],
 };
+
+// ---------------------------------------------------------------------------
+// Small helpers
+// ---------------------------------------------------------------------------
 
 function makeId(): string {
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -271,125 +168,8 @@ function makeStats(compendiumSource: string | null = null) {
   };
 }
 
-function buildFoundryAbilities(character: CharacterBuild): FoundryAbilities {
-  const modifiers = abilityModifierMap(character.abilities.final);
-  const primaryClassId = normalizeClassId(character.classing.classes[0]?.classId ?? "");
-  const saveProficiencies = new Set(CLASS_SAVE_PROFS_BY_ID[primaryClassId] ?? []);
-
-  return {
-    str: makeAbility(character.abilities.final.str, modifiers.str, saveProficiencies.has("str")),
-    dex: makeAbility(character.abilities.final.dex, modifiers.dex, saveProficiencies.has("dex")),
-    con: makeAbility(character.abilities.final.con, modifiers.con, saveProficiencies.has("con")),
-    int: makeAbility(character.abilities.final.int, modifiers.int, saveProficiencies.has("int")),
-    wis: makeAbility(character.abilities.final.wis, modifiers.wis, saveProficiencies.has("wis")),
-    cha: makeAbility(character.abilities.final.cha, modifiers.cha, saveProficiencies.has("cha")),
-  };
-}
-
-function makeAbility(value: number, modifier: number, saveProficient: boolean) {
-  return {
-    value,
-    proficient: (saveProficient ? 1 : 0) as 0 | 1,
-    max: null,
-    bonuses: { check: "", save: "" },
-    check: { roll: { min: null, max: null, mode: 0 as 0 } },
-    save: { roll: { min: null, max: null, mode: 0 as 0 } },
-  };
-}
-
-function buildFoundrySpellSlots(character: CharacterBuild) {
-  const derivedSlots = character.derived.spellcasting?.slots ?? {};
-  const normalized: {
-    spell1: { value: number };
-    spell2: { value: number };
-    spell3: { value: number };
-    spell4: { value: number };
-    spell5: { value: number };
-    spell6: { value: number };
-    spell7: { value: number };
-    spell8: { value: number };
-    spell9: { value: number };
-    pact: { value: number };
-  } = {
-    spell1: { value: derivedSlots.spell1 ?? 0 },
-    spell2: { value: derivedSlots.spell2 ?? 0 },
-    spell3: { value: derivedSlots.spell3 ?? 0 },
-    spell4: { value: derivedSlots.spell4 ?? 0 },
-    spell5: { value: derivedSlots.spell5 ?? 0 },
-    spell6: { value: derivedSlots.spell6 ?? 0 },
-    spell7: { value: derivedSlots.spell7 ?? 0 },
-    spell8: { value: derivedSlots.spell8 ?? 0 },
-    spell9: { value: derivedSlots.spell9 ?? 0 },
-    pact: { value: 0 },
-  };
-
-  const primaryClassId = normalizeClassId(character.classing.classes[0]?.classId ?? "");
-  if (getSpellProgressionForClass(primaryClassId) === "pact") {
-    const pactSlotEntry = Object.entries(derivedSlots).find(([, value]) => (value ?? 0) > 0);
-    if (pactSlotEntry) {
-      const [slotKey, value] = pactSlotEntry;
-      const pactLevel = Number.parseInt(slotKey.replace("spell", ""), 10);
-      normalized.pact = { value: value ?? 0 };
-    }
-  }
-
-  return normalized;
-}
-
-function makeSkill(ability: string) {
-  return {
-    ability,
-    roll: { min: null, max: null, mode: 0 },
-    value: 0,
-    bonuses: { check: "", passive: "" },
-  };
-}
-
-function makeSkills() {
-  return {
-    acr: makeSkill("dex"),
-    ani: makeSkill("wis"),
-    arc: makeSkill("int"),
-    ath: makeSkill("str"),
-    dec: makeSkill("cha"),
-    his: makeSkill("int"),
-    ins: makeSkill("wis"),
-    itm: makeSkill("cha"),
-    inv: makeSkill("int"),
-    med: makeSkill("wis"),
-    nat: makeSkill("int"),
-    prc: makeSkill("wis"),
-    prf: makeSkill("cha"),
-    per: makeSkill("cha"),
-    rel: makeSkill("int"),
-    slt: makeSkill("dex"),
-    ste: makeSkill("dex"),
-    sur: makeSkill("wis"),
-  };
-}
-
-function normalizeSkillLabel(value: string) {
-  return value
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
 function resolveSkillId(value: string) {
   return resolveSkillIdShared(value);
-}
-
-function normalizeProficiencyLabel(value: string) {
-  return value
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z\s:-]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
 }
 
 function parseLanguageEntry(value: string) {
@@ -400,8 +180,28 @@ function parseToolEntry(value: string) {
   return resolveToolEntryShared(value);
 }
 
-function buildSkills(character: CharacterBuild) {
-  const skills = makeSkills();
+// ---------------------------------------------------------------------------
+// Fill abilities into cloned template
+// ---------------------------------------------------------------------------
+
+function fillAbilities(actor: Record<string, any>, character: CharacterBuild) {
+  const abilities = actor.system.abilities;
+  const finals = character.abilities.final;
+  const primaryClassId = normalizeClassId(character.classing.classes[0]?.classId ?? "");
+  const saveProficiencies = new Set(CLASS_SAVE_PROFS_BY_ID[primaryClassId] ?? []);
+
+  for (const abilityId of ["str", "dex", "con", "int", "wis", "cha"] as AbilityId[]) {
+    abilities[abilityId].value = finals[abilityId];
+    abilities[abilityId].proficient = saveProficiencies.has(abilityId) ? 1 : 0;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Fill skills into cloned template
+// ---------------------------------------------------------------------------
+
+function fillSkills(actor: Record<string, any>, character: CharacterBuild) {
+  const skills = actor.system.skills;
   const backgroundSkillIds = BACKGROUND_SKILL_PROFS_BY_ID[character.background.backgroundId] ?? [];
   const selectedSkillIds = getProficiencyLabels(character, "skill")
     .map((entry) => resolveSkillId(entry))
@@ -411,121 +211,119 @@ function buildSkills(character: CharacterBuild) {
 
   for (const skillId of proficientSkills) {
     if (skillId in skills) {
-      skills[skillId as keyof typeof skills].value = 1;
+      skills[skillId].value = 1;
     }
   }
-
-  return skills;
 }
 
-function makeTool(ability: string, customLabel?: string) {
-  return {
-    ability,
-    bonus: "",
-    value: 1,
-    prof: 1,
-    roll: { min: null, max: null, mode: 0 },
-    custom: customLabel ?? "",
-  };
-}
+// ---------------------------------------------------------------------------
+// Fill tools into cloned template
+// ---------------------------------------------------------------------------
 
-function buildTools(character: CharacterBuild) {
-  const tools: Record<string, ReturnType<typeof makeTool>> = {};
+function fillTools(actor: Record<string, any>, character: CharacterBuild) {
   const backgroundToolEntries = BACKGROUND_TOOL_PROFS_BY_ID[character.background.backgroundId] ?? [];
   const toolEntries = [...backgroundToolEntries, ...getProficiencyLabels(character, "tool")];
 
   for (const entry of toolEntries) {
     const tool = parseToolEntry(entry);
-    if (!tool) {
-      continue;
-    }
+    if (!tool) continue;
 
-    tools[tool.id] = makeTool(tool.ability, tool.label);
+    actor.system.tools[tool.id] = {
+      value: 1,
+      ability: tool.ability,
+      roll: { min: null, max: null, mode: 0 },
+      bonuses: { check: "" },
+    };
   }
-
-  return tools;
 }
 
-function buildLanguages(character: CharacterBuild) {
+// ---------------------------------------------------------------------------
+// Fill spell slots into cloned template
+// ---------------------------------------------------------------------------
+
+function fillSpellSlots(actor: Record<string, any>, character: CharacterBuild) {
+  const derivedSlots = character.derived.spellcasting?.slots ?? {};
+  const spells = actor.system.spells;
+
+  for (let i = 1; i <= 9; i++) {
+    const key = `spell${i}` as keyof typeof derivedSlots;
+    spells[key].value = derivedSlots[key] ?? 0;
+  }
+
+  const primaryClassId = normalizeClassId(character.classing.classes[0]?.classId ?? "");
+  if (getSpellProgressionForClass(primaryClassId) === "pact") {
+    const pactSlotEntry = Object.entries(derivedSlots).find(([, value]) => (value ?? 0) > 0);
+    if (pactSlotEntry) {
+      spells.pact.value = pactSlotEntry[1] ?? 0;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Fill languages into cloned template
+// ---------------------------------------------------------------------------
+
+function fillLanguages(actor: Record<string, any>, character: CharacterBuild) {
   const backgroundLanguageIds = BACKGROUND_LANGUAGE_PROFS_BY_ID[character.background.backgroundId] ?? [];
   const selectedLanguageIds = getProficiencyLabels(character, "language")
     .map((entry) => parseLanguageEntry(entry))
     .filter((entry): entry is string => Boolean(entry));
   const uniqueLanguageIds = Array.from(new Set([...backgroundLanguageIds, ...selectedLanguageIds]));
 
-  return {
-    value: uniqueLanguageIds,
-    custom: "",
-    communication: {},
-  };
+  actor.system.traits.languages.value = uniqueLanguageIds;
 }
 
-function makeToken(name: string) {
-  return {
-    name,
-    displayName: 0,
-    actorLink: true,
-    width: 1,
-    height: 1,
-    texture: {
-      src: "systems/dnd5e/icons/svg/actors/character.svg",
-      anchorX: 0.5,
-      anchorY: 0.5,
-      offsetX: 0,
-      offsetY: 0,
-      fit: "contain",
-      scaleX: 1,
-      scaleY: 1,
-      rotation: 0,
-      tint: "#ffffff",
-      alphaThreshold: 0.75,
-    },
-    lockRotation: false,
-    rotation: 0,
-    alpha: 1,
-    disposition: 1,
-    displayBars: 0,
-    bar1: { attribute: "attributes.hp" },
-    bar2: { attribute: null },
-    light: {
-      negative: false,
-      priority: 0,
-      alpha: 0.5,
-      angle: 360,
-      bright: 0,
-      color: null,
-      coloration: 1,
-      dim: 0,
-      attenuation: 0.5,
-      luminosity: 0.5,
-      saturation: 0,
-      contrast: 0,
-      shadows: 0,
-      animation: { type: null, speed: 5, intensity: 5, reverse: false },
-      darkness: { min: 0, max: 1 },
-    },
-    sight: {
-      enabled: true,
-      range: 0,
-      angle: 360,
-      visionMode: "basic",
-      color: null,
-      attenuation: 0.1,
-      brightness: 0,
-      saturation: 0,
-      contrast: 0,
-    },
-    detectionModes: [],
-    occludable: { radius: 0 },
-    ring: { enabled: false, colors: { ring: null, background: null }, effects: 1, subject: { scale: 1, texture: null } },
-    turnMarker: { mode: 1, animation: null, src: null, disposition: false },
-    movementAction: null,
-    flags: {},
-    randomImg: false,
-    appendNumber: false,
-    prependAdjective: false,
-  };
+// ---------------------------------------------------------------------------
+// Fill weapon/armor proficiencies into cloned template
+// ---------------------------------------------------------------------------
+
+function fillProficiencies(actor: Record<string, any>, character: CharacterBuild) {
+  const primaryClassId = normalizeClassId(character.classing.classes[0]?.classId ?? "");
+  const profs = CLASS_PROFS_BY_ID[primaryClassId] ?? { armor: [], weapons: [] };
+
+  actor.system.traits.weaponProf.custom = profs.weapons.join(", ");
+  actor.system.traits.armorProf.value = profs.armor.filter((type) => ["light", "medium", "heavy"].includes(type));
+  actor.system.traits.armorProf.custom = profs.armor.includes("shields") ? "shields" : "";
 }
+
+// ---------------------------------------------------------------------------
+// Fill details (biography, race, background, class, etc.)
+// ---------------------------------------------------------------------------
+
+function fillDetails(actor: Record<string, any>, character: CharacterBuild) {
+  const details = actor.system.details;
+  const biography = character.identity.biography ?? {};
+
+  details.alignment = character.identity.alignment ?? "";
+  details.race = character.ancestry.raceId;
+  details.background = character.background.backgroundId;
+  details.originalClass = character.classing.classes[0]?.classId ?? "";
+  details.trait = biography.trait ?? "";
+  details.ideal = biography.ideal ?? "";
+  details.bond = biography.bond ?? "";
+  details.flaw = biography.flaw ?? "";
+
+  const bioLines: string[] = [];
+  if (biography.trait) bioLines.push(`<p><em>Trait:</em> ${biography.trait}</p>`);
+  if (biography.ideal) bioLines.push(`<p><em>Ideal:</em> ${biography.ideal}</p>`);
+  if (biography.bond) bioLines.push(`<p><em>Bond:</em> ${biography.bond}</p>`);
+  if (biography.flaw) bioLines.push(`<p><em>Flaw:</em> ${biography.flaw}</p>`);
+  if (biography.notes) bioLines.push(`<p><em>Notes:</em> ${biography.notes}</p>`);
+  details.biography.value = bioLines.join("");
+}
+
+// ---------------------------------------------------------------------------
+// Fill attributes (HP, spellcasting ability, etc.)
+// ---------------------------------------------------------------------------
+
+function fillAttributes(actor: Record<string, any>, character: CharacterBuild) {
+  actor.system.attributes.hp.value = character.derived.hp;
+  actor.system.attributes.spellcasting = character.derived.spellcasting?.ability ?? "";
+}
+
+// ---------------------------------------------------------------------------
+// Item builders (these create new objects — they don't fill the template)
+// ---------------------------------------------------------------------------
 
 function buildClassItems(character: CharacterBuild): FoundryItem[] {
   return character.classing.classes.map((entry) => {
@@ -595,10 +393,7 @@ function buildFeatItem(name: string, featType: string): FoundryItem {
 }
 
 function buildSpellReference(spellId: string | undefined) {
-  if (!spellId) {
-    return null;
-  }
-
+  if (!spellId) return null;
   return {
     type: "spell",
     spellId,
@@ -609,10 +404,7 @@ function buildSpellReference(spellId: string | undefined) {
 }
 
 function toPlutoniumSource(book?: string) {
-  if (!book) {
-    return "PHB";
-  }
-
+  if (!book) return "PHB";
   return book
     .replace(/'14/g, "")
     .replace(/'24/g, "")
@@ -633,25 +425,14 @@ function buildPlutoniumSpellReference(
   const page = catalogEntry?.plutonium?.page ?? "spells.html";
   const hash = catalogEntry?.plutonium?.hash ?? toPlutoniumHash(catalogEntry?.label ?? name, source);
   const propDroppable = catalogEntry?.plutonium?.propDroppable ?? "spell";
-
-  return {
-    page,
-    source,
-    hash,
-    propDroppable,
-    spellId,
-  };
+  return { page, source, hash, propDroppable, spellId };
 }
 
 function buildSpellDescription(name: string, summary?: string, reference?: ReturnType<typeof buildSpellReference>) {
   const lines = [`<p>${summary || `${name} exported from the canonical Bertini's Vault build.`}</p>`];
-
   if (reference) {
-    lines.push(
-      `<p><strong>Compendium lookup:</strong> ${reference.compendiumPack} / ${reference.lookup}</p>`,
-    );
+    lines.push(`<p><strong>Compendium lookup:</strong> ${reference.compendiumPack} / ${reference.lookup}</p>`);
   }
-
   return lines.join("");
 }
 
@@ -676,14 +457,7 @@ function buildSpellItem(entry: DerivedSpellEntry, classId: string): FoundryItem 
     type: "spell",
     img: "icons/svg/book.svg",
     system: {
-      source: {
-        custom: "",
-        book: "",
-        page: "",
-        license: "",
-        rules: "2014",
-        revision: 1,
-      },
+      source: { custom: "", book: "", page: "", license: "", rules: "2014", revision: 1 },
       description: { value: description, chat: catalogEntry?.summary ?? "" },
       level,
       school: catalogEntry?.school ?? "evo",
@@ -699,36 +473,31 @@ function buildSpellItem(entry: DerivedSpellEntry, classId: string): FoundryItem 
       prepared: level === 0 ? 2 : 1,
       activities: {
         [activityId]: {
-            _id: activityId,
-            type: "utility",
-            activation: { type: castingTime.type, value: null, override: false },
-            consumption: { targets: [], scaling: { allowed: false, max: "" }, spellSlot: true },
-            description: { chatFlavor: catalogEntry?.summary ?? "" },
-            duration: { units: duration.units, concentration: false, override: false },
-            effects: [],
-            range: { override: false, units: range.units },
-            target: { prompt: true, template: { contiguous: false, units: "ft" }, affects: { choice: false }, override: false },
-            uses: { spent: 0, recovery: [] },
-            sort: 0,
-            flags: {},
-          },
-        },
-        identifier: spellId,
-      },
-      flags: {
-        plutonium: {
-          ...plutoniumReference,
-        },
-        "bertinis-vault": {
-          reference,
-          plutonium: plutoniumReference,
+          _id: activityId,
+          type: "utility",
+          activation: { type: castingTime.type, value: null, override: false },
+          consumption: { targets: [], scaling: { allowed: false, max: "" }, spellSlot: true },
+          description: { chatFlavor: catalogEntry?.summary ?? "" },
+          duration: { units: duration.units, concentration: false, override: false },
+          effects: [],
+          range: { override: false, units: range.units },
+          target: { prompt: true, template: { contiguous: false, units: "ft" }, affects: { choice: false }, override: false },
+          uses: { spent: 0, recovery: [] },
+          sort: 0,
+          flags: {},
         },
       },
-      effects: [],
-      _stats: makeStats(),
-      folder: null,
-      sort: 0,
-      ownership: { default: 0 },
+      identifier: spellId,
+    },
+    flags: {
+      plutonium: { ...plutoniumReference },
+      "bertinis-vault": { reference, plutonium: plutoniumReference },
+    },
+    effects: [],
+    _stats: makeStats(),
+    folder: null,
+    sort: 0,
+    ownership: { default: 0 },
   };
 }
 
@@ -740,10 +509,7 @@ function buildSpellItems(character: CharacterBuild): FoundryItem[] {
   for (const entry of getSpellEntries(character)) {
     const catalogEntry = getSpellCatalogEntry(entry.spellId ?? entry.name);
     const spellKey = `${catalogEntry?.id ?? slugify(entry.name)}:${entry.level}`;
-    if (seen.has(spellKey)) {
-      continue;
-    }
-
+    if (seen.has(spellKey)) continue;
     seen.add(spellKey);
     dedupedItems.push(buildSpellItem(entry, primaryClassId));
   }
@@ -777,7 +543,6 @@ function buildFeatItems(character: CharacterBuild): FoundryItem[] {
 function parseDamageFormula(formula: string) {
   const match = formula.match(/(\d+)d(\d+)/i);
   const [, numberPart, denominationPart] = match ?? [];
-
   return {
     number: numberPart ? Number.parseInt(numberPart, 10) : 1,
     denomination: denominationPart ? Number.parseInt(denominationPart, 10) : 6,
@@ -820,15 +585,7 @@ function buildWeaponItem(name: string, quantity = 1): FoundryItem {
       activation: { type: "action", value: 1, condition: "" },
       duration: { value: "", units: "inst" },
       target: {
-        template: {
-          count: "",
-          contiguous: false,
-          type: "",
-          size: "",
-          width: "",
-          height: "",
-          units: "ft",
-        },
+        template: { count: "", contiguous: false, type: "", size: "", width: "", height: "", units: "ft" },
         affects: { count: "1", type: "creature", choice: false, special: "" },
       },
       range: { value: null, units: "ft" },
@@ -958,42 +715,9 @@ function buildGearItem(name: string, quantity = 1): FoundryItem {
   };
 }
 
-function buildBiography(character: CharacterBuild) {
-  const biography = character.identity.biography ?? {};
-  const lines: string[] = [];
-
-  if (biography.trait) lines.push(`<p><em>Trait:</em> ${biography.trait}</p>`);
-  if (biography.ideal) lines.push(`<p><em>Ideal:</em> ${biography.ideal}</p>`);
-  if (biography.bond) lines.push(`<p><em>Bond:</em> ${biography.bond}</p>`);
-  if (biography.flaw) lines.push(`<p><em>Flaw:</em> ${biography.flaw}</p>`);
-  if (biography.notes) lines.push(`<p><em>Notes:</em> ${biography.notes}</p>`);
-
-  return lines.join("");
-}
-
-function buildTraitData(character: CharacterBuild) {
-  const primaryClassId = normalizeClassId(character.classing.classes[0]?.classId ?? "");
-  const profs = CLASS_PROFS_BY_ID[primaryClassId] ?? { armor: [], weapons: [] };
-
-  return {
-    size: "med",
-    di: { value: [], custom: "", bypasses: [] },
-    dr: { value: [], custom: "", bypasses: [] },
-    dv: { value: [], custom: "", bypasses: [] },
-    dm: { amount: {}, bypasses: [] },
-    ci: { value: [], custom: "" },
-    languages: buildLanguages(character),
-    weaponProf: {
-      value: [],
-      custom: profs.weapons.join(", "),
-      mastery: { value: [], bonus: [] },
-    },
-    armorProf: {
-      value: profs.armor.filter((type) => ["light", "medium", "heavy"].includes(type)),
-      custom: profs.armor.includes("shields") ? "shields" : "",
-    },
-  };
-}
+// ---------------------------------------------------------------------------
+// Build all items array
+// ---------------------------------------------------------------------------
 
 function buildItems(character: CharacterBuild): FoundryItem[] {
   const equipment = getEquipmentEntries(character);
@@ -1008,16 +732,9 @@ function buildItems(character: CharacterBuild): FoundryItem[] {
     const armorData = findArmorData(item.lookupName);
     if (armorData) {
       const isShield = Boolean(armorData.grantsShieldBonus);
-      const shouldEquip = isShield
-        ? !equippedShieldAssigned
-        : !equippedArmorAssigned;
-
-      if (isShield) {
-        equippedShieldAssigned = true;
-      } else {
-        equippedArmorAssigned = true;
-      }
-
+      const shouldEquip = isShield ? !equippedShieldAssigned : !equippedArmorAssigned;
+      if (isShield) equippedShieldAssigned = true;
+      else equippedArmorAssigned = true;
       return [buildArmorItem(item.lookupName, item.quantity, shouldEquip)];
     }
 
@@ -1032,116 +749,45 @@ function buildItems(character: CharacterBuild): FoundryItem[] {
   ];
 }
 
+// ---------------------------------------------------------------------------
+// Main export: clone template + fill
+// ---------------------------------------------------------------------------
+
 function buildFoundryActorPayloadUnchecked(character: CharacterBuild): FoundryActorPayload {
-  const payload: FoundryActorPayload = {
-    name: character.identity.characterName,
-    type: "character",
-    img: "systems/dnd5e/icons/svg/actors/character.svg",
-    system: {
-      currency: { pp: 0, gp: 0, ep: 0, sp: 0, cp: 0 },
-      abilities: buildFoundryAbilities(character),
-      bonuses: {
-        mwak: { attack: "", damage: "" },
-        rwak: { attack: "", damage: "" },
-        msak: { attack: "", damage: "" },
-        rsak: { attack: "", damage: "" },
-        abilities: { check: "", save: "", skill: "" },
-        spell: { dc: "" },
-      },
-      skills: buildSkills(character),
-      tools: buildTools(character),
-      attributes: {
-        ac: {
-          calc: "default",
-          flat: null,
-        },
-        hp: {
-          max: null,
-          temp: null,
-          tempmax: 0,
-          value: character.derived.hp,
-          bonuses: {},
-        },
-        spellcasting: character.derived.spellcasting?.ability ?? "",
-        init: { ability: "", roll: { min: 10, max: null, mode: 0 }, bonus: "" },
-        movement: { units: null, hover: false, ignoredDifficultTerrain: [] },
-        attunement: { max: 3 },
-        senses: {
-          darkvision: null,
-          blindsight: null,
-          tremorsense: null,
-          truesight: null,
-          units: null,
-          special: "",
-        },
-        exhaustion: 0,
-        concentration: {
-          ability: "",
-          roll: { min: null, max: null, mode: 0 },
-          bonuses: { save: "" },
-          limit: 1,
-        },
-        loyalty: {},
-        death: {
-          roll: { min: null, max: null, mode: 0 },
-          success: 0,
-          failure: 0,
-          bonuses: { save: "" },
-        },
-        inspiration: false,
-      },
-      bastion: { name: "", description: "" },
-      details: {
-        alignment: character.identity.alignment ?? "",
-        biography: { value: buildBiography(character), public: "" },
-        race: character.ancestry.raceId,
-        background: character.background.backgroundId,
-        originalClass: character.classing.classes[0]?.classId ?? "",
-        xp: { value: 0 },
-        trait: character.identity.biography?.trait ?? "",
-        appearance: "",
-        ideal: character.identity.biography?.ideal ?? "",
-        bond: character.identity.biography?.bond ?? "",
-        flaw: character.identity.biography?.flaw ?? "",
-        eyes: "",
-        height: "",
-        faith: "",
-        hair: "",
-        weight: "",
-        gender: "",
-        skin: "",
-        age: "",
-      },
-      spells: buildFoundrySpellSlots(character),
-      traits: buildTraitData(character),
-      resources: {
-        primary: { value: 0, max: 0, sr: false, lr: false, label: "" },
-        secondary: { value: 0, max: 0, sr: false, lr: false, label: "" },
-        tertiary: { value: 0, max: 0, sr: false, lr: false, label: "" },
-      },
-      favorites: [],
-    },
-    items: buildItems(character),
-    effects: [],
-    flags: {
-      "bertinis-vault": {
-        sourceProfile: character.meta.sourceProfile,
-        rulesVersion: character.meta.rulesVersion,
-        preflight: {
-          blockers: 0,
-          warnings: 0,
-          info: 0,
-          total: 0,
-        },
+  const actor = deepClone(blankTemplate) as Record<string, any>;
+
+  // Identity
+  actor.name = character.identity.characterName;
+  actor.prototypeToken.name = character.identity.characterName;
+
+  // Fill system fields into the cloned template
+  fillAbilities(actor, character);
+  fillSkills(actor, character);
+  fillTools(actor, character);
+  fillSpellSlots(actor, character);
+  fillAttributes(actor, character);
+  fillLanguages(actor, character);
+  fillProficiencies(actor, character);
+  fillDetails(actor, character);
+
+  // Items (these are built fresh and injected into the empty array)
+  actor.items = buildItems(character);
+
+  // Flags
+  actor.flags = {
+    "bertinis-vault": {
+      sourceProfile: character.meta.sourceProfile,
+      rulesVersion: character.meta.rulesVersion,
+      preflight: {
+        blockers: 0,
+        warnings: 0,
+        info: 0,
+        total: 0,
       },
     },
-    prototypeToken: makeToken(character.identity.characterName),
-    folder: null,
-    ownership: { default: 0 },
-    _stats: makeStats(),
   };
 
-  return foundryActorPayloadSchema.parse(payload);
+  return foundryActorPayloadSchema.parse(actor);
 }
 
 export function buildFoundryExportResult(character: CharacterBuild): FoundryExportResult {
@@ -1193,3 +839,4 @@ export function buildFoundryActorPayload(character: CharacterBuild): FoundryActo
 
   return result.payload;
 }
+
