@@ -3,7 +3,7 @@
   "label": "Warning-only validation case",
   "preflight": {
     "ok": true,
-    "generatedAt": "2026-04-02T03:48:43.996Z",
+    "generatedAt": "2026-04-03T08:11:04.808Z",
     "target": {
       "rulesVersion": "5e-2014",
       "sourceProfile": "vault-v1",
@@ -489,21 +489,21 @@
       },
       "attributes": {
         "ac": {
-          "calc": "flat",
-          "flat": 15
+          "calc": "default",
+          "flat": null
         },
         "hp": {
-          "value": 14,
-          "max": 14,
+          "max": null,
           "temp": null,
           "tempmax": 0,
+          "value": 14,
           "bonuses": {}
         },
         "spellcasting": "int",
         "init": {
           "ability": "",
           "roll": {
-            "min": null,
+            "min": 10,
             "max": null,
             "mode": 0
           },
@@ -566,11 +566,22 @@
         "race": "human",
         "background": "sage",
         "originalClass": "wizard",
+        "xp": {
+          "value": 0
+        },
         "trait": "Always writes everything down.",
         "appearance": "",
         "ideal": "Knowledge before fear.",
         "bond": "",
-        "flaw": ""
+        "flaw": "",
+        "eyes": "",
+        "height": "",
+        "faith": "",
+        "hair": "",
+        "weight": "",
+        "gender": "",
+        "skin": "",
+        "age": ""
       },
       "spells": {
         "spell1": {
@@ -601,10 +612,7 @@
           "value": 0
         },
         "pact": {
-          "value": 0,
-          "level": null,
-          "override": null,
-          "max": null
+          "value": 0
         }
       },
       "traits": {
@@ -680,7 +688,7 @@
     },
     "items": [
       {
-        "_id": "PLYBkbZc5HIUTeY1",
+        "_id": "jnoRu30sFio1ohKy",
         "name": "wizard",
         "type": "class",
         "img": "systems/dnd5e/icons/svg/items/class.svg",
@@ -740,7 +748,7 @@
         }
       },
       {
-        "_id": "HE2SzsMsSqRh9X5a",
+        "_id": "4LJnN1Dez876VxSx",
         "name": "Magic Initiate",
         "type": "feat",
         "img": "icons/svg/item-bag.svg",
@@ -798,7 +806,7 @@
         }
       },
       {
-        "_id": "fc7eTPcmVhkySQPf",
+        "_id": "UCTmlHX8inc8EkXe",
         "name": "Alert",
         "type": "feat",
         "img": "icons/svg/item-bag.svg",
@@ -856,7 +864,7 @@
         }
       },
       {
-        "_id": "j59Hxlvq50jQbWsw",
+        "_id": "zdcWawEYCviOZ075",
         "name": "Arcane Recovery",
         "type": "feat",
         "img": "icons/svg/item-bag.svg",
@@ -914,7 +922,7 @@
         }
       },
       {
-        "_id": "TdfwnXbO6gysp07O",
+        "_id": "dV0KX16FSDSBLzVQ",
         "name": "Fireball",
         "type": "spell",
         "img": "icons/svg/book.svg",
@@ -976,7 +984,6 @@
           },
           "method": "spell",
           "prepared": 1,
-          "sourceClass": "wizard",
           "activities": {
             "dnd5eactivity000": {
               "_id": "dnd5eactivity000",
@@ -1072,7 +1079,7 @@
         }
       },
       {
-        "_id": "Ua3lhohxJlRl0LhZ",
+        "_id": "qlJDsCKcDMAiLpJa",
         "name": "Shield",
         "type": "equipment",
         "img": "icons/svg/shield.svg",

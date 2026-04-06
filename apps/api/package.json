@@ -6,11 +6,11 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "dev": "node --watch src/index.js",
+    "dev": "corepack pnpm run build && node --watch dist/index.js",
     "build:deps": "corepack pnpm --filter @bertinis-vault/data-engine build",
     "build": "corepack pnpm run build:deps && tsc -p tsconfig.json",
     "typecheck": "corepack pnpm run build:deps && tsc -p tsconfig.json --noEmit",
-    "test": "node -e \"console.log('No tests yet for @bertinis-vault/api')\""
+    "test": "corepack pnpm run build && node --test ./test/*.test.mjs"
   },
   "dependencies": {
     "@bertinis-vault/data-engine": "workspace:*"

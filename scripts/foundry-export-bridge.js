@@ -179,10 +179,6 @@ function slugify(value) {
     .replace(/[\s/]+/g, '-');
 }
 
-function abilityMod(score) {
-  return Math.floor(((parseInt(score, 10) || 10) - 10) / 2);
-}
-
 function makeStats() {
   return {
     compendiumSource: null,
@@ -324,15 +320,56 @@ function buildAbilities(canonicalBuild) {
   const final = canonicalBuild?.abilities?.final || {};
   const primaryClassId = canonicalBuild?.classing?.classes?.[0]?.classId || '';
   const saveProfs = new Set(CLASS_SAVE_PROFS_BY_ID[primaryClassId] || []);
+  const makeAbility = (value, isSaveProficient) => ({
+    value: value || 10,
+    proficient: isSaveProficient ? 1 : 0,
+    max: null,
+    bonuses: { check: '', save: '' },
+    check: { roll: { min: null, max: null, mode: 0 } },
+    save: { roll: { min: null, max: null, mode: 0 } },
+  });
 
   return {
-    str: { value: final.str || 10, mod: abilityMod(final.str), proficient: saveProfs.has('str') ? 1 : 0, bonuses: { check: '', save: '' } },
-    dex: { value: final.dex || 10, mod: abilityMod(final.dex), proficient: saveProfs.has('dex') ? 1 : 0, bonuses: { check: '', save: '' } },
-    con: { value: final.con || 10, mod: abilityMod(final.con), proficient: saveProfs.has('con') ? 1 : 0, bonuses: { check: '', save: '' } },
-    int: { value: final.int || 10, mod: abilityMod(final.int), proficient: saveProfs.has('int') ? 1 : 0, bonuses: { check: '', save: '' } },
-    wis: { value: final.wis || 10, mod: abilityMod(final.wis), proficient: saveProfs.has('wis') ? 1 : 0, bonuses: { check: '', save: '' } },
-    cha: { value: final.cha || 10, mod: abilityMod(final.cha), proficient: saveProfs.has('cha') ? 1 : 0, bonuses: { check: '', save: '' } },
+    str: makeAbility(final.str, saveProfs.has('str')),
+    dex: makeAbility(final.dex, saveProfs.has('dex')),
+    con: makeAbility(final.con, saveProfs.has('con')),
+    int: makeAbility(final.int, saveProfs.has('int')),
+    wis: makeAbility(final.wis, saveProfs.has('wis')),
+    cha: makeAbility(final.cha, saveProfs.has('cha')),
   };
+}
+
+function buildSpellSlots(canonicalBuild) {
+  const slots = canonicalBuild?.derived?.spellcasting?.slots || {};
+  const normalized = {
+    spell1: { value: slots.spell1 || 0 },
+    spell2: { value: slots.spell2 || 0 },
+    spell3: { value: slots.spell3 || 0 },
+    spell4: { value: slots.spell4 || 0 },
+    spell5: { value: slots.spell5 || 0 },
+    spell6: { value: slots.spell6 || 0 },
+    spell7: { value: slots.spell7 || 0 },
+    spell8: { value: slots.spell8 || 0 },
+    spell9: { value: slots.spell9 || 0 },
+    pact: { value: 0, level: null, override: null, max: null },
+  };
+
+  const primaryClassId = canonicalBuild?.classing?.classes?.[0]?.classId || '';
+  if (getSpellProgression(primaryClassId) === 'pact') {
+    const pactSlotEntry = Object.entries(slots).find(([, value]) => (value || 0) > 0);
+    if (pactSlotEntry) {
+      const [slotKey, value] = pactSlotEntry;
+      const pactLevel = Number.parseInt(slotKey.replace('spell', ''), 10);
+      normalized.pact = {
+        value: value || 0,
+        level: Number.isNaN(pactLevel) ? null : pactLevel,
+        override: null,
+        max: null,
+      };
+    }
+  }
+
+  return normalized;
 }
 
 function makeSkill(ability) {
@@ -912,7 +949,7 @@ export function buildFoundryActorPreview(canonicalBuild) {
       skills: buildSkills(canonicalBuild),
       tools: buildTools(canonicalBuild),
       attributes: {
-        ac: { flat: canonicalBuild?.derived?.ac || 10 },
+        ac: { calc: 'flat', flat: canonicalBuild?.derived?.ac || 10 },
         init: { ability: '', roll: { min: null, max: null, mode: 0 }, bonus: '' },
         movement: { units: null, hover: false, ignoredDifficultTerrain: [] },
         attunement: { max: 3 },
@@ -970,7 +1007,7 @@ export function buildFoundryActorPreview(canonicalBuild) {
         skin: '',
         age: '',
       },
-      spells: canonicalBuild?.derived?.spellcasting?.slots || {},
+      spells: buildSpellSlots(canonicalBuild),
       traits: buildTraitData(canonicalBuild),
       resources: {
         primary: { value: 0, max: 0, sr: false, lr: false, label: '' },

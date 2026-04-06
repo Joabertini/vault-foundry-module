@@ -7,6 +7,12 @@ export type DerivedEquipmentEntry = {
   quantity: number;
 };
 
+export type DerivedSpellEntry = {
+  name: string;
+  level: number;
+  spellId?: string;
+};
+
 export function getNormalizedProficiencyLabels(
   character: CharacterBuild,
   kind: "skill" | "language" | "tool",
@@ -43,12 +49,13 @@ export function getProficiencyLabels(
   );
 }
 
-export function getSpellEntries(character: CharacterBuild) {
+export function getSpellEntries(character: CharacterBuild): DerivedSpellEntry[] {
   const normalizedSpells = character.choices.normalized?.spells ?? [];
   if (normalizedSpells.length) {
     return normalizedSpells.map((entry) => ({
       name: entry.label,
       level: entry.level,
+      ...(entry.spellId ? { spellId: entry.spellId } : {}),
     }));
   }
 

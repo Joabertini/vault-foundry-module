@@ -1,4 +1,19 @@
 import type { CharacterBuild, CharacterBuildInput } from "@bertinis-vault/contracts";
+import {
+  getArmorCatalogEntry,
+  getBackgroundCatalogEntry,
+  getFeatCatalogEntry,
+  getGearCatalogEntry,
+  getSpellCatalogEntry,
+  getSubclassCatalogEntry,
+  getWeaponCatalogEntry,
+  resolveArmorId,
+  resolveFeatId,
+  resolveGearId,
+  resolveSpellId,
+  resolveWeaponId,
+  slugifyId,
+} from "@bertinis-vault/data-engine";
 import { deriveCharacterBuild } from "@bertinis-vault/domain";
 
 export type BuilderState = {
@@ -7,7 +22,9 @@ export type BuilderState = {
   playerName: string;
   alignment: string;
   raceId: string;
+  subraceId: string;
   classId: string;
+  subclassId: string;
   backgroundId: string;
   featId: string;
   weaponId: string;
@@ -43,6 +60,148 @@ function uniqueEntries(values: string[]) {
   return Array.from(new Set(values.filter(Boolean)));
 }
 
+const skillNames = new Set([
+  "acrobatics",
+  "animal handling",
+  "arcana",
+  "athletics",
+  "deception",
+  "history",
+  "insight",
+  "intimidation",
+  "investigation",
+  "medicine",
+  "nature",
+  "perception",
+  "performance",
+  "persuasion",
+  "religion",
+  "sleight of hand",
+  "stealth",
+  "survival",
+]);
+
+function normalizeText(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s'()-]/g, "")
+    .replace(/\s+/g, " ");
+}
+
+function classifyProficiencyKind(entry: string) {
+  const normalized = normalizeText(entry);
+
+  if (skillNames.has(normalized)) {
+    return { kind: "skill" as const, id: undefined };
+  }
+
+  const gearEntry = getGearCatalogEntry(entry);
+  if (
+    gearEntry &&
+    /(tool|tools|kit|kit's|supplies|instrument|gaming set|vehicle)/i.test(gearEntry.label)
+  ) {
+    return { kind: "tool" as const, id: gearEntry.id };
+  }
+
+  if (/(tool|tools|kit|supplies|instrument|gaming set|vehicle)/i.test(entry)) {
+    return { kind: "tool" as const, id: gearEntry?.id ?? resolveGearId(entry) };
+  }
+
+  const weaponEntry = getWeaponCatalogEntry(entry);
+  if (weaponEntry) {
+    return { kind: "weapon" as const, id: weaponEntry.id };
+  }
+
+  const armorEntry = getArmorCatalogEntry(entry);
+  if (armorEntry) {
+    return { kind: "armor" as const, id: armorEntry.id };
+  }
+
+  return { kind: "other" as const, id: undefined };
+}
+
+function normalizeEquipmentEntry(entry: string) {
+  const weaponEntry = getWeaponCatalogEntry(entry);
+  if (weaponEntry) {
+    return {
+      itemId: weaponEntry.id,
+      label: weaponEntry.label,
+      quantity: 1,
+      category: "weapon" as const,
+    };
+  }
+
+  const armorEntry = getArmorCatalogEntry(entry);
+  if (armorEntry) {
+    return {
+      itemId: armorEntry.id,
+      label: armorEntry.label,
+      quantity: 1,
+      category: armorEntry.grantsShieldBonus ? ("shield" as const) : ("armor" as const),
+    };
+  }
+
+  const gearEntry = getGearCatalogEntry(entry);
+  if (gearEntry) {
+    return {
+      itemId: gearEntry.id,
+      label: gearEntry.label,
+      quantity: 1,
+      category: "gear" as const,
+    };
+  }
+
+  return {
+    itemId: resolveGearId(entry),
+    label: entry,
+    quantity: 1,
+    category: "other" as const,
+  };
+}
+
+function normalizeFeatureEntry(entry: string, state: BuilderState) {
+  const featEntry = getFeatCatalogEntry(entry);
+  if (featEntry) {
+    return {
+      featureId: featEntry.id,
+      label: featEntry.label,
+      source: "feat" as const,
+    };
+  }
+
+  const subclassEntry = state.subclassId ? getSubclassCatalogEntry(state.subclassId) : undefined;
+  const backgroundEntry = state.backgroundId ? getBackgroundCatalogEntry(state.backgroundId) : undefined;
+  const normalizedLabel = normalizeText(entry);
+
+  if (
+    subclassEntry &&
+    normalizedLabel.includes(normalizeText(subclassEntry.label.replace(/^The\s+/i, "")))
+  ) {
+    return {
+      featureId: `${subclassEntry.id}:${slugifyId(entry)}`,
+      label: entry,
+      source: "subclass" as const,
+    };
+  }
+
+  if (backgroundEntry && normalizedLabel.includes(normalizeText(backgroundEntry.label))) {
+    return {
+      featureId: `${backgroundEntry.id}:${slugifyId(entry)}`,
+      label: entry,
+      source: "background" as const,
+    };
+  }
+
+  return {
+    featureId: slugifyId(entry),
+    label: entry,
+    source: "class" as const,
+  };
+}
+
 export const builderDraftStorageKey = "bertinis-vault:web-builder:draft";
 
 export const initialState: BuilderState = {
@@ -51,7 +210,9 @@ export const initialState: BuilderState = {
   playerName: "Martin",
   alignment: "Neutral Bueno",
   raceId: "human",
+  subraceId: "",
   classId: "wizard",
+  subclassId: "school-of-evocation",
   backgroundId: "sage",
   featId: "magic-initiate",
   weaponId: "quarterstaff",
@@ -89,7 +250,9 @@ export function coerceBuilderState(value: unknown): BuilderState {
     playerName: typeof candidate.playerName === "string" ? candidate.playerName : initialState.playerName,
     alignment: typeof candidate.alignment === "string" ? candidate.alignment : initialState.alignment,
     raceId: typeof candidate.raceId === "string" ? candidate.raceId : initialState.raceId,
+    subraceId: typeof candidate.subraceId === "string" ? candidate.subraceId : initialState.subraceId,
     classId: typeof candidate.classId === "string" ? candidate.classId : initialState.classId,
+    subclassId: typeof candidate.subclassId === "string" ? candidate.subclassId : initialState.subclassId,
     backgroundId:
       typeof candidate.backgroundId === "string" ? candidate.backgroundId : initialState.backgroundId,
     featId: typeof candidate.featId === "string" ? candidate.featId : initialState.featId,
@@ -147,6 +310,8 @@ export function buildCanonicalSnapshot(state: BuilderState): CharacterBuild {
   const proficiencies = uniqueEntries(parseLineList(state.proficienciesText));
   const languageEntries = uniqueEntries(parseLineList(state.languagesText));
   const languages = languageEntries.map((entry) => `Language: ${entry}`);
+  const normalizedWeapon = normalizeEquipmentEntry(state.weaponId);
+  const normalizedArmor = normalizeEquipmentEntry(state.armorId);
   const spellEntries = [
     ...parseLineList(state.cantripsText).map((entry) => ({ label: entry, level: 0 })),
     ...leveledSpells.map((entry) => {
@@ -160,7 +325,20 @@ export function buildCanonicalSnapshot(state: BuilderState): CharacterBuild {
         level: Number.parseInt(match[1] ?? "1", 10),
       };
     }),
-  ];
+  ].map((entry) => {
+    const spellId = resolveSpellId(entry.label);
+    const catalogEntry = getSpellCatalogEntry(spellId);
+
+    return {
+      spellId,
+      label: catalogEntry?.label ?? entry.label,
+      level: entry.level,
+    };
+  });
+  const backgroundEntry = state.backgroundId ? getBackgroundCatalogEntry(state.backgroundId) : undefined;
+  const backgroundGrantedFeatIds = uniqueEntries(backgroundEntry?.grantedFeatIds ?? []);
+  const chosenFeatIds =
+    state.featId && !backgroundGrantedFeatIds.includes(state.featId) ? [state.featId] : [];
 
   const buildInput: CharacterBuildInput = {
     meta: {
@@ -183,18 +361,20 @@ export function buildCanonicalSnapshot(state: BuilderState): CharacterBuild {
     },
     ancestry: {
       raceId: state.raceId,
+      ...(state.subraceId ? { subraceId: state.subraceId } : {}),
     },
     classing: {
       classes: [
         {
           classId: state.classId,
+          ...(state.subclassId ? { subclassId: state.subclassId } : {}),
           level: state.level,
         },
       ],
     },
     background: {
       backgroundId: state.backgroundId,
-      grantedFeatIds: [state.featId],
+      grantedFeatIds: backgroundGrantedFeatIds,
     },
     abilities: {
       generationMethod: "manual",
@@ -216,31 +396,34 @@ export function buildCanonicalSnapshot(state: BuilderState): CharacterBuild {
       },
     },
     choices: {
-      feats: [state.featId],
+      feats: chosenFeatIds,
       proficiencies: [...proficiencies, ...languages],
       spells: [...cantrips, ...leveledSpells],
       equipment: [state.weaponId, state.armorId, ...extraEquipment],
       features,
-      normalized: {
-        feats: [state.featId],
-        proficiencies: [
-          ...proficiencies.map((entry) => ({ kind: "skill" as const, label: entry })),
-          ...languageEntries.map((entry) => ({ kind: "language" as const, label: entry })),
-        ],
+        normalized: {
+          feats: chosenFeatIds,
+          proficiencies: [
+            ...proficiencies.map((entry) => {
+              const classification = classifyProficiencyKind(entry);
+              return {
+                kind: classification.kind,
+                ...(classification.id ? { id: classification.id } : {}),
+                label: entry,
+              };
+            }),
+            ...languageEntries.map((entry) => ({
+              kind: "language" as const,
+              label: entry,
+            })),
+          ],
         spells: spellEntries,
         equipment: [
-          { itemId: state.weaponId, label: state.weaponId, quantity: 1, category: "weapon" as const },
-          { itemId: state.armorId, label: state.armorId, quantity: 1, category: "armor" as const },
-          ...extraEquipment.map((entry) => ({
-            label: entry,
-            quantity: 1,
-            category: "gear" as const,
-          })),
+            normalizedWeapon,
+            normalizedArmor,
+            ...extraEquipment.map((entry) => normalizeEquipmentEntry(entry)),
         ],
-        features: features.map((entry) => ({
-          label: entry,
-          source: "class" as const,
-        })),
+          features: features.map((entry) => normalizeFeatureEntry(entry, state)),
       },
     },
   };

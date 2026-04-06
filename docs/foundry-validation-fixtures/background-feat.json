@@ -3,7 +3,7 @@
   "label": "Background feat plus chosen feat",
   "preflight": {
     "ok": true,
-    "generatedAt": "2026-04-02T03:48:43.992Z",
+    "generatedAt": "2026-04-03T08:11:04.803Z",
     "target": {
       "rulesVersion": "5e-2014",
       "sourceProfile": "vault-v1",
@@ -449,21 +449,21 @@
       },
       "attributes": {
         "ac": {
-          "calc": "flat",
-          "flat": 15
+          "calc": "default",
+          "flat": null
         },
         "hp": {
-          "value": 14,
-          "max": 14,
+          "max": null,
           "temp": null,
           "tempmax": 0,
+          "value": 14,
           "bonuses": {}
         },
         "spellcasting": "int",
         "init": {
           "ability": "",
           "roll": {
-            "min": null,
+            "min": 10,
             "max": null,
             "mode": 0
           },
@@ -526,11 +526,22 @@
         "race": "human",
         "background": "wildspacer",
         "originalClass": "wizard",
+        "xp": {
+          "value": 0
+        },
         "trait": "Always writes everything down.",
         "appearance": "",
         "ideal": "Knowledge before fear.",
         "bond": "",
-        "flaw": ""
+        "flaw": "",
+        "eyes": "",
+        "height": "",
+        "faith": "",
+        "hair": "",
+        "weight": "",
+        "gender": "",
+        "skin": "",
+        "age": ""
       },
       "spells": {
         "spell1": {
@@ -561,10 +572,7 @@
           "value": 0
         },
         "pact": {
-          "value": 0,
-          "level": null,
-          "override": null,
-          "max": null
+          "value": 0
         }
       },
       "traits": {
@@ -639,7 +647,7 @@
     },
     "items": [
       {
-        "_id": "itUfrIAEyMSwaYPU",
+        "_id": "i1fie1f3c0wbUVuz",
         "name": "wizard",
         "type": "class",
         "img": "systems/dnd5e/icons/svg/items/class.svg",
@@ -699,7 +707,7 @@
         }
       },
       {
-        "_id": "mOA23SXQiVUV0HPb",
+        "_id": "Slp1zEA2kwGF6hGK",
         "name": "Tough",
         "type": "feat",
         "img": "icons/svg/item-bag.svg",
@@ -757,7 +765,7 @@
         }
       },
       {
-        "_id": "Bk5mgnBFqiLha4vd",
+        "_id": "5FUEADmJtpRT8X1a",
         "name": "Alert",
         "type": "feat",
         "img": "icons/svg/item-bag.svg",
@@ -815,7 +823,7 @@
         }
       },
       {
-        "_id": "V2CmgEuQm0MnY6IM",
+        "_id": "0gmU86Huq5Hd5KBi",
         "name": "Arcane Recovery",
         "type": "feat",
         "img": "icons/svg/item-bag.svg",
@@ -873,7 +881,7 @@
         }
       },
       {
-        "_id": "AW7i2f50k3oQCKOt",
+        "_id": "WRcX3moLM52cmiRj",
         "name": "Mage Hand",
         "type": "spell",
         "img": "icons/svg/book.svg",
@@ -934,7 +942,6 @@
           },
           "method": "spell",
           "prepared": 2,
-          "sourceClass": "wizard",
           "activities": {
             "dnd5eactivity000": {
               "_id": "dnd5eactivity000",
@@ -1030,7 +1037,7 @@
         }
       },
       {
-        "_id": "DkhxgDgf6oueYt00",
+        "_id": "UnqbDaXgI6pN04NP",
         "name": "Shield",
         "type": "spell",
         "img": "icons/svg/book.svg",
@@ -1091,7 +1098,6 @@
           },
           "method": "spell",
           "prepared": 1,
-          "sourceClass": "wizard",
           "activities": {
             "dnd5eactivity000": {
               "_id": "dnd5eactivity000",
@@ -1187,7 +1193,7 @@
         }
       },
       {
-        "_id": "4n0ZcLbcdvHDaOrB",
+        "_id": "ph97NmdHgAeMLyLV",
         "name": "quarterstaff",
         "type": "weapon",
         "img": "icons/svg/sword.svg",
@@ -1235,13 +1241,19 @@
           },
           "target": {
             "template": {
+              "count": "",
               "contiguous": false,
+              "type": "",
+              "size": "",
+              "width": "",
+              "height": "",
               "units": "ft"
             },
             "affects": {
               "count": "1",
               "type": "creature",
-              "choice": false
+              "choice": false,
+              "special": ""
             }
           },
           "range": {
@@ -1380,7 +1392,7 @@
         }
       },
       {
-        "_id": "G1Q6tk5xdVBZVZnj",
+        "_id": "KYQe6kJBLTq2lYdO",
         "name": "Mage Armor",
         "type": "equipment",
         "img": "icons/svg/shield.svg",
@@ -1446,7 +1458,7 @@
         }
       },
       {
-        "_id": "rBjwiWTQ22PIr8Sp",
+        "_id": "nFyhzPGreRhZuutp",
         "name": "Spellbook",
         "type": "loot",
         "img": "icons/svg/item-bag.svg",
@@ -1497,7 +1509,7 @@
         }
       },
       {
-        "_id": "kjMHcv4IMinpJgMC",
+        "_id": "Q1qFw2Iqhdcoie2K",
         "name": "Component Pouch",
         "type": "loot",
         "img": "icons/svg/item-bag.svg",

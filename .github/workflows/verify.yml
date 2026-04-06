@@ -32,6 +32,9 @@ jobs:
       - name: Verify Environment Scaffolding
         run: corepack pnpm verify:env
 
+      - name: Build Shared Packages
+        run: corepack pnpm -r --filter '!@bertinis-vault/web' --filter '!@bertinis-vault/api' build
+
       - name: Verify Web Surface
         run: corepack pnpm web:verify
 

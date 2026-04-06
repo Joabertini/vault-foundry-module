@@ -11,14 +11,28 @@ Responsabilidades previstas:
 
 Estado actual:
 
-- scaffold inicial del servicio listo;
+- servicio TypeScript compilable dentro del workspace;
 - endpoint `GET /health`;
-- endpoints semánticos de datasets (`/datasets/classes`, `/datasets/races`, `/datasets/backgrounds`, `/datasets/feats`, `/datasets/equipment`);
-- endpoint `GET /datasets/builder-options` usando catálogos compartidos del workspace;
-- cliente base preparado para la API externa de 5etools en Render;
-- proxy selectivo `GET /upstream/json?path=...` con caché en memoria.
+- endpoints semanticos de datasets:
+  - `/datasets/classes`
+  - `/datasets/races`
+  - `/datasets/backgrounds`
+  - `/datasets/feats`
+  - `/datasets/equipment`
+  - `/datasets/spells`
+  - `/datasets/builder-options`
+- proxy selectivo `GET /upstream/json?path=...` con cache en memoria;
+- servidor exportable via `createApiServer()` para pruebas e integraciones;
+- smoke tests reales para:
+  - health
+  - builder-options
+  - spells
+  - equipment
+  - rechazo de `upstreamPath` no permitido
+  - validacion de `/upstream/json`
+  - 404 consistente para rutas desconocidas
 
-Notas de integración:
+Notas de integracion:
 
 - `GET /datasets/classes?source=local|upstream|hybrid`
 - `GET /datasets/races?source=local|upstream|hybrid`
@@ -27,13 +41,20 @@ Notas de integración:
 - `GET /datasets/equipment?source=local|upstream|hybrid`
 - `GET /datasets/spells?source=local|upstream|hybrid`
 - `upstreamPath` es configurable por query string
-- variables soportadas: `BERTINIS_5E_UPSTREAM_CLASSES_PATH`, `BERTINIS_5E_UPSTREAM_RACES_PATH`, `BERTINIS_5E_UPSTREAM_BACKGROUNDS_PATH`, `BERTINIS_5E_UPSTREAM_FEATS_PATH`, `BERTINIS_5E_UPSTREAM_EQUIPMENT_PATH` y `BERTINIS_5E_UPSTREAM_SPELLS_PATH`
+- variables soportadas:
+  - `BERTINIS_5E_UPSTREAM_CLASSES_PATH`
+  - `BERTINIS_5E_UPSTREAM_RACES_PATH`
+  - `BERTINIS_5E_UPSTREAM_BACKGROUNDS_PATH`
+  - `BERTINIS_5E_UPSTREAM_FEATS_PATH`
+  - `BERTINIS_5E_UPSTREAM_EQUIPMENT_PATH`
+  - `BERTINIS_5E_UPSTREAM_SPELLS_PATH`
 
 `/datasets/equipment` devuelve `gear`, `armor` y `weapons`.
 
-Comandos útiles:
+Comandos utiles:
 
 ```bash
 corepack pnpm install
 corepack pnpm --filter @bertinis-vault/api dev
+corepack pnpm --filter @bertinis-vault/api test
 ```

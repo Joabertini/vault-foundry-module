@@ -849,7 +849,7 @@ function buildJSON(){
 }
 
 function upJP(){
-  const j=JSON.stringify(buildJSON(),null,2);
+  const j=JSON.stringify(buildFoundryActor(),null,2);
   document.getElementById('jp').textContent=j.slice(0,1200)+(j.length>1200?'\n  ...\n}':'');
 }
 

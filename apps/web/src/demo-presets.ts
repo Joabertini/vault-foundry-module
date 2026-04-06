@@ -10,7 +10,7 @@ type DemoPreset = {
 export const DEMO_PRESETS: DemoPreset[] = [
   {
     id: "wizard",
-    name: "Wizard académico",
+    name: "Wizard academico",
     subtitle: "Control y conocimiento",
     data: {
       characterName: "Aelthar Voss",
@@ -45,7 +45,7 @@ export const DEMO_PRESETS: DemoPreset[] = [
   {
     id: "rogue",
     name: "Rogue urbana",
-    subtitle: "Sigilo y precisión",
+    subtitle: "Sigilo y precision",
     data: {
       characterName: "Nyx Vale",
       playerName: "Demo",
@@ -79,7 +79,7 @@ export const DEMO_PRESETS: DemoPreset[] = [
   {
     id: "cleric",
     name: "Cleric de soporte",
-    subtitle: "Defensa y curación",
+    subtitle: "Defensa y curacion",
     data: {
       characterName: "Seren Hal",
       playerName: "Demo",

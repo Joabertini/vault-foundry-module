@@ -3,7 +3,7 @@
   "label": "Wizard spellbook",
   "preflight": {
     "ok": true,
-    "generatedAt": "2026-04-02T03:48:43.994Z",
+    "generatedAt": "2026-04-03T08:11:04.806Z",
     "target": {
       "rulesVersion": "5e-2014",
       "sourceProfile": "vault-v1",
@@ -449,21 +449,21 @@
       },
       "attributes": {
         "ac": {
-          "calc": "flat",
-          "flat": 14
+          "calc": "default",
+          "flat": null
         },
         "hp": {
-          "value": 32,
-          "max": 32,
+          "max": null,
           "temp": null,
           "tempmax": 0,
+          "value": 32,
           "bonuses": {}
         },
         "spellcasting": "int",
         "init": {
           "ability": "",
           "roll": {
-            "min": null,
+            "min": 10,
             "max": null,
             "mode": 0
           },
@@ -526,11 +526,22 @@
         "race": "human",
         "background": "sage",
         "originalClass": "wizard",
+        "xp": {
+          "value": 0
+        },
         "trait": "Always writes everything down.",
         "appearance": "",
         "ideal": "Knowledge before fear.",
         "bond": "",
-        "flaw": ""
+        "flaw": "",
+        "eyes": "",
+        "height": "",
+        "faith": "",
+        "hair": "",
+        "weight": "",
+        "gender": "",
+        "skin": "",
+        "age": ""
       },
       "spells": {
         "spell1": {
@@ -561,10 +572,7 @@
           "value": 0
         },
         "pact": {
-          "value": 0,
-          "level": null,
-          "override": null,
-          "max": null
+          "value": 0
         }
       },
       "traits": {
@@ -640,7 +648,7 @@
     },
     "items": [
       {
-        "_id": "XkAshMAvWUct2dfQ",
+        "_id": "yI25ycEltsgylIEC",
         "name": "wizard",
         "type": "class",
         "img": "systems/dnd5e/icons/svg/items/class.svg",
@@ -700,7 +708,7 @@
         }
       },
       {
-        "_id": "z7CTW303toWYO4fL",
+        "_id": "9n5EmYe3n3MpK3lK",
         "name": "Magic Initiate",
         "type": "feat",
         "img": "icons/svg/item-bag.svg",
@@ -758,7 +766,7 @@
         }
       },
       {
-        "_id": "Ghdikh3yzJrdky1Y",
+        "_id": "9OBnDaZFr41jD5qR",
         "name": "Alert",
         "type": "feat",
         "img": "icons/svg/item-bag.svg",
@@ -816,7 +824,7 @@
         }
       },
       {
-        "_id": "vrGOdNMb1eRT1jko",
+        "_id": "S1qafIwmqEAsmTtN",
         "name": "Arcane Recovery",
         "type": "feat",
         "img": "icons/svg/item-bag.svg",
@@ -874,7 +882,7 @@
         }
       },
       {
-        "_id": "Tm4vz44V2AuC2ZDc",
+        "_id": "d409v0gGgJ1shpJ2",
         "name": "Mage Hand",
         "type": "spell",
         "img": "icons/svg/book.svg",
@@ -935,7 +943,6 @@
           },
           "method": "spell",
           "prepared": 2,
-          "sourceClass": "wizard",
           "activities": {
             "dnd5eactivity000": {
               "_id": "dnd5eactivity000",
@@ -1031,7 +1038,7 @@
         }
       },
       {
-        "_id": "pfahN9Sjz2sWkjGW",
+        "_id": "t6cfeUbe41bvjMq7",
         "name": "Shield",
         "type": "spell",
         "img": "icons/svg/book.svg",
@@ -1092,7 +1099,6 @@
           },
           "method": "spell",
           "prepared": 1,
-          "sourceClass": "wizard",
           "activities": {
             "dnd5eactivity000": {
               "_id": "dnd5eactivity000",
@@ -1188,7 +1194,7 @@
         }
       },
       {
-        "_id": "jnBQdn1fSNDmAXG5",
+        "_id": "7Rud9M3O8hybBCx6",
         "name": "Fireball",
         "type": "spell",
         "img": "icons/svg/book.svg",
@@ -1250,7 +1256,6 @@
           },
           "method": "spell",
           "prepared": 1,
-          "sourceClass": "wizard",
           "activities": {
             "dnd5eactivity000": {
               "_id": "dnd5eactivity000",
@@ -1346,7 +1351,7 @@
         }
       },
       {
-        "_id": "aO1KaYLXmSNmDWxt",
+        "_id": "sstEXdqQEBBkDAIl",
         "name": "quarterstaff",
         "type": "weapon",
         "img": "icons/svg/sword.svg",
@@ -1394,13 +1399,19 @@
           },
           "target": {
             "template": {
+              "count": "",
               "contiguous": false,
+              "type": "",
+              "size": "",
+              "width": "",
+              "height": "",
               "units": "ft"
             },
             "affects": {
               "count": "1",
               "type": "creature",
-              "choice": false
+              "choice": false,
+              "special": ""
             }
           },
           "range": {
@@ -1539,7 +1550,7 @@
         }
       },
       {
-        "_id": "RR69ytPlLVq7CrYE",
+        "_id": "CcHWOlPab780DKMA",
         "name": "Spellbook",
         "type": "loot",
         "img": "icons/svg/item-bag.svg",
@@ -1590,7 +1601,7 @@
         }
       },
       {
-        "_id": "nT0T3VDlzqvXTxRq",
+        "_id": "KkGU89HB3Q92fj6I",
         "name": "Component Pouch",
         "type": "loot",
         "img": "icons/svg/item-bag.svg",

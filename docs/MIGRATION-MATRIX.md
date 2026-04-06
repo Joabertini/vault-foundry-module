@@ -12,8 +12,9 @@ This document tracks how the legacy Foundry module is being replaced by the shar
 
 1. The active Foundry workflow still starts in the legacy root module.
 2. The legacy form is transformed into a canonical `CharacterBuild` through [`scripts/model-bridge.js`](../scripts/model-bridge.js).
-3. A Foundry-like preview is derived from that canonical build through [`scripts/foundry-export-bridge.js`](../scripts/foundry-export-bridge.js).
-4. The actor is still finalized by the legacy builder in [`scripts/character-builder.js`](../scripts/character-builder.js), but it already reuses selected pieces from the canonical preview.
+3. The legacy runtime now centralizes derived values, canonical build creation, preflight, and actor payload assembly through [`scripts/foundry-pipeline.js`](../scripts/foundry-pipeline.js).
+4. A Foundry-like preview is still derived through [`scripts/foundry-export-bridge.js`](../scripts/foundry-export-bridge.js), but both active entrypoints now consume the same transitional pipeline.
+5. Final actor creation still happens inside the root Foundry module runtime, but the canonical export flow is no longer duplicated across multiple entrypoints.
 
 ## State by Area
 
@@ -25,8 +26,9 @@ This document tracks how the legacy Foundry module is being replaced by the shar
 | BFF datasets | `apps/api` | Shared | Web already consumes semantic dataset endpoints with local/upstream/hybrid modes. |
 | Web builder snapshot | `apps/web` -> `CharacterBuild` | Shared | Web builder already produces canonical snapshots and Foundry previews. |
 | Legacy form -> canonical build | `scripts/model-bridge.js` | Transitional | Temporary bridge until Foundry module consumes shared contracts directly. |
+| Legacy form -> canonical export pipeline | `scripts/foundry-pipeline.js` | Transitional | Single transitional path for derived stats, canonical build, preflight and actor create data inside the Foundry runtime. |
 | Canonical build -> Foundry preview in legacy module | `scripts/foundry-export-bridge.js` | Transitional | Temporary JS mirror of the shared exporter logic. |
-| Final actor assembly inside Foundry | `scripts/character-builder.js` | Legacy / transitional | Still the active runtime path. |
+| Final actor assembly inside Foundry | `scripts/vault-app.js` + `scripts/character-builder.js` | Transitional | Both entrypoints now reuse the same canonical export pipeline, but the runtime still lives in the legacy root module. |
 
 ## Fields Already Reused from Canonical Preview
 
@@ -69,6 +71,7 @@ The following areas still need deliberate migration work:
 These files should be treated as temporary mirrors that must converge over time:
 
 - [`scripts/model-bridge.js`](../scripts/model-bridge.js)
+- [`scripts/foundry-pipeline.js`](../scripts/foundry-pipeline.js)
 - [`scripts/foundry-export-bridge.js`](../scripts/foundry-export-bridge.js)
 - [`packages/foundry-exporter/src/index.ts`](../packages/foundry-exporter/src/index.ts)
 
@@ -77,7 +80,7 @@ Whenever a Foundry-facing rule changes, compare all three before assuming the mi
 ## Recommended Next Migration Moves
 
 1. Reduce duplication between `scripts/foundry-export-bridge.js` and `packages/foundry-exporter/src/index.ts`.
-2. Keep moving actor sections from `scripts/character-builder.js` to the shared exporter output.
+2. Keep replacing bridge internals with the shared exporter package until `scripts/foundry-pipeline.js` becomes a thin import adapter.
 3. Replace label-based free text in the bridges with canonical ids wherever possible.
 4. Move the active Foundry module runtime into `apps/foundry-module` only after the shared exporter is trusted by tests.
 
